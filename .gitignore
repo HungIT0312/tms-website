@@ -1,0 +1,27 @@
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Logs
+logs
+*.log
+
+# Runtime data such as databases
+*.sqlite
+*.sqlite3
+
+# Editor-specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
