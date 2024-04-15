@@ -1,0 +1,80 @@
+@mixin button-auth($bg, $txt) {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  margin: 0 8px;
+  color: $txt;
+  cursor: pointer;
+  background-color: $bg;
+}
+.welcome {
+  background: rgb(87, 67, 170);
+  background: linear-gradient(
+    45deg,
+    rgba(87, 67, 170, 1) 0%,
+    rgba(212, 75, 169, 1) 100%
+  );
+  height: calc(100vh - 60px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  position: relative;
+  padding-top: 60px;
+  &__wrap {
+    display: flex;
+    flex-direction: column;
+    margin-right: 64px;
+    margin-left: 230px;
+  }
+  &__button {
+    align-self: flex-end;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+  }
+  &__title {
+    font-size: 3rem;
+    font-weight: 500;
+    margin-bottom: 32px;
+  }
+  &__intro {
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 16px;
+  }
+  &__image {
+    margin-right: 136px;
+  }
+  &__nav {
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    background-color: #fff;
+    width: 100%;
+    &--item {
+      margin: 0 48px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    &--btn {
+      @include button-auth(#0065ff, #fff);
+    }
+    &--login {
+      @include button-auth(#fff, #000);
+    }
+  }
+}
+.sitename {
+  color: #000;
+  font-weight: 800;
+  font-size: 24px;
+  margin-left: 8px;
+}

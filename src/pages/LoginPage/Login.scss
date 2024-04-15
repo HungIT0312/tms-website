@@ -1,0 +1,51 @@
+.login-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 100vh;
+}
+.login {
+  &__banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  &__form {
+    align-self: flex-start;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 32px 40px;
+    margin-top: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 400px;
+  }
+  &__sitename {
+    font-weight: 700;
+    font-size: 24px;
+  }
+}
+.trello {
+  &_left {
+    width: 25vw !important;
+  }
+  &_right {
+    width: 25vw !important;
+  }
+}
+.login__input__form {
+  width: 100%;
+  margin-top: 16px;
+}
+.login-form-button {
+  width: 100%;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}

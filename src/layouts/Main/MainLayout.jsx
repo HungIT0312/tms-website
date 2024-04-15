@@ -1,4 +1,4 @@
-import './MainLayout.scss';
+import "./MainLayout.scss";
 const MainLayout = () => {
   return <div>Main</div>;
 };
