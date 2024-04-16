@@ -1,8 +1,10 @@
+const { verifyToken } = require("../Middlewares/auth");
 const userModel = require("../Models/userModel");
 const { createRandomHexColor } = require("./helperMethods");
+const auth = require("../Middlewares/auth");
 
 const register = async (user, callback) => {
-  const newUser = userModel({ ...user, color:createRandomHexColor()});
+  const newUser = userModel({ ...user, color: createRandomHexColor() });
   await newUser
     .save()
     .then((result) => {
@@ -18,6 +20,29 @@ const login = async (email, callback) => {
     let user = await userModel.findOne({ email });
     if (!user) return callback({ errMessage: "Your email/password is wrong!" });
     return callback(false, { ...user.toJSON() });
+  } catch (err) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: err.message,
+    });
+  }
+};
+
+const refreshToken = async (refreshToken, callback) => {
+  try {
+    const decoded = await verifyToken(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+    const user = await userModel.findById(decoded.userId);
+    if (!user) return callback({ errMessage: "User not found!" });
+
+    const { accessToken, ...newRefreshToken } = auth.generateToken(
+      user._id,
+      user.email
+    );
+
+    return callback(false, { accessToken, refreshToken: newRefreshToken });
   } catch (err) {
     return callback({
       errMessage: "Something went wrong",
@@ -60,4 +85,5 @@ module.exports = {
   login,
   getUser,
   getUserWithMail,
+  refreshToken,
 };

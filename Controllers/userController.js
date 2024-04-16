@@ -1,13 +1,13 @@
-const bcrypt = require('bcryptjs');
-const userService = require('../Services/userService');
-const auth = require('../Middlewares/auth');
+const bcrypt = require("bcryptjs");
+const userService = require("../Services/userService");
+const auth = require("../Middlewares/auth");
 
 const register = async (req, res) => {
   const { name, surname, email, password } = req.body;
   if (!(name && surname && email && password))
     return res
-      .status('400')
-      .send({ errMessage: 'Please fill all required areas!' });
+      .status("400")
+      .send({ errMessage: "Please fill all required areas!" });
 
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
@@ -24,7 +24,7 @@ const login = async (req, res) => {
   if (!(email && password))
     return res
       .status(400)
-      .send({ errMessage: 'Please fill all required areas!' });
+      .send({ errMessage: "Please fill all required areas!" });
 
   await userService.login(email, (err, result) => {
     if (err) return res.status(400).send(err);
@@ -33,15 +33,35 @@ const login = async (req, res) => {
     if (!bcrypt.compareSync(password, hashedPassword))
       return res
         .status(400)
-        .send({ errMessage: 'Your email/password is wrong!' });
+        .send({ errMessage: "Your email/password is wrong!" });
+    const { accessToken, refreshToken } = auth.generateToken(
+      result._id.toString(),
+      result.email
+    );
 
-    result.token = auth.generateToken(result._id.toString(), result.email);
-    result.password = undefined;
-    result.__v = undefined;
+    delete result.__v;
+    delete result.password;
+    return res.status(200).send({
+      message: "User login successful!",
+      user: result,
+      tokens: { accessToken, refreshToken },
+    });
+  });
+};
 
-    return res
-      .status(200)
-      .send({ message: 'User login successful!', user: result });
+const refreshToken = async (req, res) => {
+  // const { refreshToken } = req.body;
+  const refreshToken = req.headers.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("refreshToken="))
+    .split("=")[1];
+  console.log(refreshToken);
+  if (!refreshToken)
+    return res.status(400).send({ errMessage: "Refresh token is required!" });
+
+  await userService.refreshToken(refreshToken, (err, result) => {
+    if (err) return res.status(401).send(err);
+    return res.status(200).send(result);
   });
 };
 
@@ -52,6 +72,8 @@ const getUser = async (req, res) => {
 
     result.password = undefined;
     result.__v = undefined;
+    delete result._v;
+    delete result.password;
 
     return res.status(200).send(result);
   });
@@ -77,4 +99,5 @@ module.exports = {
   login,
   getUser,
   getUserWithMail,
+  refreshToken,
 };
