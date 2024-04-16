@@ -1,10 +1,16 @@
-import { Button, Checkbox, Form, Input } from "antd";
-import { Link } from "react-router-dom";
-import "./Login.scss";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Button, Form, Input } from "antd";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { signInUserByEmailPass } from "../../stores/user/userThunk";
+import "./Login.scss";
+
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const onFinish = (values) => {
-    console.log("Success:", values);
+    dispatch(signInUserByEmailPass(values));
+    navigate("/");
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
@@ -21,17 +27,21 @@ const Login = () => {
       onFinishFailed={onFinishFailed}
     >
       <Form.Item
-        name="username"
+        name="email"
         rules={[
           {
+            type: "email",
+            message: "The input is not valid E-mail!",
+          },
+          {
             required: true,
-            message: "Please input your Username!",
+            message: "Please input your E-mail!",
           },
         ]}
       >
         <Input
           prefix={<UserOutlined className="site-form-item-icon" />}
-          placeholder="Username"
+          placeholder="Email"
           size="large"
         />
       </Form.Item>
@@ -51,11 +61,11 @@ const Login = () => {
           placeholder="Password"
         />
       </Form.Item>
-      <Form.Item>
+      {/* <Form.Item>
         <Form.Item name="remember" valuePropName="checked" noStyle>
           <Checkbox>Remember me</Checkbox>
         </Form.Item>
-      </Form.Item>
+      </Form.Item> */}
 
       <Form.Item>
         <Button type="primary" htmlType="submit" className="login-form-button">

@@ -1,17 +1,16 @@
 import { Image } from "antd";
 import { Outlet, useLocation } from "react-router-dom";
 import { logo, trelloLeft, trelloRight } from "../../constants/images";
+import changeTitle, { capitalizeFirstLetter } from "../../helpers/changeTitle";
 
 const AuthLayout = () => {
   const getCurrentPathName = (pathname) => {
     const pathParts = pathname.split("/");
     const lastPart = pathParts[pathParts.length - 1];
-    const capitalizedString =
-      lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
-    return capitalizedString;
+    return capitalizeFirstLetter(lastPart);
   };
   const { pathname } = useLocation();
-
+  changeTitle(pathname);
   return (
     <div className="login-container">
       <div>

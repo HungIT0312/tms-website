@@ -1,4 +1,4 @@
-const getCookie = (name) => {
+export const getCookie = (name) => {
   const cookies = document.cookie.split(";");
   for (let i = 0; i < cookies.length; i++) {
     const cookie = cookies[i].trim();
@@ -9,7 +9,9 @@ const getCookie = (name) => {
   return null;
 };
 
-const getTokenFromStorage = () => {
-  return getCookie("token");
+export const getTokenFromStorage = () => {
+  return getCookie("accessToken");
 };
-export default getTokenFromStorage;
+export const getRefreshTokenFromStorage = () => {
+  return getCookie("refreshToken");
+};

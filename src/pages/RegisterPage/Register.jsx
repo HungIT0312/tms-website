@@ -1,11 +1,24 @@
-import { Button, Divider, Form, Input } from "antd";
+import { Button, Divider, Form, Input, message as msg } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 import "./Register.scss";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signUpUser } from "../../stores/user/userThunk";
 const Register = () => {
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, message, error } = useSelector((state) => state.user);
   const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+    dispatch(signUpUser(values));
+    if (!loading && !error) {
+      msg.success(message);
+      navigate("/auth/login");
+    }
+    if (!loading && error) {
+      msg.error(message);
+    }
   };
+
   return (
     <Form
       form={form}
@@ -31,7 +44,32 @@ const Register = () => {
       >
         <Input size="large" />
       </Form.Item>
-
+      <Form.Item
+        name="name"
+        label="Name"
+        rules={[
+          {
+            required: true,
+            message: "Please input your name!",
+            whitespace: true,
+          },
+        ]}
+      >
+        <Input size="large" />
+      </Form.Item>
+      <Form.Item
+        name="surname"
+        label="Surname"
+        rules={[
+          {
+            required: true,
+            message: "Please input your surname!",
+            whitespace: true,
+          },
+        ]}
+      >
+        <Input size="large" />
+      </Form.Item>
       <Form.Item
         name="password"
         label="Password"
@@ -69,21 +107,6 @@ const Register = () => {
         ]}
       >
         <Input.Password size="large" />
-      </Form.Item>
-
-      <Form.Item
-        name="nickname"
-        label="Nickname"
-        tooltip="What do you want others to call you?"
-        rules={[
-          {
-            required: true,
-            message: "Please input your nickname!",
-            whitespace: true,
-          },
-        ]}
-      >
-        <Input size="large" />
       </Form.Item>
 
       <Form.Item>
