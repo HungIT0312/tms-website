@@ -1,6 +1,7 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
-import { useDispatch } from "react-redux";
+import { Button, Form, Input, notification } from "antd";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { signInUserByEmailPass } from "../../stores/user/userThunk";
 import "./Login.scss";
@@ -8,9 +9,23 @@ import "./Login.scss";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const onFinish = (values) => {
-    dispatch(signInUserByEmailPass(values));
-    navigate("/");
+  const user = useSelector((state) => state.user);
+  const [api, contextHolder] = notification.useNotification();
+  useEffect(() => {
+    if (user.isLogin) {
+      navigate("/");
+    }
+  }, [navigate, user.isLogin]);
+  const onFinish = async (values) => {
+    await dispatch(signInUserByEmailPass(values)).then(() => {
+      if (user.error) {
+        api.error({
+          message: `Login error !`,
+          description: user.message,
+          placement: "topRight",
+        });
+      }
+    });
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
@@ -26,6 +41,7 @@ const Login = () => {
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
     >
+      {contextHolder}
       <Form.Item
         name="email"
         rules={[

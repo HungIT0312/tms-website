@@ -1,0 +1,57 @@
+.header {
+  height: 48px;
+  border-bottom: 1px #ccc solid;
+  background-color: #fff;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  .header__logo {
+    margin-left: 24px;
+    cursor: pointer;
+
+    &--name {
+      font-weight: 700;
+      font-size: 24px;
+      margin-left: 8px;
+      color: #455570;
+    }
+  }
+  &__right {
+    margin-right: 24px;
+    display: flex;
+    align-items: center;
+  }
+  &__search {
+    // margin-right: 16px;
+  }
+  &__avatar {
+    font-size: 16px;
+    padding: 4px;
+    border-radius: 50%;
+    &:hover {
+      cursor: pointer;
+      background-color: #cccccc70;
+    }
+  }
+  &__mail {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 8px;
+    padding: 8px;
+    border-radius: 50%;
+    color: #5e6c83;
+    &:hover {
+      cursor: pointer;
+      background-color: #cccccc70;
+    }
+  }
+  &__popup {
+    width: fit-content;
+    border-radius: 8px;
+    position: absolute;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    top: 48px;
+    right: 8px;
+  }
+}

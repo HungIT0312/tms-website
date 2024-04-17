@@ -1,9 +1,12 @@
 import { Button, Image } from "antd";
 import { logo, welcome } from "../../constants/images";
 import "./Welcome.scss";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import changeTitle from "../../helpers/changeTitle";
 const Welcome = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  changeTitle(pathname);
   return (
     <div className="welcome">
       <div className="welcome__nav">

@@ -1,20 +1,13 @@
-@mixin button-auth($bg, $txt) {
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 16px;
-  margin: 0 8px;
-  color: $txt;
-  cursor: pointer;
-  background-color: $bg;
-}
+@import "../../assets/scss/variable";
 .welcome {
-  background: rgb(87, 67, 170);
+  background: rgb(37, 56, 88);
   background: linear-gradient(
-    45deg,
-    rgba(87, 67, 170, 1) 0%,
-    rgba(212, 75, 169, 1) 100%
+    175deg,
+    rgba(37, 56, 88, 1) 0%,
+    rgba(25, 60, 114, 1) 41%,
+    rgba(22, 61, 120, 1) 45%,
+    rgba(20, 61, 123, 1) 56%,
+    rgba(7, 65, 151, 1) 100%
   );
   height: calc(100vh - 60px);
   display: flex;
@@ -65,10 +58,24 @@
       align-items: center;
     }
     &--btn {
-      @include button-auth(#0065ff, #fff);
+      cursor: pointer;
+      padding: 8px 16px;
+      margin: 0px 8px;
     }
     &--login {
-      @include button-auth(#fff, #000);
+      color: $primary-color;
+      &:hover {
+        font-weight: 500;
+      }
+    }
+    &--signup {
+      color: $primary-color;
+      border-radius: 4px;
+      border: 1px solid $primary-color;
+      font-weight: 500;
+      &:hover {
+        background-color: #eeeeeecd;
+      }
     }
   }
 }
