@@ -6,9 +6,13 @@ import ProfilePopup from "../Popup/Profile/ProfilePopup";
 import { useEffect, useRef, useState } from "react";
 import ProfileModal from "../Modal/Profile/ProfileModal";
 import { useSelector } from "react-redux";
+import InvitationPopup from "../Popup/Ivitation/InvitationPopup";
 export const Header = () => {
   const [isPopup, setIsPopup] = useState(false);
+  const [isInvitationPop, setIsInvitationPop] = useState(false);
   const popupRef = useRef(null);
+  const invitationRef = useRef(null);
+
   const [open, setOpen] = useState(false);
   const { userInformation } = useSelector((state) => state.user);
 
@@ -19,6 +23,12 @@ export const Header = () => {
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
         setIsPopup(false);
+      }
+      if (
+        invitationRef.current &&
+        !invitationRef.current.contains(event.target)
+      ) {
+        setIsInvitationPop(false);
       }
     };
 
@@ -45,7 +55,10 @@ export const Header = () => {
           prefix={<SearchOutlined />}
           className="header__search"
         />
-        <span className="header__mail">
+        <span
+          className="header__mail"
+          onClick={() => setIsInvitationPop(!isInvitationPop)}
+        >
           <Badge size="small" count={5}>
             <MailOutlined
               style={{
@@ -63,6 +76,14 @@ export const Header = () => {
         {isPopup && (
           <div className="header__popup" ref={popupRef}>
             <ProfilePopup showModal={showModal} />
+          </div>
+        )}
+        {isInvitationPop && (
+          <div
+            className="header__popup header__popup--mail"
+            ref={invitationRef}
+          >
+            <InvitationPopup showModal={showModal} />
           </div>
         )}
         <ProfileModal isOpen={open} callback={setOpen} />

@@ -5,6 +5,7 @@
   position: fixed;
   top: 0;
   width: 100%;
+  z-index: 99;
   .header__logo {
     margin-left: 24px;
     cursor: pointer;
@@ -53,5 +54,9 @@
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     top: 48px;
     right: 8px;
+    // &--mail {
+    //   height: 600px;
+    //   overflow-y: auto;
+    // }
   }
 }

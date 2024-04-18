@@ -1,0 +1,8 @@
+.workspace {
+  padding: 80px 24px 0px 24px;
+  width: calc(100% - 48px);
+  height: calc(100vh - 80px);
+  &__content {
+    margin-top: 48px;
+  }
+}

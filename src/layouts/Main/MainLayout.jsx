@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import "./MainLayout.scss";
 import changeTitle from "../../helpers/changeTitle";
 import Header from "../../components/Header";
@@ -22,7 +22,7 @@ const MainLayout = () => {
   return (
     <div className="main-layout">
       <Header />
-      <main>body</main>
+      <Outlet />
     </div>
   );
 };

@@ -1,0 +1,22 @@
+.BoardPreview {
+  &__cover {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 42px 16px 16px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    &:hover {
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+  }
+  &__title {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #fff;
+  }
+}

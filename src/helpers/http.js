@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getNewAccessToken } from "../api/user/user.api";
 import { getTokenFromStorage } from "./getTokenFromStorage";
-import { setAccessToken } from "./setToken";
+import { setAccessToken, setRefreshToken } from "./setToken";
+import { redirect } from "react-router-dom";
 const apiUrl = import.meta.env.VITE_API_KEY;
 
 class Http {
@@ -14,36 +15,29 @@ class Http {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      withCredentials: true,
     });
     this.instance.interceptors.response.use(
       (response) => {
         return response.data;
       },
-      ({ response }) => {
-        if (response.status === 400) {
-          return Promise.reject(response.data);
-        }
-        const result = { ...response.data, status: response.status };
-        return Promise.reject(result);
-      },
       async (error) => {
         const originalRequest = error.config;
-        console.log(originalRequest);
         if (error.response.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-
           try {
-            const newAccessToken = await this.getNewAccessToken();
-            if (newAccessToken) {
-              setAccessToken(newAccessToken); // Lưu accessToken mới vào storage
-              originalRequest.headers[
-                "Authorization"
-              ] = `Bearer ${newAccessToken}`;
-              return axios(originalRequest);
-            }
-          } catch (refreshError) {
-            // Xử lý lỗi khi lấy accessToken mới không thành công
-            return Promise.reject(refreshError);
+            const { accessToken, refreshToken } =
+              await this.getNewAccessToken();
+            setAccessToken(accessToken);
+            setRefreshToken(refreshToken);
+            // Lưu refreshToken mới vào cookie
+            originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+            return this.retryRequest(originalRequest);
+            // return axios(originalRequest);
+          } catch (error) {
+            // Xử lý lỗi khi không thể lấy được tokens mới
+            redirect("/auth/login");
+            return Promise.reject(error);
           }
         }
         return Promise.reject(error);
@@ -65,18 +59,20 @@ class Http {
         return Promise.reject(error);
       }
     );
-    // this.instance.interceptors.response.use(
-    //   (response) => {
-    //     return response.data;
-    //   }
-    // );
   }
-  async getNewAccessToken(refreshToken) {
+  async getNewAccessToken() {
     try {
-      const response = await getNewAccessToken(refreshToken);
-      return response.data.accessToken;
+      const response = await getNewAccessToken();
+      return response;
     } catch (error) {
-      return null;
+      return Promise.reject(error);
+    }
+  }
+  async retryRequest(originalRequest) {
+    try {
+      return await this.instance(originalRequest);
+    } catch (error) {
+      return Promise.reject(error);
     }
   }
   get(url, config = null) {

@@ -1,0 +1,16 @@
+.invitation {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+  margin: 8px 0;
+
+  &__text {
+    font-size: 14px;
+  }
+  &__date {
+    font-size: 14px;
+  }
+  &__action {
+    font-size: 20px;
+    cursor: pointer;
+  }
+}

@@ -3,8 +3,10 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import userSlice from "./user/userSlice";
+import boardSlice from "./board/boardSlice";
 const rootReducer = combineReducers({
   user: userSlice,
+  board: boardSlice,
   // Thêm các reducer từ các slice khác vào đây
 });
 const persistConfig = {
@@ -22,4 +24,3 @@ const store = configureStore({
 const persistor = persistStore(store);
 
 export { store, persistor };
-

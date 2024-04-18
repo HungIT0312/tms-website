@@ -1,0 +1,21 @@
+.invitation {
+  &_popup {
+    padding: 24px;
+    min-width: 300px;
+    background-color: #fff;
+  }
+  &__content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 400px;
+    min-height: 64px;
+    padding: 12px 0;
+  }
+  &__title {
+    margin: 8px 0px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}

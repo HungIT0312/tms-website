@@ -1,7 +1,6 @@
-import { Button, Form, Input, Modal } from "antd";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Form, Input, Modal } from "antd";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 
 // eslint-disable-next-line react/prop-types
 const ProfileModal = ({ isOpen, callback }) => {

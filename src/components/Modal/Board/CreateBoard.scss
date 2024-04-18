@@ -1,0 +1,35 @@
+.create-board {
+  &__preview {
+    width: 200px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: aliceblue;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+  .bg-image {
+    cursor: pointer;
+    position: relative;
+    &--checked {
+      position: absolute;
+      width: 64px;
+      height: 40px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: #fdf5f5;
+      //center img by position
+    }
+  }
+  label {
+    font-weight: 500;
+  }
+}
+.bg-image--active > .bg-image--checked {
+  display: flex;
+}
