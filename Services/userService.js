@@ -2,7 +2,8 @@ const { verifyToken } = require("../Middlewares/auth");
 const userModel = require("../Models/userModel");
 const { createRandomHexColor } = require("./helperMethods");
 const auth = require("../Middlewares/auth");
-
+const { decode } = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const register = async (user, callback) => {
   const newUser = userModel({ ...user, color: createRandomHexColor() });
   await newUser
@@ -27,14 +28,24 @@ const login = async (email, callback) => {
     });
   }
 };
-
+const verifyToken1 = (token, secret) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
+};
 const refreshToken = async (refreshToken, callback) => {
   try {
-    const decoded = await verifyToken(
+    const decoded = await verifyToken1(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
-    const user = await userModel.findById(decoded.userId);
+    const user = await userModel.findById(decoded.id);
     if (!user) return callback({ errMessage: "User not found!" });
 
     const { accessToken, ...newRefreshToken } = auth.generateToken(
@@ -42,7 +53,7 @@ const refreshToken = async (refreshToken, callback) => {
       user.email
     );
 
-    return callback(false, { accessToken, refreshToken: newRefreshToken });
+    return callback(false, { accessToken, ...newRefreshToken });
   } catch (err) {
     return callback({
       errMessage: "Something went wrong",
@@ -87,3 +98,10 @@ module.exports = {
   getUserWithMail,
   refreshToken,
 };
+
+// "errMessage": "Authorization token invalid",
+// "details": {
+//     "name": "TokenExpiredError",
+//     "message": "jwt expired",
+//     "expiredAt": "2024-04-18T10:22:11.000Z"
+// }

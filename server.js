@@ -12,9 +12,14 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 // AUTH VERIFICATION AND UNLESS
 
 auth.verifyToken.unless = unless;
@@ -24,6 +29,7 @@ app.use(
     path: [
       { url: "/user/login", method: ["POST"] },
       { url: "/user/register", method: ["POST"] },
+      { url: "/user/refresh-token", method: ["POST"] },
     ],
   })
 );

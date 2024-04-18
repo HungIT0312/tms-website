@@ -50,17 +50,19 @@ const login = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  // const { refreshToken } = req.body;
+  // console.log(req.headers);
   const refreshToken = req.headers.cookie
     .split("; ")
     .find((cookie) => cookie.startsWith("refreshToken="))
     .split("=")[1];
-  console.log(refreshToken);
-  if (!refreshToken)
+  if (!refreshToken) {
     return res.status(400).send({ errMessage: "Refresh token is required!" });
+  }
 
   await userService.refreshToken(refreshToken, (err, result) => {
-    if (err) return res.status(401).send(err);
+    if (err) {
+      return res.status(401).send(err);
+    }
     return res.status(200).send(result);
   });
 };
@@ -74,7 +76,6 @@ const getUser = async (req, res) => {
     result.__v = undefined;
     delete result._v;
     delete result.password;
-
     return res.status(200).send(result);
   });
 };

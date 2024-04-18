@@ -14,12 +14,12 @@ const generateToken = (id, email) => {
 
 const verifyToken = async (req, res, next) => {
   try {
-    if (!req.headers["authorization"])
+    if (!req.headers.authorization) {
       return res
         .status(401)
         .send({ errMessage: "Authorization token not found!" });
-
-    const header = req.headers["authorization"];
+    }
+    const header = req.headers.authorization;
     const token = header.split(" ")[1];
 
     await jwt.verify(
@@ -37,7 +37,7 @@ const verifyToken = async (req, res, next) => {
     );
   } catch (error) {
     return res.status(500).send({
-      errMesage: "Internal server error occured!",
+      errMessage: "Internal server error occured!",
       details: error.message,
     });
   }
