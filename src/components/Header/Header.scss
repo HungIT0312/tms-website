@@ -11,7 +11,7 @@
     cursor: pointer;
 
     &--name {
-      font-weight: 700;
+      font-weight: 500;
       font-size: 24px;
       margin-left: 8px;
       color: #455570;
@@ -22,9 +22,7 @@
     display: flex;
     align-items: center;
   }
-  &__search {
-    // margin-right: 16px;
-  }
+
   &__avatar {
     font-size: 16px;
     padding: 4px;

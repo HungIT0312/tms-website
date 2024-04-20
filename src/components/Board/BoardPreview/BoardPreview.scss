@@ -4,19 +4,59 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 42px 16px 16px 16px;
+    padding: 16px;
     cursor: pointer;
-    border-radius: 4px;
-    &:hover {
-      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 16px;
+    aspect-ratio: 3/2;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    position: relative;
+    .image {
+      width: 100%;
+      height: auto;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    &:hover::before {
+      opacity: 1;
+    }
+    &:hover .BoardPreview__button-detail {
+      bottom: 50%;
+      opacity: 1;
     }
   }
+
   &__title {
-    position: absolute;
-    top: 8px;
-    left: 16px;
-    font-size: 18px;
+    font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+    font-size: 16px;
     font-weight: 500;
-    color: #fff;
+    color: rgb(41, 41, 41);
+    margin-top: 8px;
+  }
+  &__button-detail {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    color: #333;
+    padding: 10px 20px;
+    transition: bottom 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 16px;
   }
 }

@@ -36,7 +36,7 @@ const routes = createBrowserRouter([
       },
 
       {
-        path: "board/:boardId",
+        path: "board/:boardId/:boardTitle",
       },
     ],
   },

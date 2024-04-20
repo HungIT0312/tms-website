@@ -1,12 +1,12 @@
-import { MailOutlined, SearchOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Flex, Image, Input } from "antd";
-import { logo } from "../../constants/images";
-import "./Header.scss";
-import ProfilePopup from "../Popup/Profile/ProfilePopup";
+import { MailFilled } from "@ant-design/icons";
+import { Avatar, Badge, Flex, Image } from "antd";
 import { useEffect, useRef, useState } from "react";
-import ProfileModal from "../Modal/Profile/ProfileModal";
 import { useSelector } from "react-redux";
+import { logo } from "../../constants/images";
+import ProfileModal from "../Modal/Profile/ProfileModal";
 import InvitationPopup from "../Popup/Ivitation/InvitationPopup";
+import ProfilePopup from "../Popup/Profile/ProfilePopup";
+import "./Header.scss";
 export const Header = () => {
   const [isPopup, setIsPopup] = useState(false);
   const [isInvitationPop, setIsInvitationPop] = useState(false);
@@ -46,23 +46,19 @@ export const Header = () => {
           preview={false}
           width={32}
         />
-        <span className="header__logo--name">Tms</span>
+        <span className="header__logo--name">TMS</span>
       </Flex>
       <div className="header__right">
-        <Input
-          size="middle"
-          placeholder="Search"
-          prefix={<SearchOutlined />}
-          className="header__search"
-        />
+        
         <span
           className="header__mail"
           onClick={() => setIsInvitationPop(!isInvitationPop)}
         >
           <Badge size="small" count={5}>
-            <MailOutlined
+            <MailFilled
               style={{
                 fontSize: 20,
+                color: "#44546f",
               }}
             />
           </Badge>

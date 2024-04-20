@@ -6,6 +6,9 @@ export const createBoard = (boardData) => {
 export const getAllBoards = () => {
   return http.get("/board");
 };
+export const getBoardById = (boardId) => {
+  return http.get(`/board/${boardId}`);
+};
 // route.post("/:boardId/add-member", boardController.addMember);
 // route.put("/:boardId/update-background", boardController.updateBackground);
 // route.put(

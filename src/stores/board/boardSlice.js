@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createNewBoard, getAllUserBoard } from "./boardThunk";
+import { createNewBoard, getAllUserBoard, getBoard } from "./boardThunk";
 
 const initialState = {
   isLoading: false,
   error: false,
   message: null,
   boards: [],
+  selectedBoard: {},
 };
 
 const boardSlice = createSlice({
@@ -14,6 +15,8 @@ const boardSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // state.message = action.payload.boards;
+
       .addCase(createNewBoard.pending, (state) => {
         state.isLoading = true;
         state.error = false;
@@ -22,13 +25,14 @@ const boardSlice = createSlice({
       .addCase(createNewBoard.fulfilled, (state, action) => {
         state.isLoading = false;
         state.boards.push(action.payload);
-        // state.message = action.payload.boards;
       })
       .addCase(createNewBoard.rejected, (state, action) => {
         state.isLoading = false;
         state.message = action.payload.errMessage;
         state.error = true;
       })
+      // GET BOARDS
+
       .addCase(getAllUserBoard.pending, (state) => {
         state.isLoading = true;
         state.error = false;
@@ -39,6 +43,23 @@ const boardSlice = createSlice({
         state.boards = action.payload;
       })
       .addCase(getAllUserBoard.rejected, (state, action) => {
+        state.isLoading = false;
+        state.message = action.payload.errMessage;
+        state.error = true;
+      })
+
+      // GET BOARD  BY ID
+
+      .addCase(getBoard.pending, (state) => {
+        state.isLoading = true;
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(getBoard.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.selectedBoard = action.payload;
+      })
+      .addCase(getBoard.rejected, (state, action) => {
         state.isLoading = false;
         state.message = action.payload.errMessage;
         state.error = true;

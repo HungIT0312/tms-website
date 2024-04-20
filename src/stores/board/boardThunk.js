@@ -1,5 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createBoard, getAllBoards } from "../../api/board/board.api";
+import {
+  createBoard,
+  getAllBoards,
+  getBoardById,
+} from "../../api/board/board.api";
 
 export const createNewBoard = createAsyncThunk(
   "board/createNewBoard",
@@ -17,6 +21,17 @@ export const getAllUserBoard = createAsyncThunk(
   async (user, thunkApi) => {
     try {
       const response = await getAllBoards();
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const getBoard = createAsyncThunk(
+  "board/getBoard",
+  async (id, thunkApi) => {
+    try {
+      const response = await getBoardById(id);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);
