@@ -36,6 +36,10 @@ const userSchema = mongoose.Schema({
       ref: "invitation",
     },
   ],
+  _destroy: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("user", userSchema);

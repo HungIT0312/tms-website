@@ -6,11 +6,11 @@ const invitationSchema = mongoose.Schema({
     ref: "user",
     required: true,
   },
-//   invited: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "user",
-//     required: true,
-//   },
+  invited: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
   status: {
     type: String,
     enum: ["pending", "accepted", "rejected"],
@@ -23,11 +23,7 @@ const invitationSchema = mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now,
-    required: true,
-  },
-  updatedAt: {
-    type: Date,
+    default: Date.now(),
   },
 });
 

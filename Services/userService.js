@@ -1,8 +1,6 @@
-const { verifyToken } = require("../Middlewares/auth");
 const userModel = require("../Models/userModel");
 const { createRandomHexColor } = require("./helperMethods");
 const auth = require("../Middlewares/auth");
-const { decode } = require("jsonwebtoken");
 const jwt = require("jsonwebtoken");
 const register = async (user, callback) => {
   const newUser = userModel({ ...user, color: createRandomHexColor() });
@@ -90,13 +88,48 @@ const getUserWithMail = async (email, callback) => {
     });
   }
 };
+const getAllUsersByIds = async (userIds, callback) => {
+  try {
+    const users = await userModel.find({ _id: { $in: userIds } });
+    return callback(
+      false,
+      users.map((user) => ({ ...user.toJSON() }))
+    );
+  } catch (error) {
+    return callback({
+      errMessage: "Something went wrong while getting users",
+      details: error.message,
+    });
+  }
+};
 
+const searchUsers = async (query, callback) => {
+  try {
+    const users = await userModel.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+      ],
+    });
+    return callback(
+      false,
+      users.map((user) => ({ ...user.toJSON() }))
+    );
+  } catch (error) {
+    return callback({
+      errMessage: "Something went wrong while searching users",
+      details: error.message,
+    });
+  }
+};
 module.exports = {
   register,
   login,
   getUser,
   getUserWithMail,
   refreshToken,
+  getAllUsersByIds,
+  searchUsers,
 };
 
 // "errMessage": "Authorization token invalid",

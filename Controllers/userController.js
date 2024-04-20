@@ -94,11 +94,26 @@ const getUserWithMail = async (req, res) => {
     return res.status(200).send(dataTransferObject);
   });
 };
-
+const searchUsers = async (req, res) => {
+  const query = req.body;
+  await userService.searchUsers(query, (err, result) => {
+    if (err) return res.status(404).send(err);
+    return res.status(200).send(result);
+  });
+};
+const getAllUsersByIds = async (req, res) => {
+  const userIds = req.body;
+  await userService.getAllUsersByIds(userIds, (err, result) => {
+    if (err) return res.status(404).send(err);
+    return res.status(200).send(result);
+  });
+};
 module.exports = {
   register,
   login,
   getUser,
   getUserWithMail,
   refreshToken,
+  searchUsers,
+  getAllUsersByIds,
 };

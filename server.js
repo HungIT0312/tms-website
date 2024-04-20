@@ -7,6 +7,7 @@ const userRoute = require("./Routes/userRoute");
 const boardRoute = require("./Routes/boardRoute");
 const listRoute = require("./Routes/listRoute");
 const cardRoute = require("./Routes/cardRoute");
+const invitationRoute = require("./Routes/invitationRoute");
 const auth = require("./Middlewares/auth");
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use("/user", userRoute);
 app.use("/board", boardRoute);
 app.use("/list", listRoute);
 app.use("/card", cardRoute);
+app.use("/invitation", invitationRoute);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is online! Port: ${process.env.PORT}`);

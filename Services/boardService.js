@@ -1,5 +1,6 @@
 const { findOne } = require("../Models/boardModel");
 const boardModel = require("../Models/boardModel");
+const invitationModel = require("../Models/invitationModel");
 const userModel = require("../Models/userModel");
 
 const create = async (req, callback) => {
@@ -234,7 +235,26 @@ const addMember = async (id, members, user, callback) => {
     });
   }
 };
-
+const sentMemberInvitation = async (boardId, members, user, callback) => {
+  try {
+    await Promise.all(
+      members.map(async (member) => {
+        const newInvitation = new invitationModel({
+          inviter: user._id,
+          invited: member._id, // Assuming member is an object containing user details
+          board: boardId,
+        });
+        await newInvitation.save();
+      })
+    );
+    return callback(false, { message: "Invitations sent!" });
+  } catch (error) {
+    return callback({
+      message: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
 module.exports = {
   create,
   getAll,
@@ -244,4 +264,5 @@ module.exports = {
   updateBoardDescription,
   updateBackground,
   addMember,
+  sentMemberInvitation,
 };
