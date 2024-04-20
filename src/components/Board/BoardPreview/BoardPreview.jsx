@@ -1,11 +1,11 @@
 import { TeamOutlined } from "@ant-design/icons";
 import { Flex } from "antd";
+import _ from "lodash";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { taskBg } from "../../../constants/images";
 import { capitalizeFirstLetter } from "../../../helpers/changeTitle";
 import "./BoardPreview.scss";
-import _ from "lodash";
 
 const BoardPreview = ({ board }) => {
   const navigate = useNavigate();
@@ -15,18 +15,20 @@ const BoardPreview = ({ board }) => {
   };
   return (
     <Flex className="BoardPreview" vertical>
-      <div
-        style={{
-          background: `url(${board.backgroundImageLink})  no-repeat center/cover`,
-        }}
-        className="BoardPreview__cover"
+      <Flex
+        style={{ position: "relative" }}
+        justify="center"
+        align="center"
+        className="BoardPreview__imgGroup"
         onClick={() => handleChooseBoard(board._id)}
       >
+        <img src={board.backgroundImageLink} className="BoardPreview__cover" />
         <img className="image" src={taskBg} />
         <div className="BoardPreview__button-detail" type="primary">
           See Detail
         </div>
-      </div>
+      </Flex>
+
       <span
         className="BoardPreview__title"
         onClick={() => handleChooseBoard(board._id)}
