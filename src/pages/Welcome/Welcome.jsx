@@ -1,8 +1,8 @@
 import { Button, Image } from "antd";
-import { logo, welcome } from "../../constants/images";
 import "./Welcome.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import changeTitle from "../../helpers/changeTitle";
+import images from "../../constants/images";
 const Welcome = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -11,7 +11,7 @@ const Welcome = () => {
     <div className="welcome">
       <div className="welcome__nav">
         <div className="welcome__nav--item" onClick={() => navigate("/home")}>
-          <Image width={60} src={logo} preview={false} />
+          <Image width={60} src={images.logo} preview={false} />
           <div className="sitename">TMS</div>
         </div>
 
@@ -44,7 +44,7 @@ const Welcome = () => {
         </Button>
       </div>
       <div className="welcome__image">
-        <Image width={600} src={welcome} preview={false} />
+        <Image width={600} src={images.welcome} preview={false} />
       </div>
     </div>
   );

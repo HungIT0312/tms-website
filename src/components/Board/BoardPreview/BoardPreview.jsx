@@ -3,7 +3,7 @@ import { Flex } from "antd";
 import _ from "lodash";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { taskBg } from "../../../constants/images";
+import images from "../../../constants/images";
 import { capitalizeFirstLetter } from "../../../helpers/changeTitle";
 import "./BoardPreview.scss";
 
@@ -23,7 +23,7 @@ const BoardPreview = ({ board }) => {
         onClick={() => handleChooseBoard(board._id)}
       >
         <img src={board.backgroundImageLink} className="BoardPreview__cover" />
-        <img className="image" src={taskBg} />
+        <img className="image" src={images.taskBg} />
         <div className="BoardPreview__button-detail" type="primary">
           See Detail
         </div>

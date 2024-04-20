@@ -17,15 +17,24 @@ const Login = () => {
     }
   }, [navigate, user.isLogin]);
   const onFinish = async (values) => {
-    await dispatch(signInUserByEmailPass(values)).then(() => {
-      if (user.error) {
+    await dispatch(signInUserByEmailPass(values))
+      .unwrap()
+      .then((rs) => {
+        if (rs) {
+          api.success({
+            message: `Login successfully !`,
+            description: rs.message,
+            placement: "topRight",
+          });
+        }
+      })
+      .catch((err) => {
         api.error({
           message: `Login error !`,
-          description: user.message,
+          description: err.errMessage,
           placement: "topRight",
         });
-      }
-    });
+      });
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);

@@ -1,7 +1,7 @@
 import { EllipsisOutlined } from "@ant-design/icons";
 import { Avatar, Divider, Flex, Image } from "antd";
 import { useSelector } from "react-redux";
-import { filterBoard, iconBoard, owner } from "../../../constants/images";
+import images from "../../../constants/images";
 import "./BoardHeader.scss";
 const BoardHeader = () => {
   const { selectedBoard } = useSelector((state) => state.board);
@@ -10,12 +10,12 @@ const BoardHeader = () => {
   return (
     <div className="board-header">
       <Flex gap={8} align="center" className="board-header__title">
-        <Image width={32} src={iconBoard} />
-        {selectedBoard.title.toUpperCase()}
+        <Image width={32} src={images.iconBoard} />
+        {selectedBoard.title}
       </Flex>
       <Flex justify="center" align="center" gap={8}>
         <Flex gap={8} className="filter-btn">
-          <img width={16} src={filterBoard} />
+          <img width={16} src={images.filterBoard} />
           <span>Filter</span>
         </Flex>
         <Divider
@@ -31,7 +31,7 @@ const BoardHeader = () => {
           </Avatar>
           <span title="This member is the owner." className="owner__badge">
             <Image
-              src={owner}
+              src={images.owner}
               alt="owner."
               title="This member is the owner."
               preview={false}

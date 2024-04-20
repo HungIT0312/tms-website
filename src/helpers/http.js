@@ -39,6 +39,9 @@ class Http {
             redirect("/auth/login");
             return Promise.reject(error);
           }
+        } else if (error.response.status === 400) {
+          // Handle 400 errors here by returning response.data
+          return Promise.reject(error.response.data);
         }
         return Promise.reject(error);
       }

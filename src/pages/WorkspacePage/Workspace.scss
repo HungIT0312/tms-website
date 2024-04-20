@@ -3,7 +3,8 @@
   width: calc(100% - 48px);
   height: calc(100vh - 80px);
   &__content {
-    margin-top: 48px;
+    // margin-top: 48px;
+    // height: 100%;
   }
   &-create {
     padding: 16px;
@@ -24,8 +25,7 @@
     padding-bottom: 8px;
     border-bottom: 1px solid #172b4d;
   }
-  &__search{
+  &__search {
     height: 34px;
-
   }
 }

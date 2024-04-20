@@ -6,9 +6,7 @@ import { useParams } from "react-router-dom";
 import BoardHeader from "../../components/Board/BoardHeader/BoardHeader";
 const Board = () => {
   const dispatch = useDispatch();
-  const { isLoading, error, message, selectedBoard } = useSelector(
-    (state) => state.board
-  );
+  const { selectedBoard } = useSelector((state) => state.board);
   // id from params
   const { boardId } = useParams();
   useEffect(() => {

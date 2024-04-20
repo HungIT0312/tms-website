@@ -2,7 +2,7 @@ import { MailFilled } from "@ant-design/icons";
 import { Avatar, Badge, Flex, Image } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { logo } from "../../constants/images";
+import images from "../../constants/images";
 import ProfileModal from "../Modal/Profile/ProfileModal";
 import InvitationPopup from "../Popup/Ivitation/InvitationPopup";
 import ProfilePopup from "../Popup/Profile/ProfilePopup";
@@ -42,14 +42,13 @@ export const Header = () => {
       <Flex className="header__logo" align="center" justify="center">
         <Image
           className="header__logo--image"
-          src={logo}
+          src={images.logo}
           preview={false}
           width={32}
         />
         <span className="header__logo--name">TMS</span>
       </Flex>
       <div className="header__right">
-        
         <span
           className="header__mail"
           onClick={() => setIsInvitationPop(!isInvitationPop)}

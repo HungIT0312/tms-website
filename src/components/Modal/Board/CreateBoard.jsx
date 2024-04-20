@@ -3,12 +3,12 @@ import { Col, Flex, Form, Image, Input, Modal, Row, notification } from "antd";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { bgColors, bgImages } from "../../../constants/backgroundImage";
-import { bg1, taskBg } from "../../../constants/images";
+import images from "../../../constants/images";
 import { createNewBoard } from "../../../stores/board/boardThunk";
 import "./CreateBoard.scss";
 // eslint-disable-next-line react/prop-types
 const CreateBoard = ({ isOpen, showModal }) => {
-  const [bgLink, setBgLink] = useState(bg1);
+  const [bgLink, setBgLink] = useState(images.bg1);
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
 
@@ -80,7 +80,7 @@ const CreateBoard = ({ isOpen, showModal }) => {
               className="create-board__preview"
               style={{ background: `url(${bgLink})  no-repeat center/cover` }}
             >
-              <Image src={taskBg} preview={false} />
+              <Image src={images.taskBg} preview={false} />
             </div>
           </Flex>
 

@@ -1,27 +1,14 @@
-import {
-  bg1,
-  bg2,
-  bg3,
-  bgColor1,
-  bgColor2,
-  bgColor3,
-  bgColor4,
-  bgColor5,
-  bgColor6,
-  bgColor7,
-  bgColor8,
-  bgColor9,
-} from "./images";
+import images from "./images";
 
 export const bgColors = [
-  bgColor1,
-  bgColor2,
-  bgColor3,
-  bgColor4,
-  bgColor5,
-  bgColor6,
-  bgColor7,
-  bgColor8,
-  bgColor9,
+  images.bgColor1,
+  images.bgColor2,
+  images.bgColor3,
+  images.bgColor4,
+  images.bgColor5,
+  images.bgColor6,
+  images.bgColor7,
+  images.bgColor8,
+  images.bgColor9,
 ];
-export const bgImages = [bg1, bg2, bg3];
+export const bgImages = [images.bg1, images.bg2, images.bg3];

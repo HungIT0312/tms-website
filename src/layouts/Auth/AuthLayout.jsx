@@ -1,6 +1,6 @@
 import { Image } from "antd";
 import { Outlet, useLocation } from "react-router-dom";
-import { logo, trelloLeft, trelloRight } from "../../constants/images";
+import images from "../../constants/images";
 import changeTitle, { capitalizeFirstLetter } from "../../helpers/changeTitle";
 
 const AuthLayout = () => {
@@ -14,13 +14,17 @@ const AuthLayout = () => {
   return (
     <div className="login-container">
       <div>
-        <Image className="trello_left" src={trelloLeft} preview={false} />
+        <Image
+          className="trello_left"
+          src={images.trelloLeft}
+          preview={false}
+        />
       </div>
       <div className="login__form">
         <div className="login__banner">
           <Image
             width={30}
-            src={logo}
+            src={images.logo}
             preview={false}
             className="login__logo"
           />
@@ -30,7 +34,11 @@ const AuthLayout = () => {
         <Outlet />
       </div>
       <div>
-        <Image className="trello_right" src={trelloRight} preview={false} />
+        <Image
+          className="trello_right"
+          src={images.trelloRight}
+          preview={false}
+        />
       </div>
     </div>
   );

@@ -1,12 +1,12 @@
+import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Col, Flex, Image, Input, Row } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import BoardPreview from "../../components/Board/BoardPreview/BoardPreview";
 import CreateBoard from "../../components/Modal/Board/CreateBoard";
-import { emptyBoard } from "../../constants/images";
+import images from "../../constants/images";
 import { getAllUserBoard } from "../../stores/board/boardThunk";
 import "./Workspace.scss";
-import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
-import BoardPreview from "../../components/Board/BoardPreview/BoardPreview";
 const Workspace = () => {
   const [isOpenCreateModel, setIsOpenCreateModel] = useState(false);
   const [searchKey, setSearchKey] = useState("");
@@ -56,12 +56,15 @@ const Workspace = () => {
       <div className="workspace__content">
         <Row
           gutter={[32, 32]}
-          align="middle"
-          style={{ height: "100%", overflowY: "auto" }}
+          // style={{ height: "100%", overflowY: "auto" }}
         >
           {!loading && boards.length < 1 && (
             <Flex justify="center" align="center" vertical>
-              <Image preview={false} src={emptyBoard} width={160}></Image>
+              <Image
+                preview={false}
+                src={images.emptyBoard}
+                width={160}
+              ></Image>
               <span
                 className="content__msg"
                 style={{ marginTop: 24, fontWeight: 600 }}
