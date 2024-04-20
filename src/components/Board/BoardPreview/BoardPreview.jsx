@@ -5,10 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { taskBg } from "../../../constants/images";
 import { capitalizeFirstLetter } from "../../../helpers/changeTitle";
 import "./BoardPreview.scss";
+import _ from "lodash";
+
 const BoardPreview = ({ board }) => {
   const navigate = useNavigate();
   const handleChooseBoard = async (id) => {
-    navigate(`/board/${id}/${board.title.toLowerCase()}`);
+    const slug = _.kebabCase(board.title.toLowerCase());
+    navigate(`/board/${id}/${slug}`);
   };
   return (
     <Flex className="BoardPreview" vertical>

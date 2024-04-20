@@ -1,0 +1,40 @@
+.board-header {
+  height: 54px;
+  background-color: rgb(255 255 255 / 24%);
+  position: fixed;
+  top: 49px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100vw - 48px);
+  padding: 0 24px;
+
+  &__title {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 32px;
+  }
+  .owner {
+    position: relative;
+    &__badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  }
+  .filter-btn {
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: center;
+    padding: 4px 8px;
+
+    &:hover {
+      background-color: rgb(255 255 255 / 50%);
+      cursor: pointer;
+    }
+  }
+}

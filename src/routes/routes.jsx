@@ -5,6 +5,7 @@ import Login from "../pages/LoginPage/Login";
 import Register from "../pages/RegisterPage/Register";
 import AuthLayout from "../layouts/Auth/AuthLayout";
 import Workspace from "../pages/WorkspacePage/Workspace";
+import Board from "../pages/BoardPage/Board";
 
 const routes = createBrowserRouter([
   {
@@ -37,6 +38,7 @@ const routes = createBrowserRouter([
 
       {
         path: "board/:boardId/:boardTitle",
+        element: <Board />,
       },
     ],
   },

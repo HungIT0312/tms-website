@@ -18,6 +18,9 @@ import bgColor9 from "../assets/images/bg-color-9.svg";
 import bg1 from "../assets/images/bg-1.jpg";
 import bg2 from "../assets/images/bg-2.jpg";
 import bg3 from "../assets/images/bg-3.jpg";
+import iconBoard from "../assets/images/icon-board.svg";
+import owner from "../assets/images/owner.png";
+import filterBoard from "../assets/images/filter-board.svg";
 export {
   trelloLeft,
   trelloRight,
@@ -39,4 +42,7 @@ export {
   bg1,
   bg2,
   bg3,
+  iconBoard,
+  owner,
+  filterBoard,
 };
