@@ -21,6 +21,7 @@ app.use(
     credentials: true,
   })
 );
+// app.use(cors({ credentials: true }));
 // AUTH VERIFICATION AND UNLESS
 
 auth.verifyToken.unless = unless;

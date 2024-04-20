@@ -50,7 +50,7 @@ const login = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  // console.log(req.headers);
+  console.log(req.headers.cookie);
   const refreshToken = req.headers.cookie
     .split("; ")
     .find((cookie) => cookie.startsWith("refreshToken="))
