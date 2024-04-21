@@ -55,7 +55,7 @@ const rejectInvitation = async (invitationId, userId, callback) => {
   try {
     const invitation = await invitationModel.findById(invitationId);
 
-    if (!invitation || invitation.invited.toString() !== userId) {
+    if (!invitation || invitation.invited.toString() !== userId.toString()) {
       return callback({ message: "Invitation not found or invalid." });
     }
 
@@ -66,7 +66,10 @@ const rejectInvitation = async (invitationId, userId, callback) => {
     // invitation.status = "rejected";
     // await invitation.save();
 
-    return callback(false, { message: "Invitation rejected!" });
+    return callback(false, {
+      message: "Invitation rejected!",
+      invitationId: invitationId,
+    });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
