@@ -1,8 +1,9 @@
 import { MailFilled } from "@ant-design/icons";
 import { Avatar, Badge, Flex, Image } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import images from "../../constants/images";
+import { getAllInvite } from "../../stores/invitation/invitationThunk";
 import ProfileModal from "../Modal/Profile/ProfileModal";
 import InvitationPopup from "../Popup/Ivitation/InvitationPopup";
 import ProfilePopup from "../Popup/Profile/ProfilePopup";
@@ -12,13 +13,19 @@ export const Header = () => {
   const [isInvitationPop, setIsInvitationPop] = useState(false);
   const popupRef = useRef(null);
   const invitationRef = useRef(null);
-
   const [open, setOpen] = useState(false);
   const { userInformation } = useSelector((state) => state.user);
+  const { invitations } = useSelector((state) => state.invitation);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllInvite({ userId: userInformation._id }));
+  }, [dispatch, userInformation]);
 
   const showModal = () => {
     setOpen(!open);
   };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
@@ -37,6 +44,7 @@ export const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   return (
     <Flex align="center" justify="space-between" className="header">
       <Flex className="header__logo" align="center" justify="center">
@@ -53,7 +61,7 @@ export const Header = () => {
           className="header__mail"
           onClick={() => setIsInvitationPop(!isInvitationPop)}
         >
-          <Badge size="small" count={5}>
+          <Badge size="small" count={invitations.length} showZero>
             <MailFilled
               style={{
                 fontSize: 20,
@@ -78,7 +86,7 @@ export const Header = () => {
             className="header__popup header__popup--mail"
             ref={invitationRef}
           >
-            <InvitationPopup showModal={showModal} />
+            <InvitationPopup showModal={showModal} invitations={invitations} />
           </div>
         )}
         <ProfileModal isOpen={open} callback={setOpen} />

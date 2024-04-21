@@ -10,28 +10,38 @@
   padding: 0 24px;
 
   &__title {
-    color: #fff;
+    color: #000;
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 32px;
   }
   .owner {
     position: relative;
+    cursor: pointer;
     &__badge {
       position: absolute;
       bottom: 0;
       right: 0;
     }
   }
-  .filter-btn {
+  .filter-btn,
+  .add-btn {
     padding: 4px;
     border-radius: 4px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 20px;
     text-align: center;
     padding: 4px 8px;
 
+    &:hover {
+      background-color: rgb(255 255 255 / 50%);
+      cursor: pointer;
+    }
+  }
+  &__back {
+    padding: 8px;
+    border-radius: 50%;
     &:hover {
       background-color: rgb(255 255 255 / 50%);
       cursor: pointer;

@@ -1,0 +1,25 @@
+.board-content {
+  margin-top: 54px;
+  height: calc(100vh - 103px);
+  overflow-x: auto;
+  &::-webkit-scrollbar {
+    height: 8px !important;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    height: 8px !important;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5); /* Darker color on hover */
+  }
+}

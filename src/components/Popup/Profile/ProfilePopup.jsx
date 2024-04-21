@@ -44,13 +44,14 @@ const ProfilePopup = (props) => {
       <div className="profilePopup__item" onClick={handleChangeAccount}>
         Change account
       </div>
-      <div
+      <Flex
         className="profilePopup__logout profilePopup__item"
         onClick={handleLogOut}
+        gap={8}
       >
         <span>Log out</span>
         <LogoutOutlined />
-      </div>
+      </Flex>
     </div>
   );
 };

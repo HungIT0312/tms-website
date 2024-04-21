@@ -15,8 +15,13 @@ export const getUser = (userData) => {
 export const getUserByEmail = (userData) => {
   return http.post("/user/get-user-with-email", userData);
 };
+export const searchUser = (key) => {
+  return http.post("/user/search", key);
+};
 // router.post("/register", userController.register);
 // router.post("/login", userController.login);
 // router.get("/get-user", userController.getUser);
+// router.get("/get-users", userController.getAllUsersByIds);
+// router.get("/search", userController.searchUsers);
 // router.post("/get-user-with-email", userController.getUserWithMail);
 // router.post("/refresh-token", userController.refreshToken);

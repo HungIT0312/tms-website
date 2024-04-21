@@ -1,5 +1,5 @@
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Flex, Image, Input, Row } from "antd";
+import { Button, Col, Divider, Flex, Image, Input, Row } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BoardPreview from "../../components/Board/BoardPreview/BoardPreview";
@@ -12,6 +12,7 @@ const Workspace = () => {
   const [searchKey, setSearchKey] = useState("");
   const [input, setInput] = useState("");
   const { loading, boards } = useSelector((state) => state.board);
+  const { userInformation } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   useEffect(() => {
     const fetchBoard = async () => {
@@ -28,9 +29,44 @@ const Workspace = () => {
       clearTimeout(time);
     };
   }, [input]);
-  const searchedBoard = boards?.filter((item) => {
-    return item.title.toLowerCase().includes(searchKey.toLowerCase().trim());
-  });
+  // const myBoards =
+  //   boards &&
+  //   boards.filter((board) => {
+  //     return board?.members.some(
+  //       (member) =>
+  //         member.user.toString() === userInformation._id.toString() &&
+  //         member.role === "owner"
+  //     );
+  //   });
+  // const memberBoards =
+  //   boards &&
+  //   boards.filter((board) => {
+  //     return board?.members.some(
+  //       (member) =>
+  //         member.user.toString() === userInformation._id.toString() &&
+  //         member.role === "member"
+  //     );
+  //   });
+  const renderBoards = (role) => {
+    const renderBoardsItem =
+      boards &&
+      boards.filter((board) => {
+        return board?.members.some(
+          (member) =>
+            member.user.toString() === userInformation._id.toString() &&
+            member.role === role
+        );
+      });
+    return renderBoardsItem;
+  };
+  const searchedBoard = (role) => {
+    const boards = renderBoards(role);
+    const searchedBoard = boards.filter((item) => {
+      return item?.title.toLowerCase().includes(searchKey.toLowerCase().trim());
+    });
+    return searchedBoard;
+  };
+
   return (
     <div className="workspace">
       <Flex justify="space-between" style={{ paddingBottom: 32 }}>
@@ -59,7 +95,12 @@ const Workspace = () => {
           // style={{ height: "100%", overflowY: "auto" }}
         >
           {!loading && boards.length < 1 && (
-            <Flex justify="center" align="center" vertical>
+            <Flex
+              style={{ width: "100vw" }}
+              justify="center"
+              align="center"
+              vertical
+            >
               <Image
                 preview={false}
                 src={images.emptyBoard}
@@ -85,7 +126,19 @@ const Workspace = () => {
           )}
           {!loading &&
             boards &&
-            searchedBoard.map((board) => (
+            searchedBoard("owner").map((board) => (
+              <Col key={board._id} xs={24} sm={12} md={6} lg={6}>
+                <BoardPreview board={board} />
+              </Col>
+            ))}
+          <Divider orientation="left" orientationMargin={12}>
+            <div className="workspace-title" style={{ border: "none" }}>
+              Workspace is participating
+            </div>
+          </Divider>
+          {!loading &&
+            boards &&
+            searchedBoard("member").map((board) => (
               <Col key={board._id} xs={24} sm={12} md={6} lg={6}>
                 <BoardPreview board={board} />
               </Col>

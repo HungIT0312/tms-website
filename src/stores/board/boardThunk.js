@@ -4,6 +4,7 @@ import {
   getAllBoards,
   getBoardById,
 } from "../../api/board/board.api";
+import { acceptInvitation } from "../../api/invitation/invitation.api";
 
 export const createNewBoard = createAsyncThunk(
   "board/createNewBoard",
@@ -32,6 +33,17 @@ export const getBoard = createAsyncThunk(
   async (id, thunkApi) => {
     try {
       const response = await getBoardById(id);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const acceptBoardInvite = createAsyncThunk(
+  "board/acceptBoardInvite",
+  async (id, thunkApi) => {
+    try {
+      const response = await acceptInvitation(id);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

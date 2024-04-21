@@ -1,28 +1,17 @@
-import { useSelector } from "react-redux";
+/* eslint-disable react/prop-types */
 import "./InvitationPopup.scss";
 import InvitationItem from "./InvitationItem/InvitationItem";
-const InvitationPopup = () => {
-  const { userInformation } = useSelector((state) => state.user);
+import { Empty } from "antd";
+const InvitationPopup = ({ invitations = [] }) => {
   return (
     <div className="invitation_popup">
       <div className="invitation__title">Invitation</div>
       <div className="invitation__content">
-        {/* {userInformation.invitations &&
-        userInformation.invitations.length > 0 ? (
-          userInformation.invitations.map((invitation) => (
+        {invitations.length > 0 &&
+          invitations.map((invitation) => (
             <InvitationItem key={invitation._id} invitation={invitation} />
-          ))
-        ) : (
-          <div className="invitation__empty">No more invitations</div>
-        )} */}
-        {userInformation.invitations.map((invitation) => (
-          <InvitationItem key={invitation._id} invitation={invitation} />
-        ))}
-        <InvitationItem />
-        <InvitationItem />
-        <InvitationItem />
-        <InvitationItem />
-        <InvitationItem />
+          ))}
+        {invitations.length < 1 && <Empty description={"No invitation"} />}
       </div>
     </div>
   );

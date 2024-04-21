@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createNewBoard, getAllUserBoard, getBoard } from "./boardThunk";
+import {
+  acceptBoardInvite,
+  createNewBoard,
+  getAllUserBoard,
+  getBoard,
+} from "./boardThunk";
 
 const initialState = {
   isLoading: false,
@@ -60,6 +65,23 @@ const boardSlice = createSlice({
         state.selectedBoard = action.payload;
       })
       .addCase(getBoard.rejected, (state, action) => {
+        state.isLoading = false;
+        state.message = action.payload.errMessage;
+        state.error = true;
+      })
+      // ACCEPT BOARD INVITATION
+
+      .addCase(acceptBoardInvite.pending, (state) => {
+        state.isLoading = true;
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(acceptBoardInvite.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.boards.push(action.payload.board);
+        state.message = action.payload.message;
+      })
+      .addCase(acceptBoardInvite.rejected, (state, action) => {
         state.isLoading = false;
         state.message = action.payload.errMessage;
         state.error = true;

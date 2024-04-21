@@ -4,15 +4,17 @@ import storage from "redux-persist/lib/storage";
 
 import userSlice from "./user/userSlice";
 import boardSlice from "./board/boardSlice";
+import invitationSlice from "./invitation/invitationSlice";
 const rootReducer = combineReducers({
   user: userSlice,
   board: boardSlice,
+  invitation: invitationSlice,
   // Thêm các reducer từ các slice khác vào đây
 });
 const persistConfig = {
   key: "root",
   storage,
-  //   whitelist: ["user"], // Chỉ lưu trữ reducer 'user'
+  whitelist: ["user", "board"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

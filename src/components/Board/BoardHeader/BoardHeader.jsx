@@ -1,28 +1,31 @@
-import { EllipsisOutlined } from "@ant-design/icons";
-import { Avatar, Divider, Flex, Image } from "antd";
+import {
+  EllipsisOutlined,
+  LeftOutlined,
+  UserAddOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Avatar, Divider, Flex, Image, Tooltip } from "antd";
+import { useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import images from "../../../constants/images";
+import AddMember from "../../Modal/AddMember/AddMember";
 import "./BoardHeader.scss";
 const BoardHeader = () => {
   const { selectedBoard } = useSelector((state) => state.board);
   const { userInformation } = useSelector((state) => state.user);
+  const [isOpen, setIsOpen] = useState(false);
 
-  return (
-    <div className="board-header">
-      <Flex gap={8} align="center" className="board-header__title">
-        <Image width={32} src={images.iconBoard} />
-        {selectedBoard.title}
-      </Flex>
-      <Flex justify="center" align="center" gap={8}>
-        <Flex gap={8} className="filter-btn">
-          <img width={16} src={images.filterBoard} />
-          <span>Filter</span>
-        </Flex>
-        <Divider
-          type="vertical"
-          style={{ color: "#fff", background: "#000" }}
-        />
-        <div className="owner" title="This member is the owner.">
+  const navigate = useNavigate();
+  const members = selectedBoard.members;
+  const renderMember = members.map((member) => {
+    if (member.role === "owner") {
+      return (
+        <div
+          key={member._id}
+          className="owner"
+          title="This member is the owner."
+        >
           <Avatar
             size={"small"}
             style={{ background: `${userInformation.color}`, fontSize: 10 }}
@@ -39,8 +42,59 @@ const BoardHeader = () => {
             />
           </span>
         </div>
+      );
+    } else
+      return (
+        <Tooltip
+          key={member._id}
+          title={"member"}
+          placement="bottom"
+          style={{ cursor: "pointer" }}
+        >
+          <Avatar
+            style={{
+              backgroundColor: member.color,
+            }}
+            icon={<UserOutlined />}
+          >
+            {member.name[0] + member.surname[0]}
+          </Avatar>
+        </Tooltip>
+      );
+  });
+  return (
+    <div className="board-header">
+      <Flex gap={8} align="center" className="board-header__title">
+        <LeftOutlined
+          size={32}
+          onClick={() => navigate(-1)}
+          className="board-header__back"
+        />
+        <span>{selectedBoard.title}</span>
+      </Flex>
+      <Flex justify="center" align="center" gap={8}>
+        <Flex gap={8} className="filter-btn" align="center" justify="center">
+          <img width={16} src={images.filterBoard} />
+          <span>Filter</span>
+        </Flex>
+        <Divider
+          type="vertical"
+          style={{ color: "#fff", background: "#000" }}
+        />
+        <Flex
+          gap={8}
+          className="add-btn"
+          align="center"
+          justify="center"
+          onClick={() => setIsOpen(true)}
+        >
+          <UserAddOutlined size={16} />
+          <span>Add member</span>
+        </Flex>
+        <Avatar.Group maxCount={3}>{renderMember}</Avatar.Group>
         <EllipsisOutlined style={{ cursor: "pointer", fontSize: 24 }} />
       </Flex>
+      <AddMember isOpen={isOpen} setIsOpen={setIsOpen} board={selectedBoard} />
     </div>
   );
 };
