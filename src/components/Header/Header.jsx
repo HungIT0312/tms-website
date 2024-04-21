@@ -1,6 +1,6 @@
 import { MailFilled } from "@ant-design/icons";
 import { Avatar, Badge, Flex, Image } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import images from "../../constants/images";
 import { getAllInvite } from "../../stores/invitation/invitationThunk";
@@ -44,7 +44,12 @@ export const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
+  const countMail = useMemo(() => {
+    return invitations.reduce(
+      (acc, curr) => (curr.status === "pending" ? acc + 1 : acc),
+      0
+    );
+  }, [invitations]);
   return (
     <Flex align="center" justify="space-between" className="header">
       <Flex className="header__logo" align="center" justify="center">
@@ -61,7 +66,7 @@ export const Header = () => {
           className="header__mail"
           onClick={() => setIsInvitationPop(!isInvitationPop)}
         >
-          <Badge size="small" count={invitations.length} showZero>
+          <Badge size="small" count={countMail} showZero>
             <MailFilled
               style={{
                 fontSize: 20,

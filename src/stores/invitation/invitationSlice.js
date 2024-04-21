@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { acceptBoardInvite } from "../board/boardThunk";
-import { getAllInvite } from "./invitationThunk";
+import { getAllInvite, rejectInvite } from "./invitationThunk";
 
 const initialState = {
   isLoading: false,
@@ -46,6 +46,24 @@ const invitationSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(getAllInvite.rejected, (state, action) => {
+        state.isLoading = false;
+        state.message = action.payload.errMessage;
+        state.error = true;
+      })
+      //==============================================
+      .addCase(rejectInvite.pending, (state) => {
+        state.isLoading = true;
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(rejectInvite.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.invitations = state.invitations.filter(
+          (invitation) => invitation._id !== action.payload.invitationId
+        );
+        state.message = action.payload.message;
+      })
+      .addCase(rejectInvite.rejected, (state, action) => {
         state.isLoading = false;
         state.message = action.payload.errMessage;
         state.error = true;

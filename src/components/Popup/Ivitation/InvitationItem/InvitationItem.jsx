@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import "./InvitationItem.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { acceptBoardInvite } from "../../../../stores/board/boardThunk";
+import { rejectInvite } from "../../../../stores/invitation/invitationThunk";
 // eslint-disable-next-line no-unused-vars
 const InvitationItem = ({ invitation }) => {
   const { message } = useSelector((state) => state.board);
@@ -20,25 +21,30 @@ const InvitationItem = ({ invitation }) => {
       });
     }
   };
+  const handleReject = async () => {
+    dispatch(rejectInvite(invitation._id));
+  };
   const date = new Date(invitation.createdAt).toLocaleDateString("en-GB");
   return (
-    <Flex className="invitation" direction="column" align="center" gap={8}>
+    <Flex className="invitation" align="center" justify="space-between" gap={8}>
       {contextHolder}
-      <div>
-        <Avatar style={{ background: invitation.inviter.color }}>
-          {invitation.inviter.name[0] + invitation.inviter.surname[0]}
-        </Avatar>
-      </div>
-      <Flex gap={8} vertical>
-        <span className="invitation__text">
-          <span>
-            {invitation.inviter.name + " " + invitation.inviter.surname}
+      <Flex gap={8} align="center" justify="center">
+        <div>
+          <Avatar style={{ background: invitation.inviter.color }}>
+            {invitation.inviter.name[0] + invitation.inviter.surname[0]}
+          </Avatar>
+        </div>
+        <Flex gap={8} vertical>
+          <span className="invitation__text">
+            <span>
+              {invitation.inviter.name + " " + invitation.inviter.surname}
+            </span>
+            <span> invited you to join "</span>
+            <strong>{invitation.board.title}</strong>".
           </span>
-          <span> invited you to join "</span>
-          <strong>{invitation.board.title}</strong>".
-        </span>
-        <Flex justify="space-between" align="center">
-          <div className="invitation__date">Invited at {date}</div>
+          <Flex justify="space-between" align="center">
+            <div className="invitation__date">Invited at {date}</div>
+          </Flex>
         </Flex>
       </Flex>
       {invitation.status === "pending" && (
@@ -51,6 +57,7 @@ const InvitationItem = ({ invitation }) => {
           <CloseCircleTwoTone
             twoToneColor="red"
             className="invitation__action"
+            onClick={handleReject}
           />
         </Flex>
       )}

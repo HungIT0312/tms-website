@@ -3,8 +3,8 @@ import http from "../../helpers/http";
 export const acceptInvitation = async (id) => {
   return http.post(`/invitation/accept`, { invitationId: id });
 };
-export const rejectInvitation = (invitationId) => {
-  return http.post("/invitation/reject", invitationId);
+export const rejectInvitation = (id) => {
+  return http.post("/invitation/reject", { invitationId: id });
 };
 export const inviteUser = (invitationData) => {
   return http.post("/invitation/invite", invitationData);
