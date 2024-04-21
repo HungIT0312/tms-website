@@ -7,10 +7,13 @@ const register = async (user, callback) => {
   await newUser
     .save()
     .then((result) => {
-      return callback(false, { message: "User created successfuly!" });
+      return callback(false, { message: "User created successfully!" });
     })
     .catch((err) => {
-      return callback({ errMessage: "Email already in use!", details: err });
+      return callback({
+        errMessage: "Email already in use!",
+        details: err.message,
+      });
     });
 };
 
@@ -73,21 +76,7 @@ const getUser = async (id, callback) => {
   }
 };
 
-const getUserWithMail = async (email, callback) => {
-  try {
-    let user = await userModel.findOne({ email });
-    if (!user)
-      return callback({
-        errMessage: "There is no registered user with this e-mail.",
-      });
-    return callback(false, { ...user.toJSON() });
-  } catch (error) {
-    return callback({
-      errMessage: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
+
 const getAllUsersByIds = async (userIds, callback) => {
   try {
     const users = await userModel.find({ _id: { $in: userIds } });
@@ -111,10 +100,11 @@ const searchUsers = async (query, callback) => {
         { email: { $regex: query, $options: "i" } },
       ],
     });
-    return callback(
-      false,
-      users.map((user) => ({ ...user.toJSON() }))
-    );
+    const searchResults = users.map((user) => {
+      const { password, __v, ...userData } = user.toJSON();
+      return userData;
+    });
+    return callback(false, searchResults);
   } catch (error) {
     return callback({
       errMessage: "Something went wrong while searching users",
@@ -126,15 +116,7 @@ module.exports = {
   register,
   login,
   getUser,
-  getUserWithMail,
   refreshToken,
   getAllUsersByIds,
   searchUsers,
 };
-
-// "errMessage": "Authorization token invalid",
-// "details": {
-//     "name": "TokenExpiredError",
-//     "message": "jwt expired",
-//     "expiredAt": "2024-04-18T10:22:11.000Z"
-// }

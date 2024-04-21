@@ -13,6 +13,5 @@ route.post("/create", boardController.create);
 route.get("/:id", boardController.getById);
 route.get("/:id/activity", boardController.getActivityById);
 route.get("/", boardController.getAll);
-route.post("/send-invitation", boardController.sentMemberInvitation);
 
 module.exports = route;

@@ -50,7 +50,6 @@ const login = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  console.log(req.headers.cookie);
   const refreshToken = req.headers.cookie
     .split("; ")
     .find((cookie) => cookie.startsWith("refreshToken="))
@@ -80,22 +79,8 @@ const getUser = async (req, res) => {
   });
 };
 
-const getUserWithMail = async (req, res) => {
-  const { email } = req.body;
-  await userService.getUserWithMail(email, (err, result) => {
-    if (err) return res.status(404).send(err);
-
-    const dataTransferObject = {
-      name: result.name,
-      surname: result.surname,
-      color: result.color,
-      email: result.email,
-    };
-    return res.status(200).send(dataTransferObject);
-  });
-};
 const searchUsers = async (req, res) => {
-  const query = req.body;
+  const query = req.body.key;
   await userService.searchUsers(query, (err, result) => {
     if (err) return res.status(404).send(err);
     return res.status(200).send(result);
@@ -112,7 +97,6 @@ module.exports = {
   register,
   login,
   getUser,
-  getUserWithMail,
   refreshToken,
   searchUsers,
   getAllUsersByIds,
