@@ -2,8 +2,15 @@
 import { MailOutlined, UserDeleteOutlined } from "@ant-design/icons";
 import { Avatar, Button, Flex } from "antd";
 
-const SearchUserItem = ({ member, handleInvite, pendingUsers }) => {
+const SearchUserItem = ({
+  member,
+  handleInvite,
+  pendingUsers,
+  isOwner,
+  handleRemoveMember,
+}) => {
   const isPending = pendingUsers.some((user) => user.invited === member._id);
+
   return (
     <Flex
       key={member._id}
@@ -26,7 +33,13 @@ const SearchUserItem = ({ member, handleInvite, pendingUsers }) => {
         </Button>
       )}
       {member.role && member.role === "member" && (
-        <Button icon={<UserDeleteOutlined />} className="remove-btn">
+        <Button
+          icon={<UserDeleteOutlined />}
+          disabled={!isOwner}
+          className="remove-btn"
+          title={`${!isOwner ? "Only  the owner can remove members" : ""}`}
+          onClick={() => handleRemoveMember(member.user.toString())}
+        >
           Remove
         </Button>
       )}

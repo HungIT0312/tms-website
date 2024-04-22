@@ -1,25 +1,23 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import {
-  MailOutlined,
-  UserAddOutlined,
-  UserDeleteOutlined,
-} from "@ant-design/icons";
-import { Avatar, Button, Flex, Input, Modal, notification } from "antd";
+import { UserAddOutlined } from "@ant-design/icons";
+import { Flex, Input, Modal, notification } from "antd";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { searchUser } from "../../../api/user/user.api";
-import "./AddMember.scss";
 import {
   getInvitationsPendingByBoard,
   inviteUser,
 } from "../../../api/invitation/invitation.api";
+import { searchUser } from "../../../api/user/user.api";
+import "./AddMember.scss";
 import SearchUserItem from "./SearchUserItem/SearchUserItem";
-const AddMember = ({ isOpen, setIsOpen, board }) => {
+import { removeMemberInBoard } from "../../../stores/board/boardThunk";
+import { useDispatch, useSelector } from "react-redux";
+const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
   const [inputText, setInputText] = useState();
   const [keyword, setKeyword] = useState();
   const [userSearch, setUserSearch] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
+  const dispatch = useDispatch();
   const [api, contextHolder] = notification.useNotification();
   useEffect(() => {
     const time = setTimeout(() => {
@@ -86,7 +84,16 @@ const AddMember = ({ isOpen, setIsOpen, board }) => {
   };
 
   // eslint-disable-next-line react/prop-types
-
+  const handleRemoveMember = (id) => {
+    dispatch(
+      removeMemberInBoard({ boardId: board._id.toString(), memberId: id })
+    );
+    api.success({
+      message: `Remove member !`,
+      description: "Successfully",
+      placement: "bottomRight",
+    });
+  };
   const renderAll = (members = []) => {
     return (
       members &&
@@ -96,10 +103,13 @@ const AddMember = ({ isOpen, setIsOpen, board }) => {
           key={index}
           handleInvite={handleInvite}
           pendingUsers={pendingUsers}
+          isOwner={isOwner}
+          handleRemoveMember={handleRemoveMember}
         />
       ))
     );
   };
+
   return (
     <Modal
       title="Add member"

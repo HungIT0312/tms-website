@@ -78,6 +78,10 @@ const Register = () => {
             required: true,
             message: "Please input your password!",
           },
+          {
+            min: 6,
+            message: "Password must be at least 6 characters.",
+          },
         ]}
         hasFeedback
       >

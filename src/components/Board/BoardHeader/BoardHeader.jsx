@@ -17,20 +17,22 @@ const BoardHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
-  const members = selectedBoard.members;
+  const members = selectedBoard?.members;
+  const isOwner = selectedBoard.members.some(
+    (mem) =>
+      mem.user.toString() === userInformation._id.toString() &&
+      mem.role === "owner"
+  );
   const renderMember = members.map((member) => {
     if (member.role === "owner") {
       return (
         <div
           key={member._id}
           className="owner"
-          title="This member is the owner."
+          title={`${member.name + " " + member.surname} is the owner.`}
         >
-          <Avatar
-            size={"small"}
-            style={{ background: `${userInformation.color}`, fontSize: 10 }}
-          >
-            {userInformation.name[0] + userInformation.surname[0]}
+          <Avatar style={{ background: `${member.color}`, fontSize: 10 }}>
+            {member.name[0] + member.surname[0]}
           </Avatar>
           <span title="This member is the owner." className="owner__badge">
             <Image
@@ -43,11 +45,11 @@ const BoardHeader = () => {
           </span>
         </div>
       );
-    } else
+    } else if (member.role === "member") {
       return (
         <Tooltip
           key={member._id}
-          title={"member"}
+          title={member.name + " " + member.surname}
           placement="bottom"
           style={{ cursor: "pointer" }}
         >
@@ -61,6 +63,7 @@ const BoardHeader = () => {
           </Avatar>
         </Tooltip>
       );
+    }
   });
   return (
     <div className="board-header">
@@ -91,10 +94,15 @@ const BoardHeader = () => {
           <UserAddOutlined size={16} />
           <span>Add member</span>
         </Flex>
-        <Avatar.Group maxCount={3}>{renderMember}</Avatar.Group>
+        <Avatar.Group maxCount={4}>{renderMember}</Avatar.Group>
         <EllipsisOutlined style={{ cursor: "pointer", fontSize: 24 }} />
       </Flex>
-      <AddMember isOpen={isOpen} setIsOpen={setIsOpen} board={selectedBoard} />
+      <AddMember
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        board={selectedBoard}
+        isOwner={isOwner}
+      />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import {
   createNewBoard,
   getAllUserBoard,
   getBoard,
+  removeMemberInBoard,
 } from "./boardThunk";
 
 const initialState = {
@@ -62,7 +63,10 @@ const boardSlice = createSlice({
       })
       .addCase(getBoard.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.selectedBoard = action.payload;
+        state.selectedBoard = {
+          ...action.payload,
+          members: action.payload.members.reverse(),
+        };
       })
       .addCase(getBoard.rejected, (state, action) => {
         state.isLoading = false;
@@ -83,6 +87,27 @@ const boardSlice = createSlice({
       })
       .addCase(acceptBoardInvite.rejected, (state, action) => {
         state.isLoading = false;
+        state.message = action.payload.errMessage;
+        state.error = true;
+      })
+      //=====================================================
+
+      .addCase(removeMemberInBoard.pending, (state) => {
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(removeMemberInBoard.fulfilled, (state, action) => {
+        state.selectedBoard = {
+          ...state.selectedBoard,
+          members: state.selectedBoard.members.filter(
+            (member) =>
+              member.user.toString() !== action.payload.removedMemberId
+          ),
+        };
+        state.error = false;
+        state.message = action.payload.message;
+      })
+      .addCase(removeMemberInBoard.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
       });

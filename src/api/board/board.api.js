@@ -9,6 +9,10 @@ export const getAllBoards = () => {
 export const getBoardById = (boardId) => {
   return http.get(`/board/${boardId}`);
 };
+export const removeMemberInBoardById = (data) => {
+  const { boardId, memberId } = data;
+  return http.post(`/board/${boardId}/remove-member`, { memberId: memberId });
+};
 // route.post("/:boardId/add-member", boardController.addMember);
 // route.put("/:boardId/update-background", boardController.updateBackground);
 // route.put(
