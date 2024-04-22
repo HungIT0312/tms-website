@@ -125,8 +125,7 @@ const addMember = async (req, res) => {
   const validate = req.user.boards.filter((board) => board === req.params.id);
   if (!validate)
     return res.status(400).send({
-      errMessage:
-        "You can not add member to this board, you are not a member or owner!",
+      errMessage: "You can not add member to this board, you are not owner!",
     });
   const { boardId } = req.params;
   const { members } = req.body;
@@ -135,6 +134,25 @@ const addMember = async (req, res) => {
     if (err) return res.status(400).send(err);
     return res.status(200).send(result);
   });
+};
+const removeMember = async (req, res) => {
+  const validate = req.user.boards.filter((board) => board === req.params.id);
+  if (!validate)
+    return res.status(400).send({
+      errMessage: "You can not remove member you are not owner!",
+    });
+  const { boardId } = req.params;
+  const { memberId } = req.body;
+  // Call the service
+  await boardService.removeMember(
+    boardId,
+    memberId,
+    req.user,
+    (err, result) => {
+      if (err) return res.status(400).send(err);
+      return res.status(200).send(result);
+    }
+  );
 };
 
 module.exports = {
@@ -146,4 +164,5 @@ module.exports = {
   updateBoardDescription,
   updateBackground,
   addMember,
+  removeMember,
 };

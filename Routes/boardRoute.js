@@ -3,6 +3,7 @@ const boardController = require("../Controllers/boardController");
 const route = express.Router();
 
 route.post("/:boardId/add-member", boardController.addMember);
+route.post("/:boardId/remove-member", boardController.removeMember);
 route.put("/:boardId/update-background", boardController.updateBackground);
 route.put(
   "/:boardId/update-board-description",

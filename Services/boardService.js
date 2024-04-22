@@ -31,30 +31,6 @@ const create = async (req, callback) => {
       role: "owner",
     });
 
-    // Save newBoard's id to boards of members and,
-    // Add ids of members to newBoard
-    // await Promise.all(
-    // 	members.map(async (member) => {
-    // 		const newMember = await userModel.findOne({ email: member.email });
-    // 		newMember.boards.push(newBoard._id);
-    // 		await newMember.save();
-    // 		allMembers.push({
-    // 			user: newMember._id,
-    // 			name: newMember.name,
-    // 			surname: newMember.surname,
-    // 			email: newMember.email,
-    // 			color: newMember.color,
-    // 			role: 'member',
-    // 		});
-    // 		//Add to board activity
-    // 		newBoard.activity.push({
-    // 			user: user.id,
-    // 			name: user.name,
-    // 			action: `added user '${newMember.name}' to this board`,
-    // 		});
-    // 	})
-    // );
-
     // Add created activity to activities of this board
     newBoard.activity.unshift({
       user: user._id,
@@ -235,6 +211,55 @@ const addMember = async (id, members, user, callback) => {
     });
   }
 };
+const removeMember = async (boardId, memberId, user, callback) => {
+  try {
+    const board = await boardModel.findById(boardId);
+
+    // Find index of member to remove
+    const memberIndex = board.members.findIndex(
+      (member) => member.user.toString() === memberId.toString()
+    );
+    if (memberIndex === -1) {
+      return callback({ message: "Member not found in board" });
+    }
+
+    // Remove member from board's members array
+    const removedMember = board.members.splice(memberIndex, 1)[0];
+
+    // Remove board from member's boards array
+    const member = await userModel.findById(memberId);
+    const boardIndex = member.boards.findIndex(
+      (board) => board.toString() === boardId
+    );
+    if (boardIndex !== -1) {
+      member.boards.splice(boardIndex, 1);
+    }
+    await member.save();
+
+    // Log the activity
+    board.activity.unshift({
+      user: user._id,
+      name: user.name,
+      action: `removed user '${
+        removedMember.name + " " + removedMember.surname
+      }' from this board`,
+      color: user.color,
+    });
+
+    // Save changes
+    await board.save();
+
+    return callback(false, {
+      message: "Remove member successfully!",
+      removedMemberId: removedMember.user,
+    });
+  } catch (error) {
+    return callback({
+      message: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
 
 module.exports = {
   create,
@@ -245,4 +270,5 @@ module.exports = {
   updateBoardDescription,
   updateBackground,
   addMember,
+  removeMember,
 };
