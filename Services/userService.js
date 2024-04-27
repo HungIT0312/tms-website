@@ -1,26 +1,108 @@
 const userModel = require("../Models/userModel");
+const dotenv = require("dotenv");
 const { createRandomHexColor } = require("./helperMethods");
 const auth = require("../Middlewares/auth");
 const jwt = require("jsonwebtoken");
-const register = async (user, callback) => {
-  const newUser = userModel({ ...user, color: createRandomHexColor() });
-  await newUser
-    .save()
-    .then((result) => {
-      return callback(false, { message: "User created successfully!" });
-    })
-    .catch((err) => {
-      return callback({
-        errMessage: "Email already in use!",
-        details: err.message,
-      });
+const nodemailer = require("nodemailer");
+const emailHTML = require("../utils/mailHTML");
+dotenv.config();
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SERVER_EMAIL,
+    pass: process.env.SERVER_EMAIL_PASS,
+  },
+});
+
+const registerByEmail = async (user, currentURL, callback) => {
+  try {
+    const verificationToken = jwt.sign(
+      { email: user.email },
+      process.env.EMAIL_VERIFICATION_SECRET
+    );
+
+    const mailOptions = {
+      from: process.env.SERVER_EMAIL,
+      to: user.email,
+      subject: "Email Verification",
+      text: `Please click this button to verify your email.`,
+      html: emailHTML(currentURL, verificationToken),
+    };
+    const newUser = new userModel({
+      ...user,
+      color: createRandomHexColor(),
+      verificationToken,
     });
+    await newUser
+      .save()
+      .then((result) => {
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            return callback({
+              errMessage: "Failed to send verification email",
+              details: error,
+            });
+          } else {
+            return callback(false, {
+              message:
+                "User created successfully! Please check your email for verification.",
+            });
+          }
+        });
+      })
+      .catch((err) => {
+        return callback({
+          errMessage: "Email already in use!",
+          details: err.message,
+        });
+      });
+  } catch (err) {
+    return callback({
+      errMessage: "Failed to register user",
+      details: err.message,
+    });
+  }
+};
+const verifyEmail = async (verificationToken, callback) => {
+  try {
+    const decoded = jwt.verify(
+      verificationToken,
+      process.env.EMAIL_VERIFICATION_SECRET
+    );
+    const user = await userModel.findOne({
+      email: decoded.email,
+      verificationToken,
+    });
+    if (!user) return callback({ errMessage: "Invalid verification token" });
+
+    user.verified = true;
+    user.verificationToken = null;
+    await user.save();
+
+    return callback(false, {
+      message: "Email verified successfully!",
+      verified: true,
+    });
+  } catch (err) {
+    return callback({
+      errMessage: "Failed to verify email",
+      details: err.message,
+    });
+  }
 };
 
 const login = async (email, callback) => {
   try {
     let user = await userModel.findOne({ email });
     if (!user) return callback({ errMessage: "Your email/password is wrong!" });
+    // if (!user.verified)
+    //   return callback({
+    //     errMessage: "Please check your email for a verification mail!",
+    //     details: err.message,
+    //     redirectLink: "/auth/verify-mail",
+    //   });
     return callback(false, { ...user.toJSON() });
   } catch (err) {
     return callback({
@@ -76,7 +158,6 @@ const getUser = async (id, callback) => {
   }
 };
 
-
 const getAllUsersByIds = async (userIds, callback) => {
   try {
     const users = await userModel.find({ _id: { $in: userIds } });
@@ -113,10 +194,11 @@ const searchUsers = async (query, callback) => {
   }
 };
 module.exports = {
-  register,
   login,
   getUser,
   refreshToken,
   getAllUsersByIds,
   searchUsers,
+  registerByEmail,
+  verifyEmail,
 };

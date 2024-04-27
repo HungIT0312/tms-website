@@ -2,7 +2,9 @@ const bcrypt = require("bcryptjs");
 const userService = require("../Services/userService");
 const auth = require("../Middlewares/auth");
 
-const register = async (req, res) => {
+//==========================================================================================
+
+const registerByEmail = async (req, res) => {
   const { name, surname, email, password } = req.body;
   if (!(name && surname && email && password))
     return res
@@ -12,13 +14,22 @@ const register = async (req, res) => {
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
   req.body.password = hashedPassword;
-
-  await userService.register(req.body, (err, result) => {
+  const currentURL = req.get("origin");
+  await userService.registerByEmail(req.body, currentURL, (err, result) => {
     if (err) return res.status(400).send(err);
     return res.status(201).send(result);
   });
 };
 
+//==========================================================================================
+const verifyEmail = async (req, res) => {
+  const { verificationToken } = req.body;
+  await userService.verifyEmail(verificationToken, (err, result) => {
+    if (err) return res.status(400).send(err);
+    return res.status(201).send(result);
+  });
+};
+//==========================================================================================
 const login = async (req, res) => {
   const { email, password } = req.body;
   if (!(email && password))
@@ -41,6 +52,7 @@ const login = async (req, res) => {
 
     delete result.__v;
     delete result.password;
+    delete result.verificationToken;
     return res.status(200).send({
       message: "User login successful!",
       user: result,
@@ -93,11 +105,13 @@ const getAllUsersByIds = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+
 module.exports = {
-  register,
   login,
   getUser,
   refreshToken,
   searchUsers,
   getAllUsersByIds,
+  verifyEmail,
+  registerByEmail,
 };

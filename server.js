@@ -30,12 +30,12 @@ app.use(
   auth.verifyToken.unless({
     path: [
       { url: "/user/login", method: ["POST"] },
-      { url: "/user/register", method: ["POST"] },
       { url: "/user/refresh-token", method: ["POST"] },
+      { url: "/user/register-by-mail", method: ["POST"] },
+      { url: "/user/verify-mail", method: ["POST"] },
     ],
   })
 );
-
 //MONGODB CONNECTION
 
 mongoose.Promise = global.Promise;

@@ -4,6 +4,7 @@ const userSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
+
   },
   surname: {
     type: String,
@@ -39,6 +40,13 @@ const userSchema = mongoose.Schema({
   _destroy: {
     type: Boolean,
     default: false,
+  },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
   },
 });
 
