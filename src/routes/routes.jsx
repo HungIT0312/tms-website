@@ -6,6 +6,7 @@ import Register from "../pages/RegisterPage/Register";
 import AuthLayout from "../layouts/Auth/AuthLayout";
 import Workspace from "../pages/WorkspacePage/Workspace";
 import Board from "../pages/BoardPage/Board";
+import VerifiedMail from "../pages/VerifiedPage/VerifiedMail";
 
 const routes = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const routes = createBrowserRouter([
       {
         path: "register",
         element: <Register />,
+      },
+      {
+        path: "verify-mail",
+        element: <VerifiedMail />,
       },
     ],
   },

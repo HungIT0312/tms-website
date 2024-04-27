@@ -5,10 +5,12 @@ import storage from "redux-persist/lib/storage";
 import userSlice from "./user/userSlice";
 import boardSlice from "./board/boardSlice";
 import invitationSlice from "./invitation/invitationSlice";
+import authSlice from "./auth/authSlice";
 const rootReducer = combineReducers({
   user: userSlice,
   board: boardSlice,
   invitation: invitationSlice,
+  auth: authSlice,
   // Thêm các reducer từ các slice khác vào đây
 });
 const persistConfig = {

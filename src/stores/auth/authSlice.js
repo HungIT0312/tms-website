@@ -1,34 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  deleteCookie,
-  setAccessToken,
-  setRefreshToken,
-} from "../../helpers/setToken";
-import { signInUserByEmailPass, signUpUserByEmail } from "./userThunk";
-
-const userSlice = createSlice({
-  name: "user",
-  initialState: {
-    userInformation: null,
-    message: null,
-    loading: false,
-    error: false,
-    isLogin: false,
-  },
+import { signUpUserByEmail, verifyMailUser } from "../user/userThunk";
+const initialState = {
+  message: null,
+  loading: false,
+  error: false,
+  verified: false,
+};
+const authSlice = createSlice({
+  name: "auth",
+  initialState: initialState,
   reducers: {
-    logOut: (state) => {
-      state.userInformation = null;
-      state.message = null;
-      state.loading = false;
-      state.error = false;
-      state.isLogin = false;
-      deleteCookie();
-      window.localStorage.clear();
+    setMessage(state, action) {
+      state.message = action.payload;
+    },
+    resetAuthData() {
+      return { ...initialState };
     },
   },
   extraReducers: (builder) => {
     builder
-
       //=================================================================================
       .addCase(signUpUserByEmail.pending, (state) => {
         state.loading = true;
@@ -45,27 +35,23 @@ const userSlice = createSlice({
         state.error = true;
       })
       //=================================================================================
-
-      .addCase(signInUserByEmailPass.pending, (state) => {
+      .addCase(verifyMailUser.pending, (state) => {
         state.loading = true;
         state.error = false;
       })
-      .addCase(signInUserByEmailPass.fulfilled, (state, action) => {
+      .addCase(verifyMailUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.userInformation = action.payload.user;
         state.message = action.payload.message;
-        setRefreshToken(action.payload.tokens.refreshToken);
-        setAccessToken(action.payload.tokens.accessToken);
-        state.isLogin = true;
+        state.verified = action.payload.verified;
         state.error = false;
       })
-      .addCase(signInUserByEmailPass.rejected, (state, action) => {
+      .addCase(verifyMailUser.rejected, (state, action) => {
         state.loading = false;
         state.message = action.payload.errMessage;
         state.error = true;
-        state.isLogin = false;
       });
+    //=================================================================================
   },
 });
-export const { logOut } = userSlice.actions;
-export default userSlice.reducer;
+// export const {  } = authSlice.actions;
+export default authSlice.reducer;

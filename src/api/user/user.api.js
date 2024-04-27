@@ -6,9 +6,6 @@ export const getNewAccessToken = async () => {
 export const logInUser = (userData) => {
   return http.post("/user/login", userData);
 };
-export const registerUser = (userData) => {
-  return http.post("/user/register", userData);
-};
 export const getUser = (userData) => {
   return http.get("/user/get-user", userData);
 };
@@ -18,10 +15,17 @@ export const getUserByEmail = (userData) => {
 export const searchUser = (key) => {
   return http.post("/user/search", key);
 };
+export const registerUserByEmail = (userData) => {
+  return http.post("/user/register-by-mail", userData);
+};
+export const verifyMail = (token) => {
+  return http.post("/user/verify-mail", token);
+};
 // router.post("/register", userController.register);
 // router.post("/login", userController.login);
 // router.get("/get-user", userController.getUser);
 // router.get("/get-users", userController.getAllUsersByIds);
-// router.get("/search", userController.searchUsers);
-// router.post("/get-user-with-email", userController.getUserWithMail);
+// router.post("/search", userController.searchUsers);
 // router.post("/refresh-token", userController.refreshToken);
+// router.post("/register-by-mail", userController.registerByEmail);
+// router.post("/verify-mail", userController.verifyEmail);

@@ -1,24 +1,30 @@
-import { Button, Divider, Form, Input, message as msg } from "antd";
+import { Button, Col, Divider, Form, Input, Row, message as msg } from "antd";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { signUpUserByEmail } from "../../stores/user/userThunk";
 import "./Register.scss";
-import { useDispatch, useSelector } from "react-redux";
-import { signUpUser } from "../../stores/user/userThunk";
 const Register = () => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, message, error } = useSelector((state) => state.user);
   const onFinish = (values) => {
-    dispatch(signUpUser(values));
-    if (!loading && !error) {
-      msg.success(message);
-      navigate("/auth/login");
-    }
-    if (!loading && error) {
-      msg.error(message);
-    }
+    dispatch(signUpUserByEmail(values))
+      .unwrap()
+      .then((response) => {
+        navigate("/auth/login");
+        msg.success(response.message);
+      })
+      .catch((error) => {
+        msg.error(error.errMessage);
+      });
   };
-
+  const validateName = (_, value) => {
+    const regex = /^[a-zA-Z\s]*$/;
+    if (!regex.test(value)) {
+      return Promise.reject(new Error("Should contain only letters!"));
+    }
+    return Promise.resolve();
+  };
   return (
     <Form
       form={form}
@@ -28,6 +34,44 @@ const Register = () => {
       layout="vertical"
       className="login__input__form"
     >
+      <Row gutter={12}>
+        <Col xs={24} md={12} lg={12}>
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[
+              {
+                required: true,
+                message: "Please input your name!",
+                whitespace: true,
+              },
+              {
+                validator: validateName,
+              },
+            ]}
+          >
+            <Input size="large" />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={12} lg={12}>
+          <Form.Item
+            name="surname"
+            label="Surname"
+            rules={[
+              {
+                required: true,
+                message: "Please input your surname!",
+                whitespace: true,
+              },
+              {
+                validator: validateName,
+              },
+            ]}
+          >
+            <Input size="large" />
+          </Form.Item>
+        </Col>
+      </Row>
       <Form.Item
         name="email"
         label="E-mail"
@@ -44,32 +88,7 @@ const Register = () => {
       >
         <Input size="large" />
       </Form.Item>
-      <Form.Item
-        name="name"
-        label="Name"
-        rules={[
-          {
-            required: true,
-            message: "Please input your name!",
-            whitespace: true,
-          },
-        ]}
-      >
-        <Input size="large" />
-      </Form.Item>
-      <Form.Item
-        name="surname"
-        label="Surname"
-        rules={[
-          {
-            required: true,
-            message: "Please input your surname!",
-            whitespace: true,
-          },
-        ]}
-      >
-        <Input size="large" />
-      </Form.Item>
+
       <Form.Item
         name="password"
         label="Password"
