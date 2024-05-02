@@ -4,6 +4,7 @@ import {
   getAllBoards,
   getBoardById,
   removeMemberInBoardById,
+  updateBoard,
 } from "../../api/board/board.api";
 import { acceptInvitation } from "../../api/invitation/invitation.api";
 
@@ -56,6 +57,17 @@ export const removeMemberInBoard = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await removeMemberInBoardById(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const updateBoardInfo = createAsyncThunk(
+  "board/updateBoardInfo",
+  async (data, thunkApi) => {
+    try {
+      const response = await updateBoard(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

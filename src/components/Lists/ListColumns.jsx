@@ -1,16 +1,18 @@
+/* eslint-disable react/prop-types */
 import { Flex } from "antd";
+import { useSelector } from "react-redux";
 import Column from "./Column/Column";
-import './ListColumns.scss'
-const ListColumns = () => {
+import "./ListColumns.scss";
+const ListColumns = ({ handleCreateList }) => {
+  const { lists } = useSelector((state) => state.list);
+  const renderLists = lists?.map((list) => (
+    <Column key={list._id} list={list} />
+  ));
+
   return (
     <Flex gap={12} className="list-columns">
-      <Column />
-      <Column />
-      <Column />
-      <Column />
-      <Column />
-      <Column />
-      <button>add</button>
+      {renderLists}
+      <Column isAddList={true} handleCreateList={handleCreateList} />
     </Flex>
   );
 };

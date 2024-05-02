@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   EllipsisOutlined,
   LeftOutlined,
@@ -6,19 +7,24 @@ import {
 } from "@ant-design/icons";
 import { Avatar, Divider, Flex, Image, Tooltip } from "antd";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import images from "../../../constants/images";
 import AddMember from "../../Modal/AddMember/AddMember";
 import "./BoardHeader.scss";
-const BoardHeader = () => {
+
+import { EditText } from "react-edit-text";
+import "react-edit-text/dist/index.css";
+import { updateBoardInfo } from "../../../stores/board/boardThunk";
+import boardProperty from "../../../constants/boardProperty";
+const BoardHeader = ({ showDrawer }) => {
   const { selectedBoard } = useSelector((state) => state.board);
   const { userInformation } = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const members = selectedBoard?.members;
-  const isOwner = selectedBoard.members.some(
+  const members = selectedBoard.members || [];
+  const isOwner = selectedBoard?.members?.some(
     (mem) =>
       mem.user.toString() === userInformation._id.toString() &&
       mem.role === "owner"
@@ -65,6 +71,15 @@ const BoardHeader = () => {
       );
     }
   });
+  //===========================================================================
+  const handleBoardTitleChange = (data) => {
+    const updateData = {
+      boardId: selectedBoard?._id,
+      newValue: data.value,
+      property: boardProperty.TITLE,
+    };
+    dispatch(updateBoardInfo(updateData));
+  };
   return (
     <div className="board-header">
       <Flex gap={8} align="center" className="board-header__title">
@@ -73,7 +88,13 @@ const BoardHeader = () => {
           onClick={() => navigate(-1)}
           className="board-header__back"
         />
-        <span>{selectedBoard.title}</span>
+        <EditText
+          name="title"
+          defaultValue={selectedBoard.title}
+          inline
+          style={{ width: `${selectedBoard?.title?.length}ch` }}
+          onSave={(value) => handleBoardTitleChange(value)}
+        />
       </Flex>
       <Flex justify="center" align="center" gap={8}>
         <Flex gap={8} className="filter-btn" align="center" justify="center">
@@ -95,7 +116,10 @@ const BoardHeader = () => {
           <span>Add member</span>
         </Flex>
         <Avatar.Group maxCount={4}>{renderMember}</Avatar.Group>
-        <EllipsisOutlined style={{ cursor: "pointer", fontSize: 24 }} />
+        <EllipsisOutlined
+          style={{ cursor: "pointer", fontSize: 24 }}
+          onClick={showDrawer}
+        />
       </Flex>
       <AddMember
         isOpen={isOpen}

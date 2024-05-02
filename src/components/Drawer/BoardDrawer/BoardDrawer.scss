@@ -1,0 +1,21 @@
+.drawer-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  &:hover {
+    background-color: rgba($color: #ccc, $alpha: 0.22);
+    cursor: pointer;
+  }
+  &__icon {
+    font-size: 20px;
+    color: #44546f;
+  }
+  &__name {
+    color: #172b4d;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  &__sub {
+    font-size: 12px;
+    font-weight: 300;
+  }
+}

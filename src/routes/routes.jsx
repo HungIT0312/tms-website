@@ -13,6 +13,7 @@ const routes = createBrowserRouter([
     path: "/home",
     element: <Welcome />,
   },
+
   {
     path: "/auth",
     element: <AuthLayout />,
@@ -44,6 +45,23 @@ const routes = createBrowserRouter([
       {
         path: "board/:boardId/:boardTitle",
         element: <Board />,
+      },
+      {
+        path: "user/:userMail",
+        children: [
+          {
+            path: "",
+            element: <></>,
+          },
+          {
+            path: "activity",
+            element: <></>,
+          },
+          {
+            path: "cards",
+            element: <></>,
+          },
+        ],
       },
     ],
   },

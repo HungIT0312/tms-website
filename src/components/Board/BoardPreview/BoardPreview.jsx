@@ -14,31 +14,27 @@ const BoardPreview = ({ board }) => {
     navigate(`/board/${id}/${slug}`);
   };
   return (
-    <Flex className="BoardPreview" vertical>
-      <Flex
-        style={{ position: "relative" }}
-        justify="center"
-        align="center"
-        className="BoardPreview__imgGroup"
-        onClick={() => handleChooseBoard(board._id)}
-      >
+    <Flex
+      className="BoardPreview"
+      vertical
+      onClick={() => handleChooseBoard(board._id)}
+    >
+      <Flex justify="center" align="center" className="BoardPreview__imgGroup">
         <img src={board.backgroundImageLink} className="BoardPreview__cover" />
         <img className="image" src={images.taskBg} />
         <div className="BoardPreview__button-detail" type="primary">
           See Detail
         </div>
       </Flex>
-
-      <span
-        className="BoardPreview__title"
-        onClick={() => handleChooseBoard(board._id)}
-      >
-        {capitalizeFirstLetter(board.title)}
-      </span>
-      <span className="BoardPreview__members">
-        <TeamOutlined />
-        <span>{board.members.length}</span>
-      </span>
+      <Flex className="BoardPreview__content" vertical>
+        <span className="BoardPreview__title">
+          {capitalizeFirstLetter(board.title)}
+        </span>
+        <span className="BoardPreview__members">
+          <TeamOutlined />
+          <span>{board.members.length}</span>
+        </span>
+      </Flex>
     </Flex>
   );
 };

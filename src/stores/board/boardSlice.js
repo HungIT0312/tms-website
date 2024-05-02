@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import boardProperty from "../../constants/boardProperty";
 import {
   acceptBoardInvite,
   createNewBoard,
   getAllUserBoard,
   getBoard,
   removeMemberInBoard,
+  updateBoardInfo,
 } from "./boardThunk";
 
 const initialState = {
@@ -108,6 +110,26 @@ const boardSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(removeMemberInBoard.rejected, (state, action) => {
+        state.message = action.payload.errMessage;
+        state.error = true;
+      })
+      // UPDATE BOARD INFO
+
+      .addCase(updateBoardInfo.pending, (state) => {
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(updateBoardInfo.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const payload = action.payload;
+        console.log(payload);
+        if (payload.property === boardProperty.BACKGROUND) {
+          state.selectedBoard.backgroundImageLink = payload.newValue.link;
+          state.selectedBoard.isImage = payload.newValue.isImage;
+        } else state.selectedBoard[payload.property] = payload.newValue;
+        state.message = payload.message;
+      })
+      .addCase(updateBoardInfo.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
       });

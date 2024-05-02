@@ -29,24 +29,7 @@ const Workspace = () => {
       clearTimeout(time);
     };
   }, [input]);
-  // const myBoards =
-  //   boards &&
-  //   boards.filter((board) => {
-  //     return board?.members.some(
-  //       (member) =>
-  //         member.user.toString() === userInformation._id.toString() &&
-  //         member.role === "owner"
-  //     );
-  //   });
-  // const memberBoards =
-  //   boards &&
-  //   boards.filter((board) => {
-  //     return board?.members.some(
-  //       (member) =>
-  //         member.user.toString() === userInformation._id.toString() &&
-  //         member.role === "member"
-  //     );
-  //   });
+
   const renderBoards = (role) => {
     const renderBoardsItem =
       boards &&
@@ -91,8 +74,7 @@ const Workspace = () => {
       </Flex>
       <div className="workspace__content">
         <Row
-          gutter={[32, 32]}
-          // style={{ height: "100%", overflowY: "auto" }}
+          gutter={[16, 16]}
         >
           {!loading && boards.length < 1 && (
             <Flex
@@ -127,7 +109,7 @@ const Workspace = () => {
           {!loading &&
             boards &&
             searchedBoard("owner").map((board) => (
-              <Col key={board._id} xs={24} sm={12} md={6} lg={6}>
+              <Col key={board._id} xs={24} sm={12} md={6} lg={4}>
                 <BoardPreview board={board} />
               </Col>
             ))}
@@ -139,7 +121,7 @@ const Workspace = () => {
           {!loading &&
             boards &&
             searchedBoard("member").map((board) => (
-              <Col key={board._id} xs={24} sm={12} md={6} lg={6}>
+              <Col key={board._id} xs={24} sm={12} md={6} lg={4}>
                 <BoardPreview board={board} />
               </Col>
             ))}

@@ -1,7 +1,54 @@
-.column {
-  width: 272px;
-  background-color: #fff;
+.List-column {
+  width: 256px;
+  background-color: #f1f2f4;
   border-radius: 12px;
   height: fit-content;
-  padding: 8px;
+  max-height: calc(100% - 16px);
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  &__header {
+    line-height: 32px;
+    height: 32px;
+    padding: 0 8px;
+    cursor: pointer;
+    margin: 8px;
+  }
+  &__footer {
+    height: 32px;
+    padding: 0 8px;
+    margin: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+    &:hover {
+      background-color: rgba($color: #ccc, $alpha: 0.22);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    &--add {
+      &:hover {
+        background-color: transparent;
+        cursor: auto;
+      }
+    }
+  }
+  &__option {
+    font-size: 16px;
+    padding: 4px;
+    &:hover {
+      border-radius: 8px;
+      background-color: rgba($color: #ccc, $alpha: 0.22);
+    }
+  }
+  &__add {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+}
+.pop__item {
+  cursor: pointer;
+  &--delete {
+    color: red !important;
+  }
 }
