@@ -34,9 +34,7 @@ const create = async (req, callback) => {
     // Add created activity to activities of this board
     newBoard.activity.unshift({
       user: user._id,
-      name: user.name,
       action: "created this board",
-      color: user.color,
     });
 
     // Save new board
@@ -64,10 +62,10 @@ const getAll = async (userId, callback) => {
     const boards = await boardModel.find({ _id: { $in: boardIds } });
 
     // Delete unneccesary objects
-    // boards.forEach((board) => {
-    //   board.activity = undefined;
-    //   board.lists = undefined;
-    // });
+    boards.forEach((board) => {
+      delete board.activity;
+      delete board.lists;
+    });
 
     return callback(false, boards);
   } catch (error) {
@@ -88,11 +86,25 @@ const getById = async (id, callback) => {
   }
 };
 
-const getActivityById = async (id, callback) => {
+const getActivityById = async (boardId, page = 1, limit = 10, callback) => {
   try {
-    // Get board by id
-    const board = await boardModel.findById(id);
-    return callback(false, board.activity);
+    const skip = (page - 1) * limit;
+
+    const board = await boardModel.findById(boardId).populate({
+      path: "activity.user",
+      select: "name surname email color",
+    });
+    const activities = board.activity.slice(skip, skip + limit);
+    if (!board) {
+      return callback({ message: "Board not found" });
+    }
+
+    return callback(false, {
+      activities,
+      length: board.activity.length,
+      page,
+      limit,
+    });
   } catch (error) {
     return callback({
       message: "Something went wrong",
@@ -101,116 +113,6 @@ const getActivityById = async (id, callback) => {
   }
 };
 
-const updateBoardTitle = async (boardId, title, user, callback) => {
-  try {
-    // Get board by id
-    const board = await boardModel.findById(boardId);
-    board.title = title;
-    board.activity.unshift({
-      user: user._id,
-      name: user.name,
-      action: "update title of this board",
-      color: user.color,
-    });
-    await board.save();
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      message: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const updateBoardDescription = async (boardId, description, user, callback) => {
-  try {
-    // Get board by id
-    const board = await boardModel.findById(boardId);
-    board.description = description;
-    board.activity.unshift({
-      user: user._id,
-      name: user.name,
-      action: "update description of this board",
-      color: user.color,
-    });
-    await board.save();
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      message: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const updateBackground = async (id, background, isImage, user, callback) => {
-  try {
-    // Get board by id
-    const board = await boardModel.findById(id);
-
-    // Set variables
-    board.backgroundImageLink = background;
-    board.isImage = isImage;
-
-    // Log the activity
-    board.activity.unshift({
-      user: user._id,
-      name: user.name,
-      action: "update background of this board",
-      color: user.color,
-    });
-
-    // Save changes
-    await board.save();
-
-    return callback(false, board);
-  } catch (error) {
-    return callback({
-      message: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const addMember = async (id, members, user, callback) => {
-  try {
-    // Get board by id
-    const board = await boardModel.findById(id);
-
-    // Set variables
-    await Promise.all(
-      members.map(async (member) => {
-        const newMember = await userModel.findOne({ email: member.email });
-        newMember.boards.push(board._id);
-        await newMember.save();
-        board.members.push({
-          user: newMember._id,
-          name: newMember.name,
-          surname: newMember.surname,
-          email: newMember.email,
-          color: newMember.color,
-          role: "member",
-        });
-        //Add to board activity
-        board.activity.push({
-          user: user.id,
-          name: user.name,
-          action: `added user '${newMember.name}' to this board`,
-          color: user.color,
-        });
-      })
-    );
-    // Save changes
-    await board.save();
-
-    return callback(false, board.members);
-  } catch (error) {
-    return callback({
-      message: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
 const removeMember = async (boardId, memberId, user, callback) => {
   try {
     const board = await boardModel.findById(boardId);
@@ -239,11 +141,9 @@ const removeMember = async (boardId, memberId, user, callback) => {
     // Log the activity
     board.activity.unshift({
       user: user._id,
-      name: user.name,
       action: `removed user '${
         removedMember.name + " " + removedMember.surname
       }' from this board`,
-      color: user.color,
     });
 
     // Save changes
@@ -260,15 +160,62 @@ const removeMember = async (boardId, memberId, user, callback) => {
     });
   }
 };
+const updateBoardProperty = async (
+  boardId,
+  newValue,
+  property,
+  user,
+  callback
+) => {
+  try {
+    // Get board by id
+    const board = await boardModel.findById(boardId);
+
+    // Update board property based on the given property parameter
+    switch (property) {
+      case "title":
+        board.title = newValue;
+        board.activity.unshift({
+          user: user._id,
+          action: "update title of this board",
+        });
+        break;
+      case "description":
+        board.description = newValue;
+        board.activity.unshift({
+          user: user._id,
+          action: "update description of this board",
+        });
+        break;
+      case "background":
+        board.backgroundImageLink = newValue.link;
+        board.isImage = newValue.isImage;
+        board.activity.unshift({
+          user: user._id,
+          action: "update background of this board",
+        });
+        break;
+      default:
+        return callback({ message: "Invalid property" });
+    }
+
+    // Save changes
+    await board.save();
+
+    return callback(false, { message: "Success!", property, newValue });
+  } catch (error) {
+    return callback({
+      message: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
 
 module.exports = {
   create,
   getAll,
   getById,
   getActivityById,
-  updateBoardTitle,
-  updateBoardDescription,
-  updateBackground,
-  addMember,
   removeMember,
+  updateBoardProperty,
 };

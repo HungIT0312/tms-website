@@ -20,9 +20,7 @@ const boardSchema = mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "user",
         },
-        name: {
-          type: String,
-        },
+
         action: {
           type: String,
         },
@@ -41,9 +39,6 @@ const boardSchema = mongoose.Schema(
         actionType: {
           type: String,
           default: "action",
-        },
-        color: {
-          type: String,
         },
       },
     ],

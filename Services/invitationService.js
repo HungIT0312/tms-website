@@ -30,11 +30,10 @@ const acceptInvitation = async (invitationId, userId, callback) => {
       color: newMember.color,
       role: "member",
     });
+    const owner = board.members.filter((mem) => mem.role === "owner");
     board.activity.push({
-      user: userId,
-      name: newMember.name,
-      action: `added user '${newMember.name}' to this board`,
-      color: newMember.color,
+      user: owner,
+      action: `added user "${newMember.name}" to this board`,
     });
 
     await board.save();

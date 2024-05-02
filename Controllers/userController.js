@@ -60,6 +60,7 @@ const login = async (req, res) => {
     });
   });
 };
+//==========================================================================================
 
 const refreshToken = async (req, res) => {
   const refreshToken = req.headers.cookie
@@ -77,6 +78,7 @@ const refreshToken = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+//==========================================================================================
 
 const getUser = async (req, res) => {
   const userId = req.user.id;
@@ -90,6 +92,7 @@ const getUser = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+//==========================================================================================
 
 const searchUsers = async (req, res) => {
   const query = req.body.key;
@@ -98,6 +101,8 @@ const searchUsers = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+//==========================================================================================
+
 const getAllUsersByIds = async (req, res) => {
   const userIds = req.body;
   await userService.getAllUsersByIds(userIds, (err, result) => {
@@ -105,7 +110,15 @@ const getAllUsersByIds = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+//==========================================================================================
 
+const getAllActivities = async (req, res) => {
+  const userId = req.user._id;
+  await userService.getUserActivities(userId, (err, result) => {
+    if (err) return res.status(404).send(err);
+    return res.status(200).send(result);
+  });
+};
 module.exports = {
   login,
   getUser,
@@ -114,4 +127,5 @@ module.exports = {
   getAllUsersByIds,
   verifyEmail,
   registerByEmail,
+  getAllActivities,
 };

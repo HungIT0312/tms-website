@@ -5,6 +5,7 @@ const auth = require("../Middlewares/auth");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const emailHTML = require("../utils/mailHTML");
+const boardModel = require("../Models/boardModel");
 dotenv.config();
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -193,6 +194,48 @@ const searchUsers = async (query, callback) => {
     });
   }
 };
+
+const getUserActivities = async (userId, callback) => {
+  try {
+    const activities = await boardModel.aggregate([
+      {
+        $unwind: "$activity", // Phân rã mảng activity
+      },
+      {
+        $lookup: {
+          from: "users", // Collection chứa thông tin người dùng
+          localField: "activity.user", // Trường trong bảng board
+          foreignField: "_id", // Trường trong collection users
+          as: "userDetails", // Tên của trường chứa thông tin chi tiết người dùng
+        },
+      },
+      {
+        $match: {
+          "userDetails._id": mongoose.Types.ObjectId(userId), // Lọc hoạt động của người dùng cụ thể
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          user: "$userDetails",
+          action: "$activity.action",
+          edited: "$activity.edited",
+          cardTitle: "$activity.cardTitle",
+          actionType: "$activity.actionType",
+          date: "$activity.date",
+        },
+      },
+    ]);
+
+    return callback(false, activities);
+  } catch (error) {
+    return callback({
+      errMessage: "Something went wrong while getting user activities",
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   login,
   getUser,
@@ -201,4 +244,5 @@ module.exports = {
   searchUsers,
   registerByEmail,
   verifyEmail,
+  getUserActivities,
 };

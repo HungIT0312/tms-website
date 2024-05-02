@@ -28,9 +28,7 @@ const create = async (title, listId, boardId, user, callback) => {
 		// Add log to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `added ${card.title} to this board`,
-			color: user.color,
 		});
 		await board.save();
 
@@ -65,9 +63,7 @@ const deleteById = async (cardId, listId, boardId, user, callback) => {
 		// Add activity log to board
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `deleted ${result.title} from ${list.title}`,
-			color: user.color,
 		});
 		await board.save();
 
@@ -146,11 +142,9 @@ const addComment = async (cardId, listId, boardId, user, body, callback) => {
 		//Add comment to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: body.text,
 			actionType: 'comment',
 			cardTitle: card.title,
-			color: user.color,
 		});
 		board.save();
 
@@ -188,11 +182,9 @@ const updateComment = async (cardId, listId, boardId, commentId, user, body, cal
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: body.text,
 			actionType: 'comment',
 			edited: true,
-			color: user.color,
 			cardTitle: card.title,
 		});
 		board.save();
@@ -223,9 +215,7 @@ const deleteComment = async (cardId, listId, boardId, commentId, user, callback)
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `deleted his/her own comment from ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -260,9 +250,7 @@ const addMember = async (cardId, listId, boardId, user, memberId, callback) => {
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `added '${member.name}' to ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -295,12 +283,10 @@ const deleteMember = async (cardId, listId, boardId, user, memberId, callback) =
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action:
 				tempMember.name === user.name
 					? `left ${card.title}`
 					: `removed '${tempMember.name}' from ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -445,9 +431,7 @@ const createChecklist = async (cardId, listId, boardId, user, title, callback) =
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `added '${title}' to ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -477,9 +461,7 @@ const deleteChecklist = async (cardId, listId, boardId, checklistId, user, callb
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `removed '${cl.title}' from ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -565,11 +547,9 @@ const setChecklistItemCompleted = async (
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: completed
 				? `completed '${clItem}' on ${card.title}`
 				: `marked as uncompleted to '${clItem}' on ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -684,9 +664,7 @@ const updateDateCompleted = async (cardId, listId, boardId, user, completed, cal
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `marked the due date on ${card.title} ${completed ? 'complete' : 'uncomplete'}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -718,9 +696,7 @@ const addAttachment = async (cardId, listId, boardId, user, link, name, callback
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `attached ${validLink} to ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
@@ -756,9 +732,7 @@ const deleteAttachment = async (cardId, listId, boardId, user, attachmentId, cal
 		//Add to board activity
 		board.activity.unshift({
 			user: user._id,
-			name: user.name,
 			action: `deleted the ${attachmentObj[0].link} attachment from ${card.title}`,
-			color: user.color,
 		});
 		board.save();
 
