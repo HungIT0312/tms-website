@@ -19,7 +19,11 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://tms-website.netlify.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://tms-website.netlify.app",
+      "https://tms-tphx.onrender.com",
+    ],
     credentials: true,
   })
 );
