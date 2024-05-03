@@ -51,7 +51,7 @@ const images = {
   trelloRight: cloudLink + "trelloRight.png",
   welcome: cloudLink + "mainBgImg.png",
   cardLoading: cloudLink + "loading.svg",
-  logo: cloudLink + "logo.png",
+  logo: "https://res.cloudinary.com/dzdfqqdxs/image/upload/v1714743799/logoBanner.png",
   emptyBoard: cloudLink + "emptyBoard.svg",
   taskBg: cloudLink + "listHold.svg",
   bgColor1: cloudLink + "bgColor1.svg",

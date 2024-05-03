@@ -23,12 +23,12 @@ const AuthLayout = () => {
       <div className="login__form">
         <div className="login__banner">
           <Image
-            width={30}
+            width={160}
             src={images.logo}
             preview={false}
             className="login__logo"
           />
-          <div className="login__sitename">TMS</div>
+          {/* <div className="login__sitename">TMS</div> */}
         </div>
         <div className="">{getCurrentPathName(pathname)} to continue</div>
         <Outlet />

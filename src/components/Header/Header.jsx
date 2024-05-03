@@ -8,6 +8,7 @@ import ProfileModal from "../Modal/Profile/ProfileModal";
 import InvitationPopup from "../Popup/Ivitation/InvitationPopup";
 import ProfilePopup from "../Popup/Profile/ProfilePopup";
 import "./Header.scss";
+import { useNavigate } from "react-router-dom";
 export const Header = () => {
   const [isPopup, setIsPopup] = useState(false);
   const [isInvitationPop, setIsInvitationPop] = useState(false);
@@ -17,7 +18,7 @@ export const Header = () => {
   const { userInformation } = useSelector((state) => state.user);
   const { invitations } = useSelector((state) => state.invitation);
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(getAllInvite({ userId: userInformation._id }));
   }, [dispatch, userInformation]);
@@ -52,14 +53,18 @@ export const Header = () => {
   }, [invitations]);
   return (
     <Flex align="center" justify="space-between" className="header">
-      <Flex className="header__logo" align="center" justify="center">
+      <Flex
+        className="header__logo"
+        align="center"
+        justify="center"
+        onClick={() => navigate("/")}
+      >
         <Image
           className="header__logo--image"
           src={images.logo}
           preview={false}
-          width={32}
+          width={120}
         />
-        <span className="header__logo--name">TMS</span>
       </Flex>
       <div className="header__right">
         <span

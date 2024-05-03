@@ -6,6 +6,7 @@ import Activity from "../../../Activity/Activity";
 
 const Activities = ({ selectedBoard }) => {
   const [activities, setActivities] = useState([]);
+  const [activityLength, setActivityLength] = useState(0);
   const [limit, setLimit] = useState(10);
   const [isMore, setIsMore] = useState(true);
   useEffect(() => {
@@ -17,6 +18,7 @@ const Activities = ({ selectedBoard }) => {
           limit,
         });
         if (rs) {
+          setActivityLength(rs.length);
           setIsMore(!(rs.length === rs.activities.length));
           setActivities(rs.activities);
           setLimit(rs.limit);
@@ -40,11 +42,14 @@ const Activities = ({ selectedBoard }) => {
         activities.map((activity) => (
           <Activity key={activity._id} activity={activity} />
         ))}
-      <Button type="text" onClick={handleSeeMore}>
-        {isMore ? "See more" : "See less"}
-      </Button>
+      {activityLength > 10 && (
+        <Button type="text" onClick={handleSeeMore}>
+          {isMore ? "See more" : "See less"}
+        </Button>
+      )}
     </Flex>
   );
 };
 
 export default Activities;
+

@@ -73,9 +73,7 @@ const Workspace = () => {
         </Flex>
       </Flex>
       <div className="workspace__content">
-        <Row
-          gutter={[16, 16]}
-        >
+        <Row gutter={[16, 16]}>
           {!loading && boards.length < 1 && (
             <Flex
               style={{ width: "100vw" }}
