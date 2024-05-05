@@ -111,7 +111,7 @@ const updateCardOrder = async (
     let validate = board.lists.filter((list) => list.id === sourceId);
     const validate2 = board.lists.filter((list) => list.id === destinationId);
     if (!validate || !validate2)
-      return callback({ errMessage: "List or board informations are wrong" });
+      return callback({ errMessage: "List or board information are wrong" });
 
     // Validate the parent list of the card
     const sourceList = await listModel.findById(sourceId);
@@ -119,7 +119,7 @@ const updateCardOrder = async (
       (card) => card._id.toString() === cardId
     );
     if (!validate)
-      return callback({ errMessage: "List or card informations are wrong" });
+      return callback({ errMessage: "List or card information are wrong" });
 
     // Remove the card from source list and save
     sourceList.cards = sourceList.cards.filter(
@@ -146,35 +146,6 @@ const updateCardOrder = async (
     // Change owner board of card
     card.owner = destinationId;
     await card.save();
-
-    return callback(false, { message: "Success" });
-  } catch (error) {
-    return callback({
-      errMessage: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const updateListOrder = async (
-  boardId,
-  sourceIndex,
-  destinationIndex,
-  listId,
-  callback
-) => {
-  try {
-    // Validate the parent board of the lists
-    const board = await boardModel.findById(boardId);
-    let validate = board.lists.filter((list) => list.id === listId);
-
-    if (!validate)
-      return callback({ errMessage: "List or board information are wrong" });
-
-    // Change list order
-    board.lists.splice(sourceIndex, 1);
-    board.lists.splice(destinationIndex, 0, listId);
-    await board.save();
 
     return callback(false, { message: "Success" });
   } catch (error) {
@@ -214,12 +185,31 @@ const updateListTitle = async (listId, boardId, user, title, callback) => {
     });
   }
 };
+const changeListOrder = async (boardId, listIds, callback) => {
+  try {
+    const board = await boardModel.findById(boardId);
 
+    // if (board.lists.length !== listIds.length)
+    //   return callback({
+    //     errMessage: "Number of lists in request does not match with the board",
+    //   });
+
+    board.lists = listIds;
+    await board.save();
+
+    return callback(false, { message: "Success", lists: board.lists });
+  } catch (error) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
 module.exports = {
   create,
   getAll,
   deleteById,
   updateCardOrder,
-  updateListOrder,
   updateListTitle,
+  changeListOrder,
 };
