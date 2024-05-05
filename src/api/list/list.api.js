@@ -31,3 +31,6 @@ export const updateCardOrder = async (cardOrderData) => {
 export const updateListOrder = async (listOrderData) => {
   return http.post(`/list/change-list-order`, listOrderData);
 };
+export const changeListOrder = async (listOrderData) => {
+  return http.post(`/list/update-list-order`, listOrderData);
+};

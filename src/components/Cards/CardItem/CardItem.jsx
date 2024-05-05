@@ -7,13 +7,42 @@ import {
   MessageOutlined,
   PaperClipOutlined,
 } from "@ant-design/icons";
-import { Avatar, Flex, Tooltip } from "antd";
-import { useState } from "react";
+import { Avatar, Flex, Input, Tooltip } from "antd";
 import "./CardItem.scss";
-const CardItem = ({ card = {} }) => {
+import { useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+const CardItem = ({
+  card = {},
+  isAdd = false,
+  newTaskTitle,
+  setNewTaskTitle,
+}) => {
   const [isEnter, setIsEnter] = useState(false);
-  return (
-    <Flex className="card-item" vertical>
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: card?._id, data: { ...card, typeDrag: "card" } });
+
+  const dndKitListStyle = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.8 : undefined,
+    border: isDragging ? "1px solid #2ecc71" : undefined,
+  };
+  return !isAdd ? (
+    <Flex
+      className="card-item"
+      vertical
+      ref={setNodeRef}
+      style={dndKitListStyle}
+      {...attributes}
+      {...listeners}
+    >
       <div className="card-item__cover"></div>
       <Flex vertical gap={4}>
         <Flex className="card-item__labels" gap={8}>
@@ -88,6 +117,15 @@ const CardItem = ({ card = {} }) => {
           </Flex>
         </Flex>
       </Flex>
+    </Flex>
+  ) : (
+    <Flex className="card-item" vertical>
+      <Input
+        className="card-item__input"
+        placeholder="Type new title"
+        value={newTaskTitle}
+        onChange={(e) => setNewTaskTitle(e.target.value)}
+      />
     </Flex>
   );
 };

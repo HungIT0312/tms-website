@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createList, getAllLists } from "../../api/list/list.api";
+import { changeListOrder, createList, getAllLists } from "../../api/list/list.api";
 
 export const getAllListByBoardId = createAsyncThunk(
   "board/getAllListByBoardId",
@@ -17,6 +17,17 @@ export const createNewList = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await createList(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const changeListOrderByIds = createAsyncThunk(
+  "board/changeListOrderByIds",
+  async (data, thunkApi) => {
+    try {
+      const response = await changeListOrder(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

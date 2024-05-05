@@ -6,9 +6,9 @@ import http from "../../helpers/http";
 // };
 
 // // Tạo một danh sách mới
-// export const createList = async (listData) => {
-//   return http.post(`/list/create`, listData);
-// };
+export const createCard = async (data) => {
+  return http.post(`/card/create`, data);
+};
 
 // // Xóa một danh sách
 // export const deleteList = async (boardId, listId) => {

@@ -122,7 +122,6 @@ const boardSlice = createSlice({
       .addCase(updateBoardInfo.fulfilled, (state, action) => {
         state.isLoading = false;
         const payload = action.payload;
-        console.log(payload);
         if (payload.property === boardProperty.BACKGROUND) {
           state.selectedBoard.backgroundImageLink = payload.newValue.link;
           state.selectedBoard.isImage = payload.newValue.isImage;
