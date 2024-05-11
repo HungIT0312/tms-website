@@ -40,7 +40,13 @@ const getAll = async (boardId, callback) => {
   try {
     let lists = await listModel
       .find({ owner: { $in: boardId } })
-      .populate({ path: "cards" }) /* { path: 'cards', select: 'title' }) */
+      .populate({
+        path: "cards",
+        populate: {
+          path: "activities.user", // Populate user trong activities của mỗi card
+          model: "user", // Tên của modal user
+        },
+      })
       .exec();
 
     const board = await boardModel.findById(boardId);
