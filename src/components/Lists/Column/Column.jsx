@@ -57,7 +57,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [list]);
+  }, [list?.cards]);
 
   const hide = () => {
     setOpen(false);

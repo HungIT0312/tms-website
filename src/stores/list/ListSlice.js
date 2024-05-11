@@ -22,6 +22,13 @@ const ListSlice = createSlice({
     setListsState: (state, action) => {
       state.lists = action.payload;
     },
+    setCardsState: (state, action) => {
+      const { listId, cardIds, columnCards } = action.payload;
+      const listToUpdate = state.lists.find((list) => list._id === listId);
+      if (listToUpdate) {
+        listToUpdate.cards = columnCards;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -93,6 +100,6 @@ const ListSlice = createSlice({
   },
 });
 
-export const { setListsState } = ListSlice.actions;
+export const { setListsState, setCardsState } = ListSlice.actions;
 
 export default ListSlice.reducer;

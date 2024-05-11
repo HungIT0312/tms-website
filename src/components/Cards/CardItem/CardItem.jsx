@@ -7,11 +7,15 @@ import {
   MessageOutlined,
   PaperClipOutlined,
 } from "@ant-design/icons";
-import { Avatar, Flex, Input, Tooltip } from "antd";
-import "./CardItem.scss";
-import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Avatar, Flex, Input, Tooltip } from "antd";
+import { useState } from "react";
+import "./CardItem.scss";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setSelectedCard } from "../../../stores/card/cardSlice";
+import _ from "lodash";
 const CardItem = ({
   card = {},
   isAdd = false,
@@ -19,6 +23,10 @@ const CardItem = ({
   setNewTaskTitle,
 }) => {
   const [isEnter, setIsEnter] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
+  const dispatch = useDispatch();
   const {
     attributes,
     listeners,
@@ -34,6 +42,13 @@ const CardItem = ({
     opacity: isDragging ? 0.8 : undefined,
     border: isDragging ? "1px solid #2ecc71" : undefined,
   };
+
+  const handleSelectCard = () => {
+    const slug = _.kebabCase(card.title.toLowerCase());
+    dispatch(setSelectedCard(card));
+    navigate(`${rootLink}/c/${slug}`);
+  };
+
   return !isAdd ? (
     <Flex
       className="card-item"
@@ -42,6 +57,7 @@ const CardItem = ({
       style={dndKitListStyle}
       {...attributes}
       {...listeners}
+      onClick={handleSelectCard}
     >
       <div className="card-item__cover"></div>
       <Flex vertical gap={4}>

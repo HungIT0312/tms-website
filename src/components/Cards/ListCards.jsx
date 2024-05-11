@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import { Flex } from "antd";
-import CardItem from "./CardItem/CardItem";
-import "./ListCards.scss";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { Flex } from "antd";
+import CardItem from "./CardItem/CardItem";
+import "./ListCards.scss";
 const ListCards = ({
   cards = [],
   newTaskTitle,
@@ -30,6 +30,7 @@ const ListCards = ({
             setNewTaskTitle={handleAddCard}
             newTaskTitle={newTaskTitle}
             setIsAddNewTask={setIsAddNewTask}
+            // setModalOpen={setModalOpen}
           />
         )}
       </Flex>

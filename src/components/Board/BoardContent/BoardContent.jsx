@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Flex } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,15 +24,16 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Column from "../../Lists/Column/Column";
 import CardItem from "../../Cards/CardItem/CardItem";
 import { cloneDeep } from "lodash";
-import { setListsState } from "../../../stores/list/ListSlice";
+import { setCardsState, setListsState } from "../../../stores/list/ListSlice";
 
 const BoardContent = () => {
   const dispatch = useDispatch();
   const { boardId } = useParams();
   const { loading, lists } = useSelector((state) => state.list);
-  const [activeDragItem, setActiveDragItem] = useState(null);
+  const [activeDragItemId, setActiveDragItemId] = useState(null);
   const [activeDragItemType, setActiveDragItemType] = useState(null);
   const [activeDragItemData, setActiveDragItemData] = useState(null);
+  const [oldActiveColumn, setOldActiveColumn] = useState(null);
   useEffect(() => {
     dispatch(getAllListByBoardId(boardId));
   }, [boardId, dispatch]);
@@ -60,22 +62,15 @@ const BoardContent = () => {
   const findColumnByCardId = (cardId) => {
     return lists.find((column) => column.cards.some((c) => c._id === cardId));
   };
-  const handleDragStart = (event) => {
-    setActiveDragItem(event?.active?.id);
-    setActiveDragItemType(event?.active?.data?.current?.typeDrag);
-    setActiveDragItemData(event?.active?.data?.current);
-  };
-  const handleDragOver = (event) => {
-    if (activeDragItemType === "list") return;
-    const { active, over } = event;
-    if (!active || !over) return;
-    const {
-      id: activeDraggingCardId,
-      data: { current: activeDraggingCardData },
-    } = active;
-    const { id: overCardId } = over;
-    const activeColumn = findColumnByCardId(activeDraggingCardId);
-    const overColumn = findColumnByCardId(overCardId);
+  const moveCardBetweenDifferentColumns = (
+    overColumn,
+    overCardId,
+    active,
+    over,
+    activeColumn,
+    activeDraggingCardId,
+    activeDraggingCardData
+  ) => {
     const overCardIndex = overColumn?.cards?.findIndex(
       (card) => card._id === overCardId
     );
@@ -88,11 +83,12 @@ const BoardContent = () => {
       overCardIndex >= 0
         ? overCardIndex + modifier
         : overColumn?.cards?.length + 1;
-    if (!activeColumn || !overColumn) return;
+
+    if (!oldActiveColumn || !overColumn) return;
 
     const nextColumns = cloneDeep(lists);
     const nextActiveColumns = nextColumns.find(
-      (column) => column._id === activeColumn._id
+      (column) => column._id === oldActiveColumn._id
     );
     const nextOverColumns = nextColumns.find(
       (column) => column._id === overColumn._id
@@ -102,31 +98,118 @@ const BoardContent = () => {
       nextActiveColumns.cards = nextActiveColumns.cards.filter(
         (card) => card._id !== activeDraggingCardId
       );
-      // nextActiveColumns
     }
     if (nextOverColumns) {
       nextOverColumns.cards = nextOverColumns.cards || [];
       nextOverColumns.cards = nextOverColumns.cards.filter(
         (card) => card._id !== activeDraggingCardId
       );
-      nextOverColumns.cards.splice(newCardIndex, 0, activeDraggingCardData);
+      const newActiveDragItemData = {
+        ...activeDraggingCardData,
+        owner: nextOverColumns._id,
+      };
+      nextOverColumns.cards = nextOverColumns.cards.toSpliced(
+        newCardIndex,
+        0,
+        newActiveDragItemData
+      );
     }
-    // console.log("nextColumn", nextColumns);
     dispatch(setListsState(nextColumns));
-    // if (activeColumn?._id === overColumn?._id) return;
+    return {
+      lists: nextColumns.map(({ _id }) => _id),
+      parentListId: oldActiveColumn?._id,
+      nextListId: nextOverColumns?._id,
+      index: newCardIndex,
+      cardId: activeDraggingCardId,
+    };
+  };
+  // boardId,
+  //   sourceId,
+  //   destinationId,
+  //   destinationIndex,
+  //   cardId,
+  const handleDragStart = (event) => {
+    setActiveDragItemId(event?.active?.id);
+    setActiveDragItemType(event?.active?.data?.current?.typeDrag);
+    setActiveDragItemData(event?.active?.data?.current);
+    if (event?.active?.data?.current?.typeDrag == "card") {
+      setOldActiveColumn(findColumnByCardId(event?.active?.id));
+    }
+  };
+  const handleDragOver = (event) => {
+    const { active, over } = event;
+    if (activeDragItemType === "list") return;
+    if (!active || !over || !active.id || !over.id) return;
+
+    const {
+      id: activeDraggingCardId,
+      data: { current: activeDraggingCardData },
+    } = active;
+    const { id: overCardId } = over;
+    const overColumn = findColumnByCardId(overCardId);
+    const activeColumn = findColumnByCardId(activeDraggingCardId);
+    if (oldActiveColumn?._id === overColumn?.id) return;
+
+    if (oldActiveColumn?._id !== overColumn?._id) {
+      moveCardBetweenDifferentColumns(
+        overColumn,
+        overCardId,
+        active,
+        over,
+        activeColumn,
+        activeDraggingCardId,
+        activeDraggingCardData
+      );
+    }
   };
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-    if (!active || !over) return;
-
-    if (!active.id && !over.id) return;
+    if (!active || !over || !active.id || !over.id) return;
 
     if (activeDragItemType === "card") {
-      if (active.id !== over.id) {
-        console.log("nothing");
+      const {
+        id: activeDraggingCardId,
+        data: { current: activeDraggingCardData },
+      } = active;
+      const { id: overCardId } = over;
+      const overColumn = findColumnByCardId(overCardId);
+      const activeColumn = findColumnByCardId(activeDraggingCardId);
+      if (!oldActiveColumn || !overColumn) return;
+
+      if (oldActiveColumn._id !== overColumn._id) {
+        if (active.id !== over.id) {
+          const data = moveCardBetweenDifferentColumns(
+            overColumn,
+            overCardId,
+            active,
+            over,
+            activeColumn,
+            activeDraggingCardId,
+            activeDraggingCardData
+          );
+        }
+      } else {
+        if (active.id !== over.id) {
+          const oldIndex = oldActiveColumn?.cards?.findIndex(
+            (c) => c._id === activeDragItemId
+          );
+          const newIndex = overColumn?.cards?.findIndex(
+            (c) => c._id === over.id
+          );
+          const movedCards = arrayMove(
+            oldActiveColumn?.cards,
+            oldIndex,
+            newIndex
+          );
+          const data = {
+            listId: oldActiveColumn._id,
+            cardIds: activeDragItemId,
+            columnCards: movedCards,
+          };
+          dispatch(setCardsState(data));
+        }
       }
-      return;
     }
     if (activeDragItemType === "list") {
       if (active.id !== over.id) {
@@ -138,14 +221,15 @@ const BoardContent = () => {
           boardId: boardId,
           listIds: movedColumnIds,
         };
-        dispatch(changeListOrderByIds(data));
         dispatch(setListsState(movedColumns));
+        dispatch(changeListOrderByIds(data));
       }
     }
 
-    setActiveDragItem(null);
+    setActiveDragItemId(null);
     setActiveDragItemType(null);
     setActiveDragItemData(null);
+    setOldActiveColumn(null);
   };
 
   const handleCreateList = (data) => {

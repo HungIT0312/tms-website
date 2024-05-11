@@ -63,7 +63,7 @@ const Info = ({ owner, selectedBoard }) => {
           <span className="info__title">Description</span>
         </Flex>
         <QuillTextBox
-          content={selectedBoard?.description}
+          content={selectedBoard?.description || ""}
           placeholder={""}
           getCleanHTML={triggerCallUpdate}
         />

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Flex } from "antd";
+import { Button, Flex } from "antd";
 import DOMPurify from "dompurify";
 import { useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill";
@@ -22,7 +22,7 @@ const QuillTextBox = ({ content, placeholder, getCleanHTML = () => {} }) => {
     setIsChangeDes(false);
   };
   return (
-    <Flex className="" align="center" gap={12} vertical>
+    <Flex className="" align="end" gap={12} vertical>
       {!isChangeDes && (
         <div
           dangerouslySetInnerHTML={{ __html: cleanHTML }}
@@ -34,7 +34,11 @@ const QuillTextBox = ({ content, placeholder, getCleanHTML = () => {} }) => {
         />
       )}
       <ReactQuill
-        style={{ opacity: `${isChangeDes ? 1 : 0}` }}
+        style={{
+          opacity: `${isChangeDes ? 1 : 0}`,
+          width: "100%",
+          height: `${isChangeDes ? "100%" : 0}`,
+        }}
         ref={quillRef}
         theme="snow"
         value={value}
@@ -42,6 +46,11 @@ const QuillTextBox = ({ content, placeholder, getCleanHTML = () => {} }) => {
         onBlur={handleBlur}
         placeholder={placeholder}
       />
+      {isChangeDes && (
+        <Button type="primary" onClick={handleBlur}>
+          Save
+        </Button>
+      )}
     </Flex>
   );
 };

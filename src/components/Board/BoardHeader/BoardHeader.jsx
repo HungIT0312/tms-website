@@ -8,7 +8,7 @@ import {
 import { Avatar, Divider, Flex, Image, Tooltip } from "antd";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import images from "../../../constants/images";
 import AddMember from "../../Modal/AddMember/AddMember";
 import "./BoardHeader.scss";
@@ -23,6 +23,8 @@ const BoardHeader = ({ showDrawer }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const rootLink = location.pathname?.split("/").slice(0, 1).join("/") + "/";
   const members = selectedBoard.members || [];
   const isOwner = selectedBoard?.members?.some(
     (mem) =>
@@ -85,7 +87,7 @@ const BoardHeader = ({ showDrawer }) => {
       <Flex gap={8} align="center" className="board-header__title">
         <LeftOutlined
           size={32}
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(rootLink)}
           className="board-header__back"
         />
         <EditText

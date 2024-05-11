@@ -7,6 +7,7 @@ import AuthLayout from "../layouts/Auth/AuthLayout";
 import Workspace from "../pages/WorkspacePage/Workspace";
 import Board from "../pages/BoardPage/Board";
 import VerifiedMail from "../pages/VerifiedPage/VerifiedMail";
+import CardDetail from "../components/Modal/CardDetail/CardDetail";
 
 const routes = createBrowserRouter([
   {
@@ -45,6 +46,12 @@ const routes = createBrowserRouter([
       {
         path: "board/:boardId/:boardTitle",
         element: <Board />,
+        children: [
+          {
+            path: "c/:cardName",
+            element: <CardDetail />,
+          },
+        ],
       },
       {
         path: "user/:userMail",

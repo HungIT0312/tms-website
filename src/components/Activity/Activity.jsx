@@ -8,17 +8,19 @@ const Activity = ({ activity }) => {
       <div>
         <Avatar
           size={36}
-          style={{ background: activity.user.color, fontSize: 12 }}
+          style={{ background: activity?.user?.color, fontSize: 12 }}
         >
-          {activity.user.name[0] + activity.user.surname[0]}
+          {activity?.user?.name[0] + activity?.user?.surname[0]}
         </Avatar>
       </div>
       <Flex vertical justify="space-between" gap={4}>
         <span>
-          <strong>{activity.user.name + " " + activity.user.surname}</strong>{" "}
-          {activity.action}
+          <strong>
+            {activity?.user?.name + " " + activity?.user?.surname}
+          </strong>{" "}
+          {activity?.action}
         </span>
-        <small>{formatDateTime(activity.date)}</small>
+        <small>{formatDateTime(activity?.date)}</small>
       </Flex>
     </Flex>
   );

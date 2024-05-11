@@ -2,7 +2,7 @@
 import { Spin } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import BoardContent from "../../components/Board/BoardContent/BoardContent";
 import BoardHeader from "../../components/Board/BoardHeader/BoardHeader";
 import BoardDrawer from "../../components/Drawer/BoardDrawer/BoardDrawer";
@@ -39,6 +39,7 @@ const Board = () => {
     >
       <BoardHeader showDrawer={showDrawer} />
       <BoardContent />
+      <Outlet />
       <BoardDrawer
         open={open}
         onClose={onClose}
