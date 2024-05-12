@@ -89,22 +89,22 @@ const updateCardOrder = async (req, res) => {
     }
   );
 };
-
-const updateListTitle = async (req, res) => {
+const updateList = async (req, res) => {
   // deconstruct the params
   const { listId, boardId } = req.params;
   const user = req.user;
-  const { title } = req.body;
+  const { value, property } = req.body;
 
   // Validate the listId and boardId
   if (!(listId && boardId))
     return res.status(400).send({ errMessage: "List or board undefined" });
 
-  await listService.updateListTitle(
+  await listService.updateList(
     listId,
     boardId,
     user,
-    title,
+    value,
+    property,
     (err, result) => {
       if (err) return res.status(500).send(err);
       return res.status(200).send(result);
@@ -135,6 +135,6 @@ module.exports = {
   getAll,
   deleteById,
   updateCardOrder,
-  updateListTitle,
   changeListOrder,
+  updateList,
 };

@@ -87,13 +87,16 @@ const deleteById = async (listId, boardId, user, callback) => {
 
     board.activity.unshift({
       user: user._id,
-      action: `deleted ${result.title} from this board`,
+      action: `deleted list "${result.title}"  from this board`,
     });
     board.save();
 
     await cardModel.deleteMany({ owner: listId });
 
-    return callback(false, result);
+    return callback(false, {
+      message: "Delete list successfully!",
+      list: result,
+    });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -162,11 +165,11 @@ const updateCardOrder = async (
   }
 };
 
-const updateListTitle = async (listId, boardId, user, title, callback) => {
+const updateList = async (listId, boardId, user, value, property, callback) => {
   try {
     // Get board to check the parent of list is this board
     const board = await boardModel.findById(boardId);
-    const list = await listModel.findById(listId.toString());
+    const list = await listModel.findById(listId.toString()).populate("cards");
     // Validate the parent of the list
     const validate = board.lists.filter((list) => list.id === listId);
     if (!validate)
@@ -179,11 +182,19 @@ const updateListTitle = async (listId, boardId, user, title, callback) => {
           "You cannot delete a list that does not hosted by your boards",
       });
 
-    // Change title of list
-    list.title = title;
-    await list.save();
+    list[property] = value;
+    if (property === "_destroy") {
+      await cardModel.findByIdAndUpdate(
+        list.cardId,
+        {
+          $set: { _destroy: value },
+        },
+        { new: true }
+      );
+    }
 
-    return callback(false, { message: "Success" });
+    await list.save();
+    return callback(false, { message: "Success", list: list });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -216,6 +227,6 @@ module.exports = {
   getAll,
   deleteById,
   updateCardOrder,
-  updateListTitle,
   changeListOrder,
+  updateList,
 };

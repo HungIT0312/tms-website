@@ -32,7 +32,7 @@ const create = async (title, listId, boardId, user, callback) => {
       user: user._id,
       action: `added this card to ${list.title}`,
     });
-    card.labels = helperMethods.labelsSeed;
+    card.labels = helperMethods.labelsSeedColor;
     await card.save();
 
     // Add id of the new card to owner list
@@ -160,8 +160,8 @@ const update = async (cardId, listId, boardId, user, updatedObj, callback) => {
     //Update card
     await card.updateOne(updatedObj);
     await card.save();
-
-    return callback(false, { message: "Success!" });
+    const updatedCard = await cardModel.findById(cardId);
+    return callback(false, { message: "Success!", card: updatedCard });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -448,8 +448,7 @@ const createLabel = async (cardId, listId, boardId, user, label, callback) => {
     //Add label
     card.labels.unshift({
       text: label.text,
-      color: label.color,
-      backColor: label.backColor,
+      type: label.type,
       selected: true,
     });
     await card.save();
@@ -496,8 +495,8 @@ const updateLabel = async (
     card.labels = card.labels.map((item) => {
       if (item._id.toString() === labelId.toString()) {
         item.text = label.text;
-        item.color = label.color;
-        item.backColor = label.backColor;
+        item.type = label.type;
+        item.selected = label.selected;
       }
       return item;
     });
@@ -542,51 +541,6 @@ const deleteLabel = async (
     card.labels = card.labels.filter(
       (label) => label._id.toString() !== labelId.toString()
     );
-    await card.save();
-
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      errMessage: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const updateLabelSelection = async (
-  cardId,
-  listId,
-  boardId,
-  labelId,
-  user,
-  selected,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to update this card";
-    }
-
-    //Update label
-    card.labels = card.labels.map((item) => {
-      if (item._id.toString() === labelId.toString()) {
-        item.selected = selected;
-      }
-      return item;
-    });
     await card.save();
 
     return callback(false, { message: "Success!" });
@@ -1207,7 +1161,6 @@ module.exports = {
   createLabel,
   updateLabel,
   deleteLabel,
-  updateLabelSelection,
   createChecklist,
   deleteChecklist,
   addChecklistItem,

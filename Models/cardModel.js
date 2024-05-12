@@ -14,10 +14,7 @@ const cardSchema = mongoose.Schema({
       text: {
         type: String,
       },
-      color: {
-        type: String,
-      },
-      backColor: {
+      type: {
         type: String,
       },
       selected: {
@@ -149,6 +146,10 @@ const cardSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+  },
+  _destroy: {
+    type: Boolean,
+    default: false,
   },
 });
 

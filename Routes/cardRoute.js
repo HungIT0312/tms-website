@@ -58,10 +58,6 @@ router.post(
   cardController.createChecklist
 );
 //=========================================================================================
-router.put(
-  "/:boardId/:listId/:cardId/label/:labelId/update-label-selection",
-  cardController.updateLabelSelection
-);
 router.delete(
   "/:boardId/:listId/:cardId/label/:labelId",
   cardController.deleteLabel
