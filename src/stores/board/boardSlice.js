@@ -14,6 +14,7 @@ const initialState = {
   error: false,
   message: null,
   boards: [],
+  storageBoards: [],
   selectedBoard: {},
 };
 
@@ -48,7 +49,9 @@ const boardSlice = createSlice({
       })
       .addCase(getAllUserBoard.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.boards = action.payload;
+        // state.boards = action.payload;
+        state.boards = action.payload.filter((b) => b._destroy === false);
+        state.storageBoards = action.payload.filter((b) => b._destroy === true);
       })
       .addCase(getAllUserBoard.rejected, (state, action) => {
         state.isLoading = false;

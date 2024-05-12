@@ -1,46 +1,59 @@
 /* eslint-disable react/prop-types */
 import {
   CommentOutlined,
+  DeleteOutlined,
   DownOutlined,
   EditOutlined,
-  UserOutlined,
+  EyeOutlined,
+  PlusSquareOutlined,
+  TagsOutlined,
 } from "@ant-design/icons";
 import {
   Button,
   Col,
   Collapse,
+  DatePicker,
   Descriptions,
   Dropdown,
   Flex,
   Modal,
   Row,
   Space,
+  Tag,
 } from "antd";
-import { useEffect } from "react";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import { EditText } from "react-edit-text";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { setSelectedCard } from "../../../stores/card/cardSlice";
+import { updateCardInfo } from "../../../stores/card/cardThunk";
 import QuillTextBox from "../../QuillTextBox/QuillTextBox";
 import ActivityAndComment from "./Activity/ActivityAndComment";
 import "./CardDetail.scss";
+import Labels from "./Labels/Labels";
 import Attachment from "./UploadAttachment/Attachment";
-import { DatePicker } from "antd";
-import dayjs from "dayjs";
-const { RangePicker } = DatePicker;
 const CardDetail = () => {
   const { cardName } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
   const { selectedCard } = useSelector((state) => state.card);
+  const { boardId } = useParams();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleModalOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   useEffect(() => {
     if (!selectedCard) {
       navigate(-1);
     }
-    console.log(selectedCard?.createdAt);
-    const dateCreate = new Date(selectedCard?.createdAt);
-    console.log(dateCreate);
   }, [navigate, selectedCard]);
 
   const handleClose = () => {
@@ -53,8 +66,20 @@ const CardDetail = () => {
   const itemDetails = [
     {
       key: "1",
-      label: "UserName",
-      children: "Zhou Maomao",
+      label: "Labels",
+      children: (
+        <Flex>
+          <Tag color="success">success</Tag>
+          <Tag color="processing">processing</Tag>
+          <Tag color="error">error</Tag>
+          <Tag color="warning">warning</Tag>
+          <Tag color="orange">orange</Tag>
+          <Tag color="purple">purple</Tag>
+          {/* <Popover trigger={"click"} content={<Labels />}> */}
+          <PlusSquareOutlined onClick={showModal} />
+          {/* </Popover> */}
+        </Flex>
+      ),
       span: 2,
     },
     {
@@ -128,27 +153,37 @@ const CardDetail = () => {
   ];
   const items = [
     {
-      label: "1st menu item",
+      label: "Watch issue",
       key: "1",
-      icon: <UserOutlined />,
+      icon: <EyeOutlined />,
+    },
+    {
+      label: "Labels",
+      key: "12",
+      icon: <TagsOutlined />,
+    },
+    {
+      label: "Delete",
+      key: "3",
+      icon: <DeleteOutlined />,
+      danger: true,
     },
   ];
   const menuProps = {
     items,
   };
   const handleCardTitleChange = (data) => {
-    // const updateData = {
-    //   cardId: selectedCard?._id,
-    //   newValue: data.value,
-    //   property: cardProperty.TITLE,
-    // };
-    // dispatch(updateBoardInfo(updateData));
-    // console.log(data);
+    if (data.value !== data.previousValue) {
+      const updateData = {
+        boardId: boardId,
+        listId: selectedCard.owner,
+        cardId: selectedCard._id,
+        updateObj: { title: data?.value },
+      };
+      dispatch(updateCardInfo(updateData));
+    }
   };
-  const handleChange = (e, setFn) => {
-    setFn(e.target.value);
-    console.log(e.target.value);
-  };
+
   return (
     <Modal
       title={
@@ -156,7 +191,6 @@ const CardDetail = () => {
           name="title"
           defaultValue={selectedCard?.title}
           inline
-          // style={{ width: `${selectedCard?.title?.length}ch` }}
           style={{ width: "calc(100% - 340px)" }}
           onSave={(value) => handleCardTitleChange(value)}
         />
@@ -180,7 +214,7 @@ const CardDetail = () => {
               <Dropdown menu={menuProps}>
                 <Button>
                   <Space>
-                    Button
+                    More
                     <DownOutlined />
                   </Space>
                 </Button>
@@ -201,6 +235,16 @@ const CardDetail = () => {
             />
           </Col>
         </Row>
+        <Modal
+          title="Label"
+          open={isModalOpen}
+          onOk={handleModalOk}
+          onCancel={handleCancel}
+          centered
+          width={270}
+        >
+          <Labels />
+        </Modal>
       </div>
     </Modal>
   );

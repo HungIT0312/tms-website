@@ -15,11 +15,14 @@ export const deleteList = async (boardId, listId) => {
   return http.delete(`/list/${boardId}/${listId}`);
 };
 
-// Cập nhật tiêu đề của một danh sách
+// Cập nhật một danh sách
 export const updateListTitle = async (boardId, listId, newTitle) => {
   return http.put(`/list/${boardId}/${listId}/update-title`, {
     title: newTitle,
   });
+};
+export const updateList = async (boardId, listId, value, property) => {
+  return http.put(`/list/${boardId}/${listId}`, { value, property });
 };
 
 // Cập nhật thứ tự của các thẻ trong một danh sách
@@ -28,9 +31,9 @@ export const updateCardOrder = async (cardOrderData) => {
 };
 
 // Cập nhật thứ tự của các danh sách
-export const updateListOrder = async (listOrderData) => {
-  return http.post(`/list/change-list-order`, listOrderData);
-};
+// export const updateListOrder = async (listOrderData) => {
+//   return http.post(`/list/change-list-order`, listOrderData);
+// };
 export const changeListOrder = async (listOrderData) => {
   return http.post(`/list/update-list-order`, listOrderData);
 };

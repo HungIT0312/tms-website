@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { updateCardInfo } from "./cardThunk";
 
 const initialState = {
   isLoading: false,
@@ -26,6 +27,21 @@ const cardSlice = createSlice({
       return { ...state, selectedCard: action.payload };
     },
   },
+  extraReducers: (builder) =>
+    builder
+      .addCase(updateCardInfo.pending, (state) => {
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(updateCardInfo.fulfilled, (state, action) => {
+        state.selectedCard = action.payload.card;
+        state.message = action.payload.message;
+        state.isLoading = false;
+      })
+      .addCase(updateCardInfo.rejected, (state, action) => {
+        state.message = action.payload.errMessage;
+        state.error = true;
+      }),
 });
 
 export const { setSelectedCard } = cardSlice.actions;

@@ -1,0 +1,20 @@
+.archive {
+  &-item {
+    padding: 16px 12px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 8px;
+    cursor: pointer;
+    &:hover {
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+    &__more {
+      font-size: 24px;
+      &:hover {
+        color: #ff5722 !important;
+      }
+    }
+    &__title {
+      font-weight: 500;
+    }
+  }
+}

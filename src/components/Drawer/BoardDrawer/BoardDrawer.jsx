@@ -11,6 +11,8 @@ import { Button, Divider, Drawer, Flex, Image } from "antd";
 import "./BoardDrawer.scss";
 import Info from "./Content/Info";
 import Activities from "./Content/Activities";
+import Archive from "./Content/Archive";
+import { FiArchive } from "react-icons/fi";
 const BoardDrawer = ({
   open,
   onClose,
@@ -78,6 +80,17 @@ const BoardDrawer = ({
         gap={12}
         className="drawer-item"
         align="center"
+        onClick={() => setRenderKey("archive")}
+      >
+        <FiArchive className="drawer-item__icon" />
+        <Flex vertical>
+          <span className="drawer-item__name">Archive lists</span>
+        </Flex>
+      </Flex>
+      <Flex
+        gap={12}
+        className="drawer-item"
+        align="center"
         onClick={() => setRenderKey("setting")}
       >
         <SettingOutlined className="drawer-item__icon" />
@@ -108,7 +121,9 @@ const BoardDrawer = ({
       extra={
         renderKey !== "" && (
           <Flex>
-            <Button onClick={() => setRenderKey("")}>Back</Button>
+            <Button type="text" onClick={() => setRenderKey("")}>
+              Back
+            </Button>
           </Flex>
         )
       }
@@ -118,6 +133,7 @@ const BoardDrawer = ({
         <Info owner={owner} selectedBoard={selectedBoard} />
       )}
       {renderKey === "activity" && <Activities selectedBoard={selectedBoard} />}
+      {renderKey === "archive" && <Archive />}
     </Drawer>
   );
 };

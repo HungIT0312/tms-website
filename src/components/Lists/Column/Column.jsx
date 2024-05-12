@@ -2,9 +2,10 @@
 import {
   CloseOutlined,
   EllipsisOutlined,
+  ExclamationCircleOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Input, Popover, notification } from "antd";
+import { Button, Flex, Input, Modal, Popover, notification } from "antd";
 import { useEffect, useRef, useState } from "react";
 import ListCards from "../../Cards/ListCards";
 import "./Column.scss";
@@ -13,6 +14,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useDispatch } from "react-redux";
 import { addCard } from "../../../stores/card/cardThunk";
+import { EditText } from "react-edit-text";
+import { updateListInfo } from "../../../stores/list/ListThunk";
+import listProperty from "../../../constants/listProperty";
 
 const Column = ({ isAddList = false, handleCreateList, list }) => {
   const [isAddNew, setIsAddNew] = useState(false);
@@ -25,6 +29,8 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
   const { boardId } = useParams();
   const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch();
+
+  //====================================================DND kit===============================================
   const {
     attributes,
     listeners,
@@ -59,6 +65,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
     };
   }, [list?.cards]);
 
+  //====================================================Function===============================================
   const hide = () => {
     setOpen(false);
   };
@@ -66,13 +73,6 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
   const handleShowPop = () => {
     setOpen(!open);
   };
-
-  const content = (
-    <Flex vertical gap={8}>
-      <Flex className="pop__item">Change title</Flex>
-      <Flex className="pop__item pop__item--delete">Delete</Flex>
-    </Flex>
-  );
 
   const handleCreate = () => {
     if (!newTitle) return;
@@ -85,7 +85,6 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
     if (!newTaskTitle) return;
     const data = { title: newTaskTitle, listId: list._id, boardId: boardId };
     try {
-      // const rs = await createCard(data);
       dispatch(addCard(data))
         .unwrap()
         .then((rs) => {
@@ -104,7 +103,61 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
     setNewTaskTitle("");
     setIsAddNewTask(false);
   };
+  const handleListTitleChange = (data) => {
+    const updateData = {
+      boardId: boardId,
+      listId: list._id,
+      value: data.value,
+      property: listProperty.TITLE,
+    };
+    dispatch(updateListInfo(updateData));
+  };
+  const handleListStateChange = () => {
+    const updateData = {
+      boardId: boardId,
+      listId: list._id,
+      value: true,
+      property: listProperty.DESTROY,
+    };
+    dispatch(updateListInfo(updateData));
+  };
 
+  //====================================================render content===============================================
+  const content = (
+    <Flex vertical gap={8}>
+      <Flex
+        className="pop__item"
+        onClick={(e) => {
+          // editTitleRef.current.focus();
+        }}
+      >
+        Change title
+      </Flex>
+      <Flex
+        className="pop__item pop__item--delete"
+        onClick={() => {
+          Modal.confirm({
+            icon: (
+              <ExclamationCircleOutlined
+                style={{ color: "#FF4D4", fontSize: "20px" }}
+              />
+            ),
+            title: "Are you sure to delete this list?",
+            okText: "Delete",
+            cancelText: "Cancel",
+            onOk: handleListStateChange,
+            centered: true,
+            content: "This list will be archived",
+            okButtonProps: {
+              danger: true,
+            },
+          });
+        }}
+      >
+        Archive
+      </Flex>
+    </Flex>
+  );
   return isAddList ? (
     <Flex
       className={`List-column ${isAddNew ? "" : "List-column__add"}`}
@@ -162,7 +215,14 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
           gap={8}
         >
           <Flex className="List-column__title" flex={1}>
-            {list?.title}
+            <EditText
+              name="title"
+              defaultValue={list?.title}
+              inline
+              style={{ width: `100%` }}
+              onSave={(value) => handleListTitleChange(value)}
+              onChange={(e) => console.log(e)}
+            />
           </Flex>
           <Popover
             placement="bottomLeft"
