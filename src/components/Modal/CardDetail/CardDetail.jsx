@@ -242,6 +242,7 @@ const CardDetail = () => {
           onCancel={handleCancel}
           centered
           width={270}
+          footer={false}
         >
           <Labels />
         </Modal>
