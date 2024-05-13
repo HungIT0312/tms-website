@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { updateCardInfo } from "./cardThunk";
+import { createCardLabel, updateCardInfo, updateCardLabel } from "./cardThunk";
 
 const initialState = {
   isLoading: false,
@@ -26,6 +26,17 @@ const cardSlice = createSlice({
     setSelectedCard(state, action) {
       return { ...state, selectedCard: action.payload };
     },
+    setCardLabelSelected(state, action) {
+      const initLabels = state.selectedCard.labels;
+      state.selectedCard.labels = initLabels.map((item) => {
+        if (item._id.toString() === action.payload.labelId.toString()) {
+          item.text = action.payload.label.text;
+          item.type = action.payload.label.type;
+          item.selected = action.payload.label.selected;
+        }
+        return item;
+      });
+    },
   },
   extraReducers: (builder) =>
     builder
@@ -41,9 +52,36 @@ const cardSlice = createSlice({
       .addCase(updateCardInfo.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
+      })
+      //===============================================================
+      .addCase(updateCardLabel.pending, (state) => {
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(updateCardLabel.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.isLoading = false;
+      })
+      .addCase(updateCardLabel.rejected, (state, action) => {
+        state.message = action.payload.errMessage;
+        state.error = true;
+      })
+      //===============================================================
+
+      .addCase(createCardLabel.pending, (state) => {
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(createCardLabel.fulfilled, (state, action) => {
+        state.selectedCard.labels.unshift(action.payload.label);
+        state.isLoading = false;
+      })
+      .addCase(createCardLabel.rejected, (state, action) => {
+        state.message = action.payload.errMessage;
+        state.error = true;
       }),
 });
 
-export const { setSelectedCard } = cardSlice.actions;
+export const { setSelectedCard, setCardLabelSelected } = cardSlice.actions;
 
 export default cardSlice.reducer;

@@ -5,7 +5,7 @@ import {
   DownOutlined,
   EditOutlined,
   EyeOutlined,
-  PlusSquareOutlined,
+  PlusOutlined,
   TagsOutlined,
 } from "@ant-design/icons";
 import {
@@ -39,6 +39,7 @@ const CardDetail = () => {
   const dispatch = useDispatch();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
   const { selectedCard } = useSelector((state) => state.card);
+
   const { boardId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -63,36 +64,50 @@ const CardDetail = () => {
   const handleOk = () => {
     handleClose();
   };
+  const renderLabels =
+    selectedCard?.labels &&
+    selectedCard?.labels.map((l) => {
+      if (l.selected === true) {
+        return (
+          <Tag
+            style={{ height: 22, minWidth: 30 }}
+            key={l?._id}
+            color={l?.type}
+          >
+            {l?.text}
+          </Tag>
+        );
+      }
+    });
   const itemDetails = [
     {
       key: "1",
       label: "Labels",
       children: (
-        <Flex>
-          <Tag color="success">success</Tag>
-          <Tag color="processing">processing</Tag>
-          <Tag color="error">error</Tag>
-          <Tag color="warning">warning</Tag>
-          <Tag color="orange">orange</Tag>
-          <Tag color="purple">purple</Tag>
-          {/* <Popover trigger={"click"} content={<Labels />}> */}
-          <PlusSquareOutlined onClick={showModal} />
-          {/* </Popover> */}
+        <Flex align="center" wrap="wrap" gap={4}>
+          {renderLabels}
+          <Button
+            style={{
+              height: 22,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onClick={showModal}
+            type="text"
+            icon={<PlusOutlined />}
+          >
+            Add
+          </Button>
         </Flex>
       ),
-      span: 2,
+      span: 4,
     },
     {
       key: "2",
       label: "Telephone",
       children: "1810000000",
-      span: 2,
-    },
-    {
-      key: "3",
-      label: "Live",
-      children: "Hangzhou, Zhejiang",
-      span: 2,
+      span: 4,
     },
   ];
   const itemTime = [
@@ -241,10 +256,10 @@ const CardDetail = () => {
           onOk={handleModalOk}
           onCancel={handleCancel}
           centered
-          width={270}
+          width={300}
           footer={false}
         >
-          <Labels />
+          <Labels card={selectedCard} />
         </Modal>
       </div>
     </Modal>

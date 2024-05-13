@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Avatar, Flex, Input, Tooltip } from "antd";
+import { Avatar, Flex, Input, Tag, Tooltip } from "antd";
 import { useState } from "react";
 import "./CardItem.scss";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -49,6 +49,22 @@ const CardItem = ({
     navigate(`${rootLink}/c/${slug}`);
   };
 
+  const renderLabels =
+    card?.labels?.length > 0 &&
+    card?.labels?.map((l) => {
+      if (l.selected) {
+        return (
+          <Tag
+            key={l._id}
+            color={l.type}
+            style={{ minHeight: l.text.length < 1 ? 12 : "none", minWidth: 24 }}
+          >
+            {l.text}
+          </Tag>
+        );
+      }
+    });
+
   return !isAdd ? (
     <Flex
       className="card-item"
@@ -61,10 +77,8 @@ const CardItem = ({
     >
       <div className="card-item__cover"></div>
       <Flex vertical gap={4}>
-        <Flex className="card-item__labels" gap={8}>
-          <span className="card-item__label card-item__label--red"></span>
-          <span className="card-item__label card-item__label--blue"></span>
-          <span className="card-item__label card-item__label--yellow"></span>
+        <Flex className="card-item__labels" wrap="wrap" gap={4}>
+          {renderLabels}
         </Flex>
         <div className="card-item__title">{card?.title}</div>
         <Flex className="card-item__content" wrap="wrap" align="center" gap={8}>
@@ -72,20 +86,22 @@ const CardItem = ({
             <Flex align="center" className="card-item__content-item">
               <EyeOutlined />
             </Flex>
-            <Flex
-              align="center"
-              className="checkbox-due"
-              gap={3}
-              onMouseEnter={() => setIsEnter(true)}
-              onMouseLeave={() => setIsEnter(false)}
-            >
-              {isEnter ? (
-                <BorderOutlined size={12} />
-              ) : (
-                <ClockCircleOutlined size={12} />
-              )}
-              <span>1/5/2024</span>
-            </Flex>
+            {card?.date?.dueDate && (
+              <Flex
+                align="center"
+                className="checkbox-due"
+                gap={3}
+                onMouseEnter={() => setIsEnter(true)}
+                onMouseLeave={() => setIsEnter(false)}
+              >
+                {isEnter ? (
+                  <BorderOutlined size={12} />
+                ) : (
+                  <ClockCircleOutlined size={12} />
+                )}
+                <span>{card?.date?.dueDate}</span>
+              </Flex>
+            )}
             <Flex align="center" gap={3} className="card-item__content-item">
               <PaperClipOutlined />
               <span>2</span>

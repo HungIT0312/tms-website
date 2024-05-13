@@ -1,4 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { cloneDeep } from "lodash";
+import { mapOrder } from "../../helpers/mapOrder";
+import { addCard, updateCardInfo } from "../card/cardThunk";
 import {
   changeListOrderByIds,
   createNewList,
@@ -6,9 +9,6 @@ import {
   getAllListByBoardId,
   updateListInfo,
 } from "./ListThunk";
-import { mapOrder } from "../../helpers/mapOrder";
-import { addCard, updateCardInfo } from "../card/cardThunk";
-import { cloneDeep } from "lodash";
 
 const initialState = {
   lists: [],
@@ -31,6 +31,50 @@ const ListSlice = createSlice({
       const listToUpdate = state.lists.find((list) => list._id === listId);
       if (listToUpdate) {
         listToUpdate.cards = columnCards;
+      }
+    },
+    setCardInfoInList(state, action) {
+      const { listId, cardId, labelId, label } = action.payload;
+      const listToUpdate = state.lists.find((list) => list._id === listId);
+      if (listToUpdate) {
+        const updatedCards = listToUpdate.cards.map((card) => {
+          if (card._id === cardId) {
+            const updatedLabels = card.labels.map((l) => {
+              if (l._id === labelId) {
+                return {
+                  ...l,
+                  selected: label.selected,
+                  text: label.text,
+                  type: label.type,
+                };
+              }
+              return l;
+            });
+            return { ...card, labels: updatedLabels };
+          }
+          return card;
+        });
+
+        state.lists = state.lists.map((list) =>
+          list._id === listId ? { ...list, cards: updatedCards } : list
+        );
+      }
+    },
+    addCardLabel(state, action) {
+      const { listId, cardId, label } = action.payload;
+      const listToUpdate = state.lists.find((list) => list._id === listId);
+      if (listToUpdate) {
+        const updatedCards = listToUpdate.cards.map((card) => {
+          if (card._id === cardId) {
+            const updatedLabels = [label, ...card.labels];
+            return { ...card, labels: updatedLabels };
+          }
+          return card;
+        });
+
+        state.lists = state.lists.map((list) =>
+          list._id === listId ? { ...list, cards: updatedCards } : list
+        );
       }
     },
   },
@@ -167,9 +211,11 @@ const ListSlice = createSlice({
         state.message = action.payload.errMessage;
         state.error = true;
       });
+    //=============================================================================;
   },
 });
 
-export const { setListsState, setCardsState } = ListSlice.actions;
+export const { setListsState, setCardsState, setCardInfoInList, addCardLabel } =
+  ListSlice.actions;
 
 export default ListSlice.reducer;

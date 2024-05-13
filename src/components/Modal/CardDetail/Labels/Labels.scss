@@ -5,16 +5,40 @@
     flex-direction: column;
     gap: 8px;
     margin: 16px 0px;
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    /* Thiết lập track list */
+    &::-webkit-scrollbar-track {
+      background-color: #fff;
+      border-radius: 5px;
+    }
+
+    /* Thiết lập thanh cuộn thumb */
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
   }
   &__item {
     &-tag {
       padding: 4px 16px;
       width: 160px;
+      min-height: 30px;
     }
   }
   &__icon {
     font-size: 16px;
     padding: 4px;
+    margin-right: 8px;
     &:hover {
       cursor: pointer;
       border-radius: 8px;
