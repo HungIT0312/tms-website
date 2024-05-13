@@ -453,9 +453,10 @@ const createLabel = async (cardId, listId, boardId, user, label, callback) => {
     });
     await card.save();
 
-    const labelId = card.labels[0]._id;
+    // const labelId = card.labels[0]._id;
+    const labelInfo = card.labels[0];
 
-    return callback(false, { labelId: labelId });
+    return callback(false, { label: labelInfo });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
