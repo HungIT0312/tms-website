@@ -8,5 +8,7 @@ route.post("/create", boardController.create);
 route.get("/:id", boardController.getById);
 route.get("/:boardId/activity", boardController.getActivityById);
 route.get("/", boardController.getAll);
-
+route.post("/:boardId/label", boardController.createLabel);
+route.delete("/:boardId/label/:labelId", boardController.deleteLabel);
+route.put("/:boardId/label/:labelId", boardController.updateLabel);
 module.exports = route;

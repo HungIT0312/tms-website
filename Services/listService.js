@@ -42,10 +42,16 @@ const getAll = async (boardId, callback) => {
       .find({ owner: { $in: boardId } })
       .populate({
         path: "cards",
-        populate: {
-          path: "activities.user", // Populate user trong activities của mỗi card
-          model: "user", // Tên của modal user
-        },
+        populate: [
+          {
+            path: "activities.user", // Populate user trong activities của mỗi card
+            model: "user", // Tên của modal user
+          },
+          {
+            path: "labels", // Populate labels
+            model: "label",
+          },
+        ],
       })
       .exec();
 

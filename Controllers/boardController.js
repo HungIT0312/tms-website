@@ -104,6 +104,29 @@ const updateBoardProperty = async (req, res) => {
     return res.status(400).send({ errMessage: "Bad Request" });
   }
 };
+const createLabel = async (req, res) => {
+  const { boardId } = req.params;
+  const label = req.body;
+  await boardService.createLabel(boardId, label, (err, result) => {
+    if (err) return res.status(500).send(err);
+    return res.status(201).send(result);
+  });
+};
+const updateLabel = async (req, res) => {
+  const { labelId } = req.params;
+  const label = req.body;
+  await boardService.updateLabel(labelId, label, (err, result) => {
+    if (err) return res.status(500).send(err);
+    return res.status(201).send(result);
+  });
+};
+const deleteLabel = async (req, res) => {
+  const { boardId, labelId } = req.params;
+  await boardService.deleteLabel(boardId, labelId, (err, result) => {
+    if (err) return res.status(500).send(err);
+    return res.status(201).send(result);
+  });
+};
 module.exports = {
   create,
   getAll,
@@ -111,4 +134,7 @@ module.exports = {
   getActivityById,
   removeMember,
   updateBoardProperty,
+  createLabel,
+  deleteLabel,
+  updateLabel,
 };

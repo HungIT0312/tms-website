@@ -76,6 +76,12 @@ const boardSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    labels: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "label",
+      },
+    ],
     _destroy: {
       type: Boolean,
       default: false,

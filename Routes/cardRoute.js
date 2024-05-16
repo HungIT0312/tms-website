@@ -58,15 +58,9 @@ router.post(
   cardController.createChecklist
 );
 //=========================================================================================
-router.delete(
-  "/:boardId/:listId/:cardId/label/:labelId",
-  cardController.deleteLabel
-);
-router.put(
-  "/:boardId/:listId/:cardId/label/:labelId",
-  cardController.updateLabel
-);
-router.post("/:boardId/:listId/:cardId/label", cardController.createLabel);
+router.post("/label", cardController.addLabelToCard);
+
+router.delete("/:cardId/label/:labelId", cardController.removeLabelFromCard);
 //=========================================================================================
 
 router.post("/:boardId/:listId/:cardId/add-member", cardController.addMember);
@@ -89,5 +83,7 @@ router.delete(
   "/:boardId/:listId/:cardId/comment/:commentId",
   cardController.deleteComment
 );
-
+// router.put("/:cardId/label", async (req, rs) => {
+//   console.log(req);
+// });
 module.exports = router;

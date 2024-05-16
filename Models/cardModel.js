@@ -11,15 +11,8 @@ const cardSchema = mongoose.Schema({
   },
   labels: [
     {
-      text: {
-        type: String,
-      },
-      type: {
-        type: String,
-      },
-      selected: {
-        type: Boolean,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "label",
     },
   ],
   members: [

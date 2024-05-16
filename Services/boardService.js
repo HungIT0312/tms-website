@@ -1,29 +1,31 @@
-const { findOne } = require("../Models/boardModel");
 const boardModel = require("../Models/boardModel");
-const invitationModel = require("../Models/invitationModel");
+const cardModel = require("../Models/cardModel");
+const labelModel = require("../Models/labelModel");
 const userModel = require("../Models/userModel");
+const helperMethods = require("./helperMethods");
 
 const create = async (req, callback) => {
   try {
     const { title, backgroundImageLink, description } = req.body;
-    // Create and save new board
+
     let newBoard;
     if (description) {
-      newBoard = boardModel({ title, backgroundImageLink, description });
+      newBoard = new boardModel({ title, backgroundImageLink, description });
     } else {
-      newBoard = boardModel({ title, backgroundImageLink });
+      newBoard = new boardModel({ title, backgroundImageLink });
     }
-    newBoard.save();
+    await newBoard.save();
 
-    // Add this board to owner's boards
     const user = await userModel.findById(req.user._id);
-    user.boards.unshift(newBoard.id);
+    if (!user) {
+      return callback({ errMessage: "User not found" });
+    }
+    user.boards.unshift(newBoard._id);
     await user.save();
 
-    // Add user to members of this board
     let allMembers = [];
     allMembers.push({
-      user: user.id,
+      user: user._id,
       name: user.name,
       surname: user.surname,
       email: user.email,
@@ -31,13 +33,19 @@ const create = async (req, callback) => {
       role: "owner",
     });
 
-    // Add created activity to activities of this board
     newBoard.activity.unshift({
       user: user._id,
       action: "created this board",
     });
 
-    // Save new board
+    // Tạo và thêm nhãn (labels) cho bảng
+    const labelPromises = helperMethods.labelsSeedColor.map((l) =>
+      labelModel.create({ ...l, board: newBoard._id })
+    );
+    const newLabels = await Promise.all(labelPromises);
+    newBoard.labels = newLabels.map((label) => label._id);
+
+    // Lưu bảng mới
     newBoard.members = allMembers;
     await newBoard.save();
 
@@ -76,7 +84,7 @@ const getAll = async (userId, callback) => {
 const getById = async (id, callback) => {
   try {
     // Get board by id
-    const board = await boardModel.findById(id);
+    const board = await boardModel.findById(id).populate("labels");
     return callback(false, board);
   } catch (error) {
     return callback({
@@ -210,6 +218,78 @@ const updateBoardProperty = async (
     });
   }
 };
+//============================================================================
+const createLabel = async (boardId, labelData, callback) => {
+  try {
+    const newLabel = await labelModel.create(labelData);
+
+    const board = await boardModel.findById(boardId);
+    if (!board) return res.status(404).send("Board not found");
+
+    board.labels.push(newLabel._id);
+    await board.save();
+
+    return callback(false, { message: "Successful", label: newLabel });
+  } catch (err) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: err.message,
+    });
+  }
+};
+const updateLabel = async (labelId, labelData, callback) => {
+  try {
+    // Tìm và cập nhật nhãn
+    const updatedLabel = await labelModel.findByIdAndUpdate(
+      labelId,
+      labelData,
+      {
+        new: true,
+      }
+    );
+    if (!updatedLabel) {
+      return callback({ errMessage: "Label not found" });
+    }
+    return callback(false, { message: "Successful", label: updatedLabel });
+  } catch (err) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: err.message,
+    });
+  }
+};
+
+const deleteLabel = async (boardId, labelId, callback) => {
+  try {
+    // Tìm và xoá nhãn
+    const deletedLabel = await labelModel.findByIdAndDelete(labelId);
+    if (!deletedLabel) {
+      return callback({ errMessage: "Label not found" });
+    }
+
+    // Xoá tham chiếu nhãn khỏi bảng
+    const board = await boardModel.findById(boardId);
+    if (!board) {
+      return callback({ errMessage: "Board not found" });
+    }
+
+    board.labels.pull(labelId);
+    await board.save();
+
+    // Xoá nhãn khỏi các thẻ liên quan
+    await cardModel.updateMany(
+      { labels: labelId },
+      { $pull: { labels: labelId } }
+    );
+
+    return callback(false, { label: deletedLabel });
+  } catch (err) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: err.message,
+    });
+  }
+};
 
 module.exports = {
   create,
@@ -218,4 +298,7 @@ module.exports = {
   getActivityById,
   removeMember,
   updateBoardProperty,
+  createLabel,
+  deleteLabel,
+  updateLabel,
 };

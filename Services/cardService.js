@@ -32,7 +32,7 @@ const create = async (title, listId, boardId, user, callback) => {
       user: user._id,
       action: `added this card to ${list.title}`,
     });
-    card.labels = helperMethods.labelsSeedColor;
+    // card.labels = helperMethods.labelsSeedColor;
     await card.save();
 
     // Add id of the new card to owner list
@@ -418,133 +418,6 @@ const deleteMember = async (
     board.save();
 
     return callback(false, { message: "success" });
-  } catch (error) {
-    return callback({
-      errMessage: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const createLabel = async (cardId, listId, boardId, user, label, callback) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to add label this card";
-    }
-
-    //Add label
-    card.labels.unshift({
-      text: label.text,
-      type: label.type,
-      selected: true,
-    });
-    await card.save();
-
-    // const labelId = card.labels[0]._id;
-    const labelInfo = card.labels[0];
-
-    return callback(false, { label: labelInfo });
-  } catch (error) {
-    return callback({
-      errMessage: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const updateLabel = async (
-  cardId,
-  listId,
-  boardId,
-  labelId,
-  user,
-  label,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to update this card";
-    }
-
-    //Update label
-    card.labels = card.labels.map((item) => {
-      if (item._id.toString() === labelId.toString()) {
-        item.text = label.text;
-        item.type = label.type;
-        item.selected = label.selected;
-      }
-      return item;
-    });
-    await card.save();
-
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      errMessage: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const deleteLabel = async (
-  cardId,
-  listId,
-  boardId,
-  labelId,
-  user,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to delete this label";
-    }
-
-    //Delete label
-    card.labels = card.labels.filter(
-      (label) => label._id.toString() !== labelId.toString()
-    );
-    await card.save();
-
-    return callback(false, { message: "Success!" });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -1148,6 +1021,61 @@ const updateCover = async (
     });
   }
 };
+const addLabelToCard = async (cardId, labelId, callback) => {
+  try {
+    // Tìm thẻ theo ID
+    const card = await cardModel.findById(cardId);
+    if (!card) {
+      return callback({ errMessage: "Card not found" });
+    }
+
+    // Kiểm tra xem nhãn đã tồn tại trong thẻ chưa
+    if (card.labels.includes(labelId)) {
+      return callback({ errMessage: "Label already added to this card" });
+    }
+
+    // Thêm nhãn vào danh sách nhãn của thẻ
+    card.labels.push(labelId);
+    await card.save();
+
+    const card2 = await cardModel.findById(cardId);
+    await card2.populate("labels");
+    return callback(false, { labels: card2.labels });
+  } catch (err) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: err.message,
+    });
+  }
+};
+const removeLabelFromCard = async (cardId, labelId, callback) => {
+  try {
+    // Tìm thẻ theo ID
+    const card = await cardModel.findById(cardId);
+    if (!card) {
+      return callback({ errMessage: "Card not found" });
+    }
+
+    // // Kiểm tra xem nhãn có tồn tại trong thẻ không
+    const labelIndex = card.labels.findIndex(
+      (l) => l._id.toString() === labelId.toString()
+    );
+    if (labelIndex === -1) {
+      return callback({ errMessage: "Label not found in this card" });
+    }
+
+    // Xóa nhãn khỏi danh sách nhãn của thẻ
+    card.labels.splice(labelIndex, 1);
+    await card.save();
+
+    return callback(false, { labelId });
+  } catch (err) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: err.message,
+    });
+  }
+};
 
 module.exports = {
   create,
@@ -1159,9 +1087,6 @@ module.exports = {
   deleteComment,
   addMember,
   deleteMember,
-  createLabel,
-  updateLabel,
-  deleteLabel,
   createChecklist,
   deleteChecklist,
   addChecklistItem,
@@ -1174,4 +1099,6 @@ module.exports = {
   deleteAttachment,
   updateAttachment,
   updateCover,
+  addLabelToCard,
+  removeLabelFromCard,
 };
