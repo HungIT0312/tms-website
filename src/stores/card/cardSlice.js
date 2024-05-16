@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createCardLabel, updateCardInfo, updateCardLabel } from "./cardThunk";
+import {
+  addALabelToCard,
+  // addLabelToCard,
+  removeLabelFromCard,
+  updateCardInfo,
+} from "./cardThunk";
 
 const initialState = {
   isLoading: false,
@@ -26,16 +31,16 @@ const cardSlice = createSlice({
     setSelectedCard(state, action) {
       return { ...state, selectedCard: action.payload };
     },
-    setCardLabelSelected(state, action) {
-      const initLabels = state.selectedCard.labels;
-      state.selectedCard.labels = initLabels.map((item) => {
-        if (item._id.toString() === action.payload.labelId.toString()) {
-          item.text = action.payload.label.text;
-          item.type = action.payload.label.type;
-          item.selected = action.payload.label.selected;
-        }
-        return item;
-      });
+    deleteCardLabel(state, action) {
+      state.selectedCard.labels = state.selectedCard.labels.filter(
+        (l) => l._id !== action.payload.label._id
+      );
+    },
+    updateCardLabel(state, action) {
+      const updateCardIndex = state.selectedCard.labels.findIndex(
+        (l) => l._id === action.payload._id
+      );
+      state.selectedCard.labels[updateCardIndex] = action.payload;
     },
   },
   extraReducers: (builder) =>
@@ -54,34 +59,54 @@ const cardSlice = createSlice({
         state.error = true;
       })
       //===============================================================
-      .addCase(updateCardLabel.pending, (state) => {
+      .addCase(addALabelToCard.pending, (state) => {
         state.error = false;
         state.message = null;
       })
-      .addCase(updateCardLabel.fulfilled, (state, action) => {
+      .addCase(addALabelToCard.fulfilled, (state, action) => {
         state.message = action.payload.message;
+        state.selectedCard.labels = action.payload.labels;
         state.isLoading = false;
       })
-      .addCase(updateCardLabel.rejected, (state, action) => {
+      .addCase(addALabelToCard.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
       })
-      //===============================================================
-
-      .addCase(createCardLabel.pending, (state) => {
+      // //===============================================================
+      .addCase(removeLabelFromCard.pending, (state) => {
         state.error = false;
         state.message = null;
       })
-      .addCase(createCardLabel.fulfilled, (state, action) => {
-        state.selectedCard.labels.unshift(action.payload.label);
+      .addCase(removeLabelFromCard.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.selectedCard.labels = state.selectedCard.labels.filter(
+          (l) => l._id !== action.payload.labelId
+        );
         state.isLoading = false;
       })
-      .addCase(createCardLabel.rejected, (state, action) => {
+      .addCase(removeLabelFromCard.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
       }),
+  // .addCase(createCardLabel.pending, (state) => {
+  //   state.error = false;
+  //   state.message = null;
+  // })
+  // .addCase(createCardLabel.fulfilled, (state, action) => {
+  //   state.selectedCard.labels.unshift(action.payload.label);
+  //   state.isLoading = false;
+  // })
+  // .addCase(createCardLabel.rejected, (state, action) => {
+  //   state.message = action.payload.errMessage;
+  //   state.error = true;
+  // }),
 });
 
-export const { setSelectedCard, setCardLabelSelected } = cardSlice.actions;
+export const {
+  setSelectedCard,
+  setCardLabelSelected,
+  updateCardLabel,
+  deleteCardLabel,
+} = cardSlice.actions;
 
 export default cardSlice.reducer;

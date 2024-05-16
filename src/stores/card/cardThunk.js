@@ -1,13 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  addCardLabel,
   createCard,
-  createLabel,
+  removeCardLabel,
   updateCard,
-  updateLabel,
 } from "../../api/card/card.api";
 
 export const addCard = createAsyncThunk(
-  "board/addCard",
+  "card/addCard",
   async (data, thunkApi) => {
     try {
       const response = await createCard(data);
@@ -18,7 +18,7 @@ export const addCard = createAsyncThunk(
   }
 );
 export const updateCardInfo = createAsyncThunk(
-  "board/updateCardInfo",
+  "card/updateCardInfo",
   async (data, thunkApi) => {
     try {
       const { boardId, listId, cardId, updateObj } = data;
@@ -29,30 +29,22 @@ export const updateCardInfo = createAsyncThunk(
     }
   }
 );
-export const updateCardLabel = createAsyncThunk(
-  "board/updateCardLabel",
+export const removeLabelFromCard = createAsyncThunk(
+  "card/removeLabelFromCard",
   async (data, thunkApi) => {
     try {
-      const { boardId, listId, cardId, labelId, label } = data;
-      const response = await updateLabel(
-        boardId,
-        listId,
-        cardId,
-        labelId,
-        label
-      );
+      const response = await removeCardLabel(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);
     }
   }
 );
-export const createCardLabel = createAsyncThunk(
-  "board/createCardLabel",
+export const addALabelToCard = createAsyncThunk(
+  "card/addALabelToCardSelected",
   async (data, thunkApi) => {
     try {
-      const { boardId, listId, cardId, label } = data;
-      const response = await createLabel(boardId, listId, cardId, label);
+      const response = await addCardLabel(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

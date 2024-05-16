@@ -39,7 +39,6 @@ const CardDetail = () => {
   const dispatch = useDispatch();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
   const { selectedCard } = useSelector((state) => state.card);
-
   const { boardId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -67,17 +66,11 @@ const CardDetail = () => {
   const renderLabels =
     selectedCard?.labels &&
     selectedCard?.labels.map((l) => {
-      if (l.selected === true) {
-        return (
-          <Tag
-            style={{ height: 22, minWidth: 30 }}
-            key={l?._id}
-            color={l?.type}
-          >
-            {l?.text}
-          </Tag>
-        );
-      }
+      return (
+        <Tag style={{ height: 22, minWidth: 30 }} key={l?._id} color={l?.type}>
+          {l?.text}
+        </Tag>
+      );
     });
   const itemDetails = [
     {

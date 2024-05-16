@@ -51,19 +51,15 @@ const CardItem = ({
 
   const renderLabels =
     card?.labels?.length > 0 &&
-    card?.labels?.map((l) => {
-      if (l.selected) {
-        return (
-          <Tag
-            key={l._id}
-            color={l.type}
-            style={{ minHeight: l.text.length < 1 ? 12 : "none", minWidth: 24 }}
-          >
-            {l.text}
-          </Tag>
-        );
-      }
-    });
+    card?.labels?.map((l) => (
+      <Tag
+        key={l?._id + Math.random(1000)}
+        color={l?.type}
+        style={{ minHeight: l?.text?.length < 1 ? 12 : "none", minWidth: 24 }}
+      >
+        {l?.text}
+      </Tag>
+    ));
 
   return !isAdd ? (
     <Flex

@@ -1,10 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createBoard,
+  createLabel,
+  deleteLabel,
   getAllBoards,
   getBoardById,
   removeMemberInBoardById,
   updateBoard,
+  updateLabel,
 } from "../../api/board/board.api";
 import { acceptInvitation } from "../../api/invitation/invitation.api";
 
@@ -68,6 +71,39 @@ export const updateBoardInfo = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await updateBoard(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const updateBoardLabel = createAsyncThunk(
+  "board/updateBoardLabel",
+  async (data, thunkApi) => {
+    try {
+      const response = await updateLabel(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const createBoardLabel = createAsyncThunk(
+  "board/createBoardLabel",
+  async (data, thunkApi) => {
+    try {
+      const response = await createLabel(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const deleteBoardLabel = createAsyncThunk(
+  "board/deleteBoardLabel",
+  async (data, thunkApi) => {
+    try {
+      const response = await deleteLabel(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

@@ -2,19 +2,30 @@
 import { CheckOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Col, Flex, Form, Input, Row, Tag } from "antd";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { setCardLabelSelected } from "../../../../stores/card/cardSlice";
-import "./Labels.scss";
 import {
-  createCardLabel,
+  createBoardLabel,
+  deleteBoardLabel,
+  updateBoardLabel,
+} from "../../../../stores/board/boardThunk";
+import {
+  deleteCardLabel,
   updateCardLabel,
+} from "../../../../stores/card/cardSlice";
+import {
+  addALabelToCard,
+  removeLabelFromCard,
 } from "../../../../stores/card/cardThunk";
 import {
-  addCardLabel,
-  setCardInfoInList,
+  addACardLabelInList,
+  removeACardLabelInList,
+  removeLabelFromCardsInAllLists,
+  updateLabelInAllCardList,
 } from "../../../../stores/list/ListSlice";
+import "./Labels.scss";
 const Labels = ({ card }) => {
+  const { selectedBoard } = useSelector((state) => state.board);
   const [isAdd, setIsAdd] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [colorSelected, setColorSelected] = useState("magenta");
@@ -24,19 +35,25 @@ const Labels = ({ card }) => {
   const dispatch = useDispatch();
 
   const handleSelectLabel = (checkedValues, label) => {
-    const data = {
-      boardId,
-      listId: card?.owner,
+    const dataToAdd = {
       cardId: card?._id,
-      labelId: checkedValues,
-      label: {
-        ...label,
-        selected: !label?.selected,
-      },
+      labelData: checkedValues,
     };
-    dispatch(setCardLabelSelected(data));
-    dispatch(setCardInfoInList(data));
-    dispatch(updateCardLabel(data));
+    if (!isChecked(label)) {
+      dispatch(
+        addACardLabelInList({ listId: card?.owner, cardId: card?._id, label })
+      );
+      dispatch(addALabelToCard(dataToAdd));
+    } else {
+      dispatch(
+        removeACardLabelInList({
+          listId: card?.owner,
+          cardId: card?._id,
+          label,
+        })
+      );
+      dispatch(removeLabelFromCard(dataToAdd));
+    }
   };
   const handleEditChange = (id, type, txt) => {
     setIsAdd(true);
@@ -53,37 +70,38 @@ const Labels = ({ card }) => {
     setColorSelected("magenta");
   };
   const handleClick = () => {
+    const data = {
+      boardId,
+      listId: card?.owner,
+      cardId: card?._id,
+      labelId: idSelected,
+      label: {
+        selected: true,
+        text: text,
+        type: colorSelected,
+      },
+    };
     if (isAdd && isEdit) {
-      const data = {
-        boardId,
-        listId: card?.owner,
-        cardId: card?._id,
-        labelId: idSelected,
-        label: {
-          selected: true,
-          text: text,
-          type: colorSelected,
-        },
-      };
-      dispatch(setCardLabelSelected(data));
-      dispatch(setCardInfoInList(data));
-      dispatch(updateCardLabel(data));
+      dispatch(updateBoardLabel(data))
+        .unwrap()
+        .then((rs) => {
+          dispatch(updateLabelInAllCardList(rs.label));
+          dispatch(updateCardLabel(rs.label));
+        });
     } else {
-      const data = {
-        boardId,
-        listId: card?.owner,
-        cardId: card?._id,
-        label: {
-          selected: true,
-          text: text,
-          type: colorSelected,
-        },
-      };
-      dispatch(createCardLabel(data));
-      dispatch(addCardLabel(data));
-      console.log(data);
+      dispatch(createBoardLabel(data));
     }
     handleBack();
+  };
+  const handleDeleteLabel = () => {
+    const data = {
+      boardId,
+      labelId: idSelected,
+    };
+    dispatch(removeLabelFromCardsInAllLists(data));
+    dispatch(deleteCardLabel({ label: { _id: idSelected } }));
+    handleBack();
+    dispatch(deleteBoardLabel(data));
   };
   const labelTypes = [
     "success",
@@ -101,15 +119,18 @@ const Labels = ({ card }) => {
     "blue",
     "geekblue",
   ];
+  const isChecked = (l) => {
+    return card?.labels?.some((label) => label._id === l._id);
+  };
   const renderCardLabels =
-    card &&
-    card?.labels.map((l, index) => (
+    selectedBoard &&
+    selectedBoard?.labels.map((l, index) => (
       <Flex key={index} justify="space-between">
         <Checkbox
           value={l?._id}
           className="check-box__item"
           onClick={(e) => handleSelectLabel(e.target.value, l)}
-          checked={l?.selected}
+          checked={isChecked(l)}
         >
           <Tag className="check-box__item-tag" color={l?.type}>
             {l?.text}
@@ -148,13 +169,17 @@ const Labels = ({ card }) => {
       </Tag>
       <Form layout="vertical">
         <Form.Item name="title" label="Title">
-          <Input onChange={(e) => setText(e.target.value)}></Input>
+          <Input
+            value={text}
+            defaultValue={text}
+            onChange={(e) => setText(e.target.value)}
+          ></Input>
         </Form.Item>
         <Form.Item name="type" label="Color/type">
           <Row gutter={8}>
             {labelTypes &&
               labelTypes.map((t, index) => (
-                <Col span={8} key={index}>
+                <Col span={8} key={index + t + ""}>
                   <Tag
                     style={{
                       height: 30,
@@ -175,20 +200,31 @@ const Labels = ({ card }) => {
               ))}
           </Row>
         </Form.Item>
-        <Flex gap={8} style={{ float: "right" }}>
-          <Button
-            onClick={() => {
-              setIsAdd(false);
-              setIsEdit(false);
-              setText("");
-              setColorSelected("magenta");
-            }}
-          >
-            Back
-          </Button>
-          <Button type="primary" onClick={handleClick}>
-            OK
-          </Button>
+        <Flex
+          gap={8}
+          justify="space-between"
+          style={{ float: isEdit ? "none" : "right" }}
+        >
+          {isEdit && (
+            <Button type="" color="" danger onClick={() => handleDeleteLabel()}>
+              Delete
+            </Button>
+          )}
+          <Flex gap={8} justify="space-between">
+            <Button
+              onClick={() => {
+                setIsAdd(false);
+                setIsEdit(false);
+                setText("");
+                setColorSelected("magenta");
+              }}
+            >
+              Back
+            </Button>
+            <Button type="primary" onClick={handleClick}>
+              OK
+            </Button>
+          </Flex>
         </Flex>
       </Form>
     </Flex>

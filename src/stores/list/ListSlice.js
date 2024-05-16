@@ -33,23 +33,14 @@ const ListSlice = createSlice({
         listToUpdate.cards = columnCards;
       }
     },
-    setCardInfoInList(state, action) {
-      const { listId, cardId, labelId, label } = action.payload;
+
+    addACardLabelInList(state, action) {
+      const { listId, cardId, label } = action.payload;
       const listToUpdate = state.lists.find((list) => list._id === listId);
       if (listToUpdate) {
         const updatedCards = listToUpdate.cards.map((card) => {
           if (card._id === cardId) {
-            const updatedLabels = card.labels.map((l) => {
-              if (l._id === labelId) {
-                return {
-                  ...l,
-                  selected: label.selected,
-                  text: label.text,
-                  type: label.type,
-                };
-              }
-              return l;
-            });
+            const updatedLabels = [...card.labels, label];
             return { ...card, labels: updatedLabels };
           }
           return card;
@@ -60,13 +51,15 @@ const ListSlice = createSlice({
         );
       }
     },
-    addCardLabel(state, action) {
+    removeACardLabelInList(state, action) {
       const { listId, cardId, label } = action.payload;
       const listToUpdate = state.lists.find((list) => list._id === listId);
       if (listToUpdate) {
         const updatedCards = listToUpdate.cards.map((card) => {
           if (card._id === cardId) {
-            const updatedLabels = [label, ...card.labels];
+            const updatedLabels = card.labels.filter(
+              (l) => l._id !== label._id
+            );
             return { ...card, labels: updatedLabels };
           }
           return card;
@@ -76,6 +69,30 @@ const ListSlice = createSlice({
           list._id === listId ? { ...list, cards: updatedCards } : list
         );
       }
+    },
+    removeLabelFromCardsInAllLists(state, action) {
+      const { labelId } = action.payload;
+      state.lists.forEach((list) => {
+        const updatedCards = list.cards.map((card) => {
+          const updatedLabels = card.labels.filter(
+            (label) => label._id !== labelId
+          );
+          return { ...card, labels: updatedLabels };
+        });
+        list.cards = updatedCards;
+      });
+    },
+    updateLabelInAllCardList(state, action) {
+      const label = action.payload;
+      state.lists = state.lists.map((list) => {
+        const updatedCards = list.cards.map((card) => {
+          const updatedLabels = card.labels.map((l) =>
+            l._id === label._id ? label : l
+          );
+          return { ...card, labels: updatedLabels };
+        });
+        return { ...list, cards: updatedCards };
+      });
     },
   },
   extraReducers: (builder) => {
@@ -215,7 +232,42 @@ const ListSlice = createSlice({
   },
 });
 
-export const { setListsState, setCardsState, setCardInfoInList, addCardLabel } =
-  ListSlice.actions;
+export const {
+  setListsState,
+  setCardsState,
+  // setCardInfoInList,
+  addACardLabelInList,
+  removeACardLabelInList,
+  removeLabelFromCardsInAllLists,
+
+  updateLabelInAllCardList,
+} = ListSlice.actions;
 
 export default ListSlice.reducer;
+// setCardInfoInList(state, action) {
+//   const { listId, cardId, labelId, label } = action.payload;
+//   const listToUpdate = state.lists.find((list) => list._id === listId);
+//   if (listToUpdate) {
+//     const updatedCards = listToUpdate.cards.map((card) => {
+//       if (card._id === cardId) {
+//         const updatedLabels = card.labels.map((l) => {
+//           if (l._id === labelId) {
+//             return {
+//               ...l,
+//               selected: label.selected,
+//               text: label.text,
+//               type: label.type,
+//             };
+//           }
+//           return l;
+//         });
+//         return { ...card, labels: updatedLabels };
+//       }
+//       return card;
+//     });
+
+//     state.lists = state.lists.map((list) =>
+//       list._id === listId ? { ...list, cards: updatedCards } : list
+//     );
+//   }
+// },

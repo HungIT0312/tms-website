@@ -1,26 +1,20 @@
 import http from "../../helpers/http";
 
-// // Tạo một danh sách mới
-export const createCard = async (data) => {
+export const createCard = (data) => {
   return http.post(`/card/create`, data);
 };
 
-// // Cập nhật tiêu đề của một card
-export const updateCard = async (boardId, listId, cardId, updateObj) => {
+export const updateCard = (boardId, listId, cardId, updateObj) => {
   return http.put(`/card/${boardId}/${listId}/${cardId}`, updateObj);
 };
 //==================================================================================
-export const updateLabel = async (boardId, listId, cardId, labelId, label) => {
-  return http.put(
-    `/card/${boardId}/${listId}/${cardId}/label/${labelId}`,
-    label
-  );
+export const addCardLabel = async (data) => {
+  // const { cardId, labelData } = data;
+  return http.post(`/card/label`, data);
 };
-export const deleteLabel = async (boardId, listId, cardId, labelId) => {
-  return http.delete(`/card/${boardId}/${listId}/${cardId}/label/${labelId}`);
-};
-export const createLabel = async (boardId, listId, cardId, label) => {
-  return http.post(`/card/${boardId}/${listId}/${cardId}/label`, label);
+export const removeCardLabel = (data) => {
+  const { cardId, labelData } = data;
+  return http.delete(`/card/${cardId}/label/${labelData}`);
 };
 //==================================================================================
 

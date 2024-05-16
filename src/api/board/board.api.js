@@ -21,10 +21,17 @@ export const getActivityById = (data) => {
   const { page, boardId, limit } = data;
   return http.get(`/board/${boardId}/activity?page=${page}&limit=${limit}`);
 };
-// getActivityById;
-// route.post("/:boardId/add-member", boardController.addMember);
-// route.post("/create", boardController.create);
-// route.get("/:id", boardController.getById);
-// route.get("/:id/activity", boardController.getActivityById);
-// route.get("/", boardController.getAll);
-//route.put("/:boardId/update", boardController.updateBoardProperty);
+//===============================================
+export const updateLabel = (data) => {
+  const { boardId, labelId, label } = data;
+  return http.put(`/board/${boardId}/label/${labelId}`, label);
+};
+export const createLabel = (data) => {
+  const { boardId, label } = data;
+  return http.post(`/board/${boardId}/label`, label);
+};
+export const deleteLabel = (data) => {
+  const { boardId, labelId } = data;
+  return http.delete(`/board/${boardId}/label/${labelId}`);
+};
+
