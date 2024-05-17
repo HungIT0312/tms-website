@@ -28,7 +28,7 @@ router.put(
   "/:boardId/:listId/:cardId/dates",
   cardController.updateStartDueDates
 );
-router.put(
+router.patch(
   "/:boardId/:listId/:cardId/date-completed",
   cardController.updateDateCompleted
 );

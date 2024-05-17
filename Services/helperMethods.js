@@ -27,12 +27,12 @@ const validateCardOwners = async (
 //   { text: "", color: "#0079bf", backColor: "#055a8c", selected: false },
 // ];
 const labelsSeedColor = [
-  { text: "", type: "success", selected: false },
-  { text: "", type: "warning", selected: false },
-  { text: "", type: "progress", selected: false },
-  { text: "", type: "error", selected: false },
-  { text: "", type: "orange", selected: false },
-  { text: "", type: "purple", selected: false },
+  { text: "", type: "success", selected: true },
+  { text: "", type: "warning", selected: true },
+  { text: "", type: "progress", selected: true },
+  { text: "", type: "error", selected: true },
+  { text: "", type: "orange", selected: true },
+  { text: "", type: "purple", selected: true },
 ];
 
 const createRandomHexColor = () => {

@@ -286,8 +286,7 @@ const updateStartDueDates = async (req, res) => {
   // Get params
   const user = req.user;
   const { boardId, listId, cardId } = req.params;
-  const { startDate, dueDate, dueTime } = req.body;
-
+  const { startDate, dueDate, dueTime, completed } = req.body;
   // Call the card service
   await cardService.updateStartDueDates(
     cardId,
@@ -297,6 +296,7 @@ const updateStartDueDates = async (req, res) => {
     startDate,
     dueDate,
     dueTime,
+    completed,
     (err, result) => {
       if (err) return res.status(500).send(err);
       return res.status(200).send(result);
@@ -305,12 +305,9 @@ const updateStartDueDates = async (req, res) => {
 };
 
 const updateDateCompleted = async (req, res) => {
-  // Get params
   const user = req.user;
   const { boardId, listId, cardId } = req.params;
-  const { completed } = req.body;
-
-  // Call the card service
+  const completed = req.body;
   await cardService.updateDateCompleted(
     cardId,
     listId,

@@ -3,7 +3,13 @@ const listModel = require("../Models/listModel");
 const boardModel = require("../Models/boardModel");
 const userModel = require("../Models/userModel");
 const helperMethods = require("./helperMethods");
-
+const dayjs = require("dayjs");
+const weekday = require("dayjs/plugin/weekday");
+const localeData = require("dayjs/plugin/localeData");
+const utc = require("dayjs/plugin/utc");
+dayjs.extend(utc);
+dayjs.extend(weekday);
+dayjs.extend(localeData);
 const create = async (title, listId, boardId, user, callback) => {
   try {
     // Get list and board
@@ -744,6 +750,7 @@ const updateStartDueDates = async (
   startDate,
   dueDate,
   dueTime,
+  completed,
   callback
 ) => {
   try {
@@ -761,16 +768,18 @@ const updateStartDueDates = async (
       false
     );
     if (!validate) {
-      errMessage: "You dont have permission to update date of this card";
+      callback({
+        errMessage: "You dont have permission to update date of this card",
+      });
     }
-
     //Update dates
-    card.date.startDate = startDate;
-    card.date.dueDate = dueDate;
+    card.date.startDate = new Date(startDate);
+    card.date.dueDate = new Date(dueDate);
     card.date.dueTime = dueTime;
+    card.date.completed = completed;
     if (dueDate === null) card.date.completed = false;
     await card.save();
-    return callback(false, { message: "Success!" });
+    return callback(false, { message: "Update success!" });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -802,7 +811,9 @@ const updateDateCompleted = async (
       false
     );
     if (!validate) {
-      errMessage: "You dont have permission to update date of this card";
+      callback({
+        errMessage: "You dont have permission to update date of this card",
+      });
     }
 
     //Update date completed event
