@@ -94,6 +94,23 @@ const ListSlice = createSlice({
         return { ...list, cards: updatedCards };
       });
     },
+    updateDateCardListUI(state, action) {
+      const { cardId, listId, date } = action.payload;
+      state.lists = state.lists.map((list) => {
+        if (list._id === listId) {
+          const updatedCards = list.cards.map((card) => {
+            if (card._id === cardId) {
+              const updatedDate = { ...card.date, ...date };
+              return { ...card, date: updatedDate };
+            }
+            return card;
+          });
+          return { ...list, cards: updatedCards };
+        }
+
+        return list;
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -239,7 +256,7 @@ export const {
   addACardLabelInList,
   removeACardLabelInList,
   removeLabelFromCardsInAllLists,
-
+  updateDateCardListUI,
   updateLabelInAllCardList,
 } = ListSlice.actions;
 

@@ -10,6 +10,7 @@ import {
   updateBoardLabel,
 } from "../../../../stores/board/boardThunk";
 import {
+  addLabelToCardUI,
   deleteCardLabel,
   updateCardLabel,
 } from "../../../../stores/card/cardSlice";
@@ -24,6 +25,7 @@ import {
   updateLabelInAllCardList,
 } from "../../../../stores/list/ListSlice";
 import "./Labels.scss";
+import { addBoardLabelUI } from "../../../../stores/board/boardSlice";
 const Labels = ({ card }) => {
   const { selectedBoard } = useSelector((state) => state.board);
   const [isAdd, setIsAdd] = useState(false);
@@ -43,6 +45,7 @@ const Labels = ({ card }) => {
       dispatch(
         addACardLabelInList({ listId: card?.owner, cardId: card?._id, label })
       );
+      dispatch(addLabelToCardUI(label));
       dispatch(addALabelToCard(dataToAdd));
     } else {
       dispatch(
@@ -52,6 +55,7 @@ const Labels = ({ card }) => {
           label,
         })
       );
+      dispatch(deleteCardLabel({ label: { _id: label._id } }));
       dispatch(removeLabelFromCard(dataToAdd));
     }
   };
@@ -82,13 +86,11 @@ const Labels = ({ card }) => {
       },
     };
     if (isAdd && isEdit) {
-      dispatch(updateBoardLabel(data))
-        .unwrap()
-        .then((rs) => {
-          dispatch(updateLabelInAllCardList(rs.label));
-          dispatch(updateCardLabel(rs.label));
-        });
+      dispatch(updateLabelInAllCardList({ ...data.label, _id: idSelected }));
+      dispatch(updateCardLabel({ ...data.label, _id: idSelected }));
+      dispatch(updateBoardLabel(data));
     } else {
+      dispatch(addBoardLabelUI(data.label));
       dispatch(createBoardLabel(data));
     }
     handleBack();

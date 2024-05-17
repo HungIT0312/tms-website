@@ -4,6 +4,8 @@ import {
   createCard,
   removeCardLabel,
   updateCard,
+  updateDateCompleted,
+  updateStartDueDates,
 } from "../../api/card/card.api";
 
 export const addCard = createAsyncThunk(
@@ -45,6 +47,28 @@ export const addALabelToCard = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await addCardLabel(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const updateDates = createAsyncThunk(
+  "board/updateDates",
+  async (data, thunkApi) => {
+    try {
+      const response = await updateStartDueDates(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const updateCardDateCompleted = createAsyncThunk(
+  "board/updateCardDateCompleted",
+  async (data, thunkApi) => {
+    try {
+      const response = await updateDateCompleted(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

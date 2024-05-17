@@ -6,7 +6,7 @@ const ActivityAndComment = () => {
   const { selectedCard } = useSelector((state) => state.card);
 
   const onChange = (key) => {
-    console.log(key);
+    // console.log(key);
   };
   const renderActivities = selectedCard?.activities?.map((activity) => (
     <Activity key={activity._id} activity={activity} />

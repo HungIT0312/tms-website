@@ -12,3 +12,16 @@
     overflow-y: auto;
   }
 }
+.ant-descriptions-item-label {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 80px;
+}
+.ant-descriptions-item-content {
+  display: flex !important;
+  align-items: center !important;
+}
+.ant-descriptions-item-container {
+  display: flex !important;
+  align-items: center !important;
+}

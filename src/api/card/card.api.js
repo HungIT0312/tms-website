@@ -17,26 +17,26 @@ export const removeCardLabel = (data) => {
   return http.delete(`/card/${cardId}/label/${labelData}`);
 };
 //==================================================================================
-
-// export const updateCard = async (boardId, listId, cardId, updateObj) => {
-//   return http.put(`/card/${boardId}/${listId}/${cardId}`, updateObj);
-// };
-// export const updateCard = async (boardId, listId, cardId, updateObj) => {
-//   return http.put(`/card/${boardId}/${listId}/${cardId}`, updateObj);
-// };
-// // Cập nhật thứ tự của các thẻ trong một danh sách
-// export const updateCardOrder = async (cardOrderData) => {
-//   return http.post(`/list/change-card-order`, cardOrderData);
-// };
-
-// // Cập nhật thứ tự của các danh sách
-// export const updateListOrder = async (listOrderData) => {
-//   return http.post(`/list/change-list-order`, listOrderData);
-// };
-
+export const updateStartDueDates = (data) => {
+  const { cardId, listId, boardId, date } = data;
+  return http.put(`/card/${boardId}/${listId}/${cardId}/dates`, date);
+};
+export const updateDateCompleted = (data) => {
+  const { cardId, listId, boardId, completed } = data;
+  console.log(data);
+  return http.patch(
+    `/card/${boardId}/${listId}/${cardId}/date-completed`,
+    completed
+  );
+};
+// const user = req.user;
+// const { boardId, listId, cardId } = req.params;
+// const { startDate, dueDate, dueTime } = req.body;
 // router.put(
-//   "/:boardId/:listId/:cardId/label/:labelId/update-label-selection",
-//   cardController.updateLabelSelection
+//   "/:boardId/:listId/:cardId/dates",
+//   cardController.updateStartDueDates
 // );
-
-// router.post("/:boardId/:listId/:cardId/label", cardController.createLabel);
+// router.put(
+//   "/:boardId/:listId/:cardId/date-completed",
+//   cardController.updateDateCompleted
+// );

@@ -10,12 +10,13 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Avatar, Flex, Input, Tag, Tooltip } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./CardItem.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setSelectedCard } from "../../../stores/card/cardSlice";
 import _ from "lodash";
+import dayjs from "dayjs";
 const CardItem = ({
   card = {},
   isAdd = false,
@@ -27,6 +28,8 @@ const CardItem = ({
   const location = useLocation();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
   const dispatch = useDispatch();
+  const [status, setStatus] = useState("");
+  const [tooltipDate, setTooltipDate] = useState("");
   const {
     attributes,
     listeners,
@@ -48,7 +51,40 @@ const CardItem = ({
     dispatch(setSelectedCard(card));
     navigate(`${rootLink}/c/${slug}`);
   };
-
+  const renderDueDateStatus = (date) => {
+    const now = dayjs();
+    if (date.isBefore(now)) {
+      setStatus("error");
+      setTooltipDate("Over due");
+    } else if (date.isSame(now, "day")) {
+      setStatus("warning");
+      setTooltipDate("Due date is today");
+    } else {
+      setStatus("");
+      setTooltipDate("");
+    }
+  };
+  useEffect(() => {
+    const dueDate = dayjs(card?.date?.dueDate);
+    if (!card?.date?.dueDate || card?.date?.completed) {
+      setStatus("");
+      setTooltipDate("");
+    } else renderDueDateStatus(dueDate);
+  }, [card?.date?.completed, card?.date?.dueDate]);
+  const renderStatusColor = () => {
+    if (status == "" && card?.date?.completed) {
+      return "checkbox-due--complete";
+    }
+    if (status == "" && !card?.date?.completed) {
+      return "checkbox-due";
+    }
+    if (status == "error") {
+      return "checkbox-due--overdue";
+    }
+    if (status == "warning") {
+      return "checkbox-due";
+    }
+  };
   const renderLabels =
     card?.labels?.length > 0 &&
     card?.labels?.map((l) => (
@@ -83,20 +119,25 @@ const CardItem = ({
               <EyeOutlined />
             </Flex>
             {card?.date?.dueDate && (
-              <Flex
-                align="center"
-                className="checkbox-due"
-                gap={3}
-                onMouseEnter={() => setIsEnter(true)}
-                onMouseLeave={() => setIsEnter(false)}
-              >
-                {isEnter ? (
-                  <BorderOutlined size={12} />
-                ) : (
-                  <ClockCircleOutlined size={12} />
-                )}
-                <span>{card?.date?.dueDate}</span>
-              </Flex>
+              <Tooltip placement="bottom" title={tooltipDate} arrow={false}>
+                <Flex
+                  align="center"
+                  className={renderStatusColor()}
+                  gap={3}
+                  onMouseEnter={() => setIsEnter(true)}
+                  onMouseLeave={() => setIsEnter(false)}
+                >
+                  {isEnter ? (
+                    <BorderOutlined size={12} />
+                  ) : (
+                    <ClockCircleOutlined size={12} />
+                  )}
+                  <span>
+                    {card?.date?.dueDate &&
+                      dayjs(card?.date?.dueDate).format("YYYY-MM-DD")}
+                  </span>
+                </Flex>
+              </Tooltip>
             )}
             <Flex align="center" gap={3} className="card-item__content-item">
               <PaperClipOutlined />

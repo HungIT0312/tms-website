@@ -24,7 +24,11 @@ const initialState = {
 const boardSlice = createSlice({
   name: "board",
   initialState,
-  reducers: {},
+  reducers: {
+    addBoardLabelUI(state, action) {
+      state.selectedBoard.labels.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       // state.message = action.payload.boards;
@@ -146,7 +150,14 @@ const boardSlice = createSlice({
       .addCase(createBoardLabel.fulfilled, (state, action) => {
         state.isLoading = false;
         const payload = action.payload;
-        state.selectedBoard.labels.push(payload.label);
+        const index = state.selectedBoard.labels.findIndex(
+          (label) => !label._id
+        );
+        if (index !== -1) {
+          state.selectedBoard.labels[index] = payload.label;
+        } else {
+          state.selectedBoard.labels.push(payload.label);
+        }
         state.message = payload.message;
       })
       .addCase(createBoardLabel.rejected, (state, action) => {
@@ -191,6 +202,6 @@ const boardSlice = createSlice({
   },
 });
 
-// export const {} = boardSlice.actions;
+export const { addBoardLabelUI } = boardSlice.actions;
 
 export default boardSlice.reducer;

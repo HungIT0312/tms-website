@@ -4,6 +4,7 @@ import {
   // addLabelToCard,
   removeLabelFromCard,
   updateCardInfo,
+  updateDates,
 } from "./cardThunk";
 
 const initialState = {
@@ -41,6 +42,15 @@ const cardSlice = createSlice({
         (l) => l._id === action.payload._id
       );
       state.selectedCard.labels[updateCardIndex] = action.payload;
+    },
+    addLabelToCardUI(state, action) {
+      state.selectedCard.labels.push(action.payload);
+    },
+    updateCardDate(state, action) {
+      state.selectedCard.labels.push(action.payload);
+    },
+    updateCardDateCompletedUI(state, action) {
+      state.selectedCard.date.completed = action.payload;
     },
   },
   extraReducers: (builder) =>
@@ -87,19 +97,22 @@ const cardSlice = createSlice({
       .addCase(removeLabelFromCard.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
+      })
+      //=====================================================================
+
+      .addCase(updateDates.pending, (state) => {
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(updateDates.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.isLoading = false;
+      })
+      .addCase(updateDates.rejected, (state, action) => {
+        state.message = action.payload.errMessage;
+        state.error = true;
       }),
-  // .addCase(createCardLabel.pending, (state) => {
-  //   state.error = false;
-  //   state.message = null;
-  // })
-  // .addCase(createCardLabel.fulfilled, (state, action) => {
-  //   state.selectedCard.labels.unshift(action.payload.label);
-  //   state.isLoading = false;
-  // })
-  // .addCase(createCardLabel.rejected, (state, action) => {
-  //   state.message = action.payload.errMessage;
-  //   state.error = true;
-  // }),
+  //=====================================================================
 });
 
 export const {
@@ -107,6 +120,8 @@ export const {
   setCardLabelSelected,
   updateCardLabel,
   deleteCardLabel,
+  addLabelToCardUI,
+  updateCardDateCompletedUI,
 } = cardSlice.actions;
 
 export default cardSlice.reducer;
