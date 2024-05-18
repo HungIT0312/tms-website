@@ -25,6 +25,12 @@ const cardSchema = mongoose.Schema({
       name: {
         type: String,
       },
+      surname: {
+        type: String,
+      },
+      email: {
+        type: String,
+      },
       color: {
         type: String,
       },

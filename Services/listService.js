@@ -51,6 +51,10 @@ const getAll = async (boardId, callback) => {
             path: "labels", // Populate labels
             model: "label",
           },
+          {
+            path: "members.user", // Populate user
+            model: "user",
+          },
         ],
       })
       .exec();
@@ -190,12 +194,12 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
 
     list[property] = value;
     if (property === "_destroy") {
-      await cardModel.findByIdAndUpdate(
-        list.cardId,
-        {
-          $set: { _destroy: value },
-        },
-        { new: true }
+      await Promise.all(
+        list.cards.map(async (card) => {
+          await cardModel.findByIdAndUpdate(card._id, {
+            $set: { _destroy: value },
+          });
+        })
       );
     }
 
@@ -228,6 +232,82 @@ const changeListOrder = async (boardId, listIds, callback) => {
     });
   }
 };
+const getAllListByFilter = async (
+  boardId,
+  userIds,
+  labelIds,
+  dueDates,
+  callback
+) => {
+  try {
+    const now = new Date();
+
+    // Build the dueDate filter based on the types
+    const dueDateFilter = dueDates
+      .map((dueDate) => {
+        switch (dueDate.type) {
+          case "today":
+            return {
+              "date.dueDate": {
+                $gte: new Date(now.setHours(0, 0, 0, 0)),
+                $lt: new Date(now.setHours(23, 59, 59, 999)),
+              },
+            };
+          case "overdue":
+            return {
+              "date.dueDate": { $lt: new Date(now.setHours(0, 0, 0, 0)) },
+            };
+          case "coming":
+            return {
+              "date.dueDate": { $gte: new Date(now.setHours(0, 0, 0, 0)) },
+            };
+          default:
+            return {};
+        }
+      })
+      .filter((filter) => Object.keys(filter).length > 0);
+
+    // Build the query object for cards
+    const cardQuery = {
+      $and: [
+        userIds.length > 0 ? { "members.user": { $in: userIds } } : {},
+        labelIds.length > 0 ? { labels: { $in: labelIds } } : {},
+        ...dueDateFilter,
+      ].filter((query) => Object.keys(query).length > 0), // Filter out empty query objects
+    };
+
+    // Find lists containing cards that match the query criteria
+    let lists = await listModel
+      .find({ owner: boardId }) // Filter lists by the boardId
+      .populate({
+        path: "cards",
+        match: cardQuery.$and.length > 0 ? cardQuery : {}, // Apply the card query here only if it has conditions
+        populate: [
+          {
+            path: "activities.user", // Populate user in activities of each card
+            model: "user", // Name of the user model
+          },
+          {
+            path: "labels", // Populate labels
+            model: "label",
+          },
+          {
+            path: "members.user", // Populate user
+            model: "user",
+          },
+        ],
+      })
+      .exec();
+
+    return callback(false, lists);
+  } catch (error) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   create,
   getAll,
@@ -235,4 +315,5 @@ module.exports = {
   updateCardOrder,
   changeListOrder,
   updateList,
+  getAllListByFilter,
 };

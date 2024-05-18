@@ -27,7 +27,7 @@ const create = async (title, listId, boardId, user, callback) => {
     if (!validate)
       return callback({
         errMessage:
-          "You dont have permission to add card to this list or board",
+          "You don't have permission to add card to this list or board",
       });
 
     // Create new card
@@ -36,8 +36,17 @@ const create = async (title, listId, boardId, user, callback) => {
 
     card.activities.unshift({
       user: user._id,
-      action: `added this card to ${list.title}`,
+      action: `added this card to list "${list.title}"`,
     });
+    card.members.unshift({
+      user: user._id,
+      name: user.name,
+      surname: user.surname,
+      email: user.email,
+      color: user.color,
+      role: "owner",
+    });
+
     // card.labels = helperMethods.labelsSeedColor;
     await card.save();
 
@@ -48,13 +57,28 @@ const create = async (title, listId, boardId, user, callback) => {
     // Add log to board activity
     board.activity.unshift({
       user: user._id,
-      action: `added ${card.title} to this board`,
+      action: `added "${card.title}" to this board`,
     });
     await board.save();
-
-    // Set data transfer object
+    const updateCard = await cardModel
+      .findById(card._id)
+      .populate({
+        path: "activities.user",
+      })
+      .populate({
+        path: "members.user",
+      })
+      .populate({
+        path: "watchers.user",
+      })
+      .populate({
+        path: "labels",
+      });
     // const result = await listModel.findById(listId).populate({ path: 'cards' }).exec();
-    return callback(false, { message: "Add successful!", card });
+    return callback(false, {
+      message: "Add successful!",
+      card: updateCard,
+    });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -162,11 +186,32 @@ const update = async (cardId, listId, boardId, user, updatedObj, callback) => {
         errMessage: "You don't have permission to update this card",
       });
     }
-
+    card.activities.unshift({
+      user: user._id,
+      action: `update this card in list "${list.title}"`,
+    });
+    board.activity.unshift({
+      user: user._id,
+      action: `update card in list "${list.title}"`,
+    });
     //Update card
     await card.updateOne(updatedObj);
+    await board.save();
     await card.save();
-    const updatedCard = await cardModel.findById(cardId);
+    const updatedCard = await cardModel
+      .findById(cardId)
+      .populate({
+        path: "activities.user",
+      })
+      .populate({
+        path: "members.user",
+      })
+      .populate({
+        path: "watchers.user",
+      })
+      .populate({
+        path: "labels",
+      });
     return callback(false, { message: "Success!", card: updatedCard });
   } catch (error) {
     return callback({
@@ -334,51 +379,7 @@ const deleteComment = async (
   }
 };
 
-const addMember = async (cardId, listId, boardId, user, memberId, callback) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-    const member = await userModel.findById(memberId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to add member this card";
-    }
-
-    //Add member
-    card.members.unshift({
-      user: member._id,
-      name: member.name,
-      color: member.color,
-    });
-    await card.save();
-
-    //Add to board activity
-    board.activity.unshift({
-      user: user._id,
-      action: `added '${member.name}' to ${card.title}`,
-    });
-    board.save();
-
-    return callback(false, { message: "success" });
-  } catch (error) {
-    return callback({
-      errMessage: "Something went wrong",
-      details: error.message,
-    });
-  }
-};
-
-const deleteMember = async (
+const changeCardMember = async (
   cardId,
   listId,
   boardId,
@@ -387,43 +388,54 @@ const deleteMember = async (
   callback
 ) => {
   try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
+    // Fetch models
+    const [card, list, board, member] = await Promise.all([
+      cardModel.findById(cardId),
+      listModel.findById(listId),
+      boardModel.findById(boardId),
+      userModel.findById(memberId),
+    ]);
 
     // Validate owner
-    const validate = await helperMethods.validateCardOwners(
+    const isOwnerValid = await helperMethods.validateCardOwners(
       card,
       list,
       board,
       user,
       false
     );
-    if (!validate) {
-      errMessage: "You dont have permission to add member this card";
+    if (!isOwnerValid) {
+      return callback({
+        errMessage: "You don't have permission to add member to this card",
+      });
     }
 
-    //delete member
-    card.members = card.members.filter(
-      (a) => a.user.toString() !== memberId.toString()
-    );
+    // Add member to card
+    card.members = [
+      {
+        user: member._id,
+        name: member.name,
+        surname: member.surname,
+        email: member.email,
+        color: member.color,
+      },
+    ];
+    card.activities.unshift({
+      user: user._id,
+      action: `change the assigned person to '${member.name}' in card ${card.title}`,
+    });
+
     await card.save();
 
-    //get member
-    const tempMember = await userModel.findById(memberId);
-
-    //Add to board activity
+    // Add to board activity
     board.activity.unshift({
       user: user._id,
-      action:
-        tempMember.name === user.name
-          ? `left ${card.title}`
-          : `removed '${tempMember.name}' from ${card.title}`,
+      action: `change the assigned person to '${member.name}' in card ${card.title}' `,
     });
-    board.save();
 
-    return callback(false, { message: "success" });
+    await board.save();
+
+    return callback(false, { message: "success", member: card.members });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -773,9 +785,16 @@ const updateStartDueDates = async (
       });
     }
     //Update dates
-    card.date.startDate = new Date(startDate);
-    card.date.dueDate = new Date(dueDate);
-    card.date.dueTime = dueTime;
+    if (startDate) {
+      card.date.startDate = new Date(startDate);
+    }
+    if (dueDate) {
+      card.date.dueDate = new Date(dueDate);
+    }
+    if (dueTime) {
+      card.date.dueTime = dueTime;
+    }
+
     card.date.completed = completed;
     if (dueDate === null) card.date.completed = false;
     await card.save();
@@ -1096,8 +1115,7 @@ module.exports = {
   deleteById,
   updateComment,
   deleteComment,
-  addMember,
-  deleteMember,
+  changeCardMember,
   createChecklist,
   deleteChecklist,
   addChecklistItem,

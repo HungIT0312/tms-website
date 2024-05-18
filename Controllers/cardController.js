@@ -120,32 +120,13 @@ const deleteComment = async (req, res) => {
   );
 };
 
-const addMember = async (req, res) => {
+const changeCardMember = async (req, res) => {
   // Get params
   const user = req.user;
   const { boardId, listId, cardId } = req.params;
-
+  const { memberId } = req.body;
   // Call the card service
-  await cardService.addMember(
-    cardId,
-    listId,
-    boardId,
-    user,
-    req.body.memberId,
-    (err, result) => {
-      if (err) return res.status(500).send(err);
-      return res.status(200).send(result);
-    }
-  );
-};
-
-const deleteMember = async (req, res) => {
-  // Get params
-  const user = req.user;
-  const { boardId, listId, cardId, memberId } = req.params;
-
-  // Call the card service
-  await cardService.deleteMember(
+  await cardService.changeCardMember(
     cardId,
     listId,
     boardId,
@@ -430,8 +411,6 @@ module.exports = {
   addComment,
   updateComment,
   deleteComment,
-  addMember,
-  deleteMember,
   createChecklist,
   deleteChecklist,
   addChecklistItem,
@@ -446,4 +425,5 @@ module.exports = {
   updateCover,
   addLabelToCard,
   removeLabelFromCard,
+  changeCardMember,
 };

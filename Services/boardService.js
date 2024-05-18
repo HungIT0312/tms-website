@@ -1,9 +1,10 @@
 const boardModel = require("../Models/boardModel");
 const cardModel = require("../Models/cardModel");
 const labelModel = require("../Models/labelModel");
+const listModel = require("../Models/listModel");
 const userModel = require("../Models/userModel");
 const helperMethods = require("./helperMethods");
-
+const dayjs = require("dayjs");
 const create = async (req, callback) => {
   try {
     const { title, backgroundImageLink, description } = req.body;
@@ -133,10 +134,8 @@ const removeMember = async (boardId, memberId, user, callback) => {
       return callback({ message: "Member not found in board" });
     }
 
-    // Remove member from board's members array
     const removedMember = board.members.splice(memberIndex, 1)[0];
 
-    // Remove board from member's boards array
     const member = await userModel.findById(memberId);
     const boardIndex = member.boards.findIndex(
       (board) => board.toString() === boardId
@@ -146,6 +145,23 @@ const removeMember = async (boardId, memberId, user, callback) => {
     }
     await member.save();
 
+    const lists = await listModel.find({ owner: boardId });
+
+    for (const list of lists) {
+      const cards = await cardModel.find({ owner: list._id });
+
+      for (const card of cards) {
+        const cardMemberIndex = card.members.findIndex(
+          (cardMember) => cardMember.user.toString() === memberId.toString()
+        );
+
+        if (cardMemberIndex !== -1) {
+          card.members.splice(cardMemberIndex, 1);
+          await card.save();
+        }
+      }
+    }
+
     // Log the activity
     board.activity.unshift({
       user: user._id,
@@ -154,7 +170,7 @@ const removeMember = async (boardId, memberId, user, callback) => {
       }' from this board`,
     });
 
-    // Save changes
+    // Save changes to board
     await board.save();
 
     return callback(false, {
@@ -290,6 +306,91 @@ const deleteLabel = async (boardId, labelId, callback) => {
     });
   }
 };
+const getBoardStats = async (boardId, callback) => {
+  try {
+    // Fetch the board by ID
+    const lists = await listModel.find({ owner: boardId }).populate({
+      path: "cards",
+      populate: {
+        path: "members.user",
+        select: "name surname email color",
+      },
+    });
+    let cards = [];
+    // Loop through each list to find all cards
+    for (const list of lists) {
+      cards.push(...list.cards);
+    }
+    cards = cards.filter((c) => c._destroy === false);
+    const board = await boardModel.findById(boardId).populate("members.user");
+    if (!board) {
+      return callback({ message: "Board not found" });
+    }
+    const userStats = {};
+    // Populate the userStats object with initial data
+    board.members.forEach((member) => {
+      userStats[member.user._id.toString()] = {
+        user: member.user,
+        tasks: {
+          complete: 0,
+          unresolve: 0,
+          totalTask: 0,
+        },
+      };
+    });
+    let completeTask = 0;
+    let unResolveTask = 0;
+    let unassignedTask = 0;
+    let overdueTask = 0;
+    const now = dayjs();
+
+    // Calculate task statistics for each card
+    cards.forEach((card) => {
+      if (card.date.completed) {
+        completeTask += 1;
+      } else {
+        unResolveTask += 1;
+        // Check if the task is overdue
+        if (card.date.dueDate && dayjs(card.date.dueDate).isBefore(now)) {
+          overdueTask += 1;
+        }
+      }
+      if (card.members.length < 1) {
+        unassignedTask += 1;
+      }
+      card.members.forEach((member) => {
+        const userId = member.user._id.toString();
+        if (userStats[userId]) {
+          userStats[userId].tasks.totalTask += 1;
+          // Check if the card is completed
+          if (card.date && card.date.completed) {
+            userStats[userId].tasks.complete += 1;
+          } else {
+            userStats[userId].tasks.unresolve += 1;
+          }
+        }
+      });
+    });
+
+    // Convert userStats object to an array
+    const statsArray = Object.values(userStats);
+
+    // Return the statistics
+    return callback(false, {
+      totalTask: cards.length,
+      statsArray,
+      unResolveTask: unResolveTask,
+      completeTask: completeTask,
+      unassignedTask: unassignedTask,
+      overdueTask: overdueTask, // Added overdue task count
+    });
+  } catch (error) {
+    return callback({
+      message: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
 
 module.exports = {
   create,
@@ -301,4 +402,5 @@ module.exports = {
   createLabel,
   deleteLabel,
   updateLabel,
+  getBoardStats,
 };

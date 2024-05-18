@@ -127,6 +127,13 @@ const deleteLabel = async (req, res) => {
     return res.status(201).send(result);
   });
 };
+const getBoardStats = async (req, res) => {
+  const { boardId } = req.params;
+  await boardService.getBoardStats(boardId, (err, result) => {
+    if (err) return res.status(500).send(err);
+    return res.status(201).send(result);
+  });
+};
 module.exports = {
   create,
   getAll,
@@ -137,4 +144,5 @@ module.exports = {
   createLabel,
   deleteLabel,
   updateLabel,
+  getBoardStats,
 };

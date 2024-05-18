@@ -130,6 +130,50 @@ const changeListOrder = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+
+const getAllListByFilter = async (req, res) => {
+  try {
+    // Extract parameters from the request body
+    const { boardId } = req.params;
+    const { users, labels, dueDates } = req.body;
+
+    // Extract user IDs from the users array
+    const userIds = users.map((user) => user.user);
+
+    // Extract label IDs from the labels array
+    const labelIds = labels.map((label) => label._id);
+
+    // Validate whether boardId is in the user's boards or not
+    const isValidBoard = req.user.boards.some(
+      (board) => board.toString() === boardId
+    );
+    if (!isValidBoard) {
+      return res.status(400).send({
+        errMessage:
+          "You cannot get lists because you are not the owner of this board!",
+      });
+    }
+
+    // Call the service to get all lists that match the filter criteria
+    await listService.getAllListByFilter(
+      boardId,
+      userIds,
+      labelIds,
+      dueDates,
+      (err, result) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        return res.status(200).send(result);
+      }
+    );
+  } catch (error) {
+    return res.status(500).send({
+      errMessage: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
 module.exports = {
   create,
   getAll,
@@ -137,4 +181,5 @@ module.exports = {
   updateCardOrder,
   changeListOrder,
   updateList,
+  getAllListByFilter,
 };

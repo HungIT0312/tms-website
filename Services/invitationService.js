@@ -8,7 +8,6 @@ const acceptInvitation = async (invitationId, userId, callback) => {
       .findById(invitationId)
       .populate("board", "title description")
       .populate("inviter", "name surname color");
-
     if (!invitation || invitation.invited.toString() !== userId.toString()) {
       return callback({ message: "Invitation not found or invalid." });
     }
@@ -19,8 +18,6 @@ const acceptInvitation = async (invitationId, userId, callback) => {
     const newMember = await userModel.findById(userId);
 
     const board = await boardModel.findById(invitation.board);
-    newMember.boards.push(board._id);
-    await newMember.save();
 
     board.members.push({
       user: newMember._id,
@@ -32,12 +29,11 @@ const acceptInvitation = async (invitationId, userId, callback) => {
     });
     const owner = board.members.filter((mem) => mem.role === "owner");
     board.activity.push({
-      user: owner,
+      user: owner ? owner.user : null,
       action: `added user "${newMember.name}" to this board`,
     });
-
+    await newMember.save();
     await board.save();
-
     return callback(false, {
       message: "Invitation accepted!",
       board: board,

@@ -8,5 +8,6 @@ router.get("/:id", listController.getAll);
 router.delete("/:boardId/:listId", listController.deleteById);
 router.post("/change-card-order", listController.updateCardOrder);
 router.post("/update-list-order", listController.changeListOrder);
+router.post("/:boardId/filter", listController.getAllListByFilter);
 
 module.exports = router;

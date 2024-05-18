@@ -3,20 +3,16 @@ const invitationService = require("../Services/invitationService");
 const acceptInvitation = async (req, res) => {
   const { invitationId } = req.body;
   const userId = req.user._id;
-  try {
-    await invitationService.acceptInvitation(
-      invitationId,
-      userId,
-      (error, result) => {
-        if (error) {
-          return res.status(400).send(error);
-        }
-        res.status(200).send(result);
+  await invitationService.acceptInvitation(
+    invitationId,
+    userId,
+    (error, result) => {
+      if (error) {
+        return res.status(400).send(error);
       }
-    );
-  } catch (error) {
-    res.status(500).send({ error: "Internal server error" });
-  }
+      res.status(200).send(result);
+    }
+  );
 };
 const rejectInvitation = async (req, res) => {
   const { invitationId } = req.body;

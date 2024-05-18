@@ -63,11 +63,11 @@ router.post("/label", cardController.addLabelToCard);
 router.delete("/:cardId/label/:labelId", cardController.removeLabelFromCard);
 //=========================================================================================
 
-router.post("/:boardId/:listId/:cardId/add-member", cardController.addMember);
-router.delete(
-  "/:boardId/:listId/:cardId/:memberId/delete-member",
-  cardController.deleteMember
+router.patch(
+  "/:boardId/:listId/:cardId/member",
+  cardController.changeCardMember
 );
+
 //=========================================================================================
 router.post("/create", cardController.create);
 router.get("/:boardId/:listId/:cardId", cardController.getCard);
