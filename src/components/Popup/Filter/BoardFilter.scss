@@ -1,0 +1,47 @@
+.filter {
+  &-content {
+    max-height: calc(100vh - 180px);
+    overflow: auto;
+    padding: 16px;
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    /* Thiết lập track list */
+    &::-webkit-scrollbar-track {
+      background-color: #fff;
+      border-radius: 5px;
+    }
+
+    /* Thiết lập thanh cuộn thumb */
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+  }
+  &-coming {
+    background-color: #f5cd47;
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+  &-overdue {
+    background-color: #ff8269;
+    border-radius: 4px;
+    padding: 0 8px;
+  }
+  &-today {
+    border-radius: 4px;
+    padding: 0 8px;
+    border: 0.5px solid #eee;
+  }
+}
+.title {
+  &-segment {
+    font-size: 12px;
+    font-weight: 500;
+  }
+}

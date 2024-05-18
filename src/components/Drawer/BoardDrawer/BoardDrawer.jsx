@@ -8,11 +8,11 @@ import {
   TagOutlined,
 } from "@ant-design/icons";
 import { Button, Divider, Drawer, Flex, Image } from "antd";
+import { FiArchive } from "react-icons/fi";
 import "./BoardDrawer.scss";
-import Info from "./Content/Info";
 import Activities from "./Content/Activities";
 import Archive from "./Content/Archive";
-import { FiArchive } from "react-icons/fi";
+import Info from "./Content/Info";
 const BoardDrawer = ({
   open,
   onClose,
@@ -23,94 +23,98 @@ const BoardDrawer = ({
   const owner = (selectedBoard.members || []).filter(
     (member) => member.role === "owner"
   )[0];
-  const renderDrawerContent = (
-    <Flex vertical gap={8}>
-      <Flex
-        gap={12}
-        className="drawer-item"
-        align="start"
-        onClick={() => setRenderKey("info")}
-      >
-        <InfoCircleOutlined className="drawer-item__icon" />
-        <Flex vertical>
-          <span className="drawer-item__name">About this board</span>
-          <span className="drawer-item__sub">Add board's description</span>
+  const renderDrawerContent = (child) => {
+    return (
+      <Flex vertical gap={8}>
+        <Flex
+          gap={12}
+          className="drawer-item"
+          align="start"
+          onClick={() => setRenderKey("info")}
+        >
+          <InfoCircleOutlined className="drawer-item__icon" />
+          <Flex vertical>
+            <span className="drawer-item__name">About this board</span>
+            <span className="drawer-item__sub">Add board's description</span>
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex
-        gap={12}
-        className="drawer-item"
-        align="center"
-        onClick={() => setRenderKey("activity")}
-      >
-        <ProjectOutlined className="drawer-item__icon" />
-        <Flex vertical>
-          <span className="drawer-item__name">Activities</span>
+        <Flex
+          gap={12}
+          className="drawer-item"
+          align="center"
+          onClick={() => setRenderKey("activity")}
+        >
+          <ProjectOutlined className="drawer-item__icon" />
+          <Flex vertical>
+            <span className="drawer-item__name">Activities</span>
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex
-        gap={12}
-        className="drawer-item"
-        align="center"
-        onClick={() => setRenderKey("bg")}
-      >
-        <Image
-          src={selectedBoard.backgroundImageLink}
-          width={20}
-          height={20}
-          style={{ borderRadius: 4 }}
-        />
-        <Flex vertical>
-          <span className="drawer-item__name">Change background</span>
+        <Flex
+          gap={12}
+          className="drawer-item"
+          align="center"
+          onClick={() => setRenderKey("bg")}
+        >
+          <Image
+            src={selectedBoard.backgroundImageLink}
+            width={20}
+            height={20}
+            style={{ borderRadius: 4 }}
+          />
+          <Flex vertical>
+            <span className="drawer-item__name">Change background</span>
+          </Flex>
         </Flex>
-      </Flex>
-      <Divider />
-      <Flex
-        gap={12}
-        className="drawer-item"
-        align="center"
-        onClick={() => setRenderKey("labels")}
-      >
-        <TagOutlined className="drawer-item__icon" />
-        <Flex vertical>
-          <span className="drawer-item__name">Labels</span>
+        <Divider />
+        <Flex
+          gap={12}
+          className="drawer-item"
+          align="center"
+          onClick={() => setRenderKey("labels")}
+        >
+          <TagOutlined className="drawer-item__icon" />
+          <Flex vertical>
+            <span className="drawer-item__name">Labels</span>
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex
-        gap={12}
-        className="drawer-item"
-        align="center"
-        onClick={() => setRenderKey("archive")}
-      >
-        <FiArchive className="drawer-item__icon" />
-        <Flex vertical>
-          <span className="drawer-item__name">Archive lists</span>
+
+        <Flex
+          gap={12}
+          className="drawer-item"
+          align="center"
+          onClick={() => setRenderKey("archive")}
+        >
+          <FiArchive className="drawer-item__icon" />
+          <Flex vertical>
+            <span className="drawer-item__name">Archive lists</span>
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex
-        gap={12}
-        className="drawer-item"
-        align="center"
-        onClick={() => setRenderKey("setting")}
-      >
-        <SettingOutlined className="drawer-item__icon" />
-        <Flex vertical>
-          <span className="drawer-item__name">Setting</span>
+        <Flex
+          gap={12}
+          className="drawer-item"
+          align="center"
+          onClick={() => setRenderKey("setting")}
+        >
+          <SettingOutlined className="drawer-item__icon" />
+          <Flex vertical>
+            <span className="drawer-item__name">Setting</span>
+          </Flex>
         </Flex>
-      </Flex>
-      <Flex
-        gap={12}
-        className="drawer-item"
-        align="center"
-        // onClick={() => setRenderKey("setting")}
-      >
-        <MinusOutlined className="drawer-item__icon" />
-        <Flex vertical>
-          <span className="drawer-item__name">Close the Board</span>
+        <Flex
+          gap={12}
+          className="drawer-item"
+          align="center"
+          // onClick={() => setRenderKey("setting")}
+        >
+          <MinusOutlined className="drawer-item__icon" />
+          <Flex vertical>
+            <span className="drawer-item__name">Close the Board</span>
+          </Flex>
         </Flex>
+        {child && child}
       </Flex>
-    </Flex>
-  );
+    );
+  };
   return (
     <Drawer
       title="Menu"
@@ -119,7 +123,8 @@ const BoardDrawer = ({
       open={open}
       getContainer={".board"}
       extra={
-        renderKey !== "" && (
+        renderKey !== "" &&
+        renderKey !== "analysis" && (
           <Flex>
             <Button type="text" onClick={() => setRenderKey("")}>
               Back
@@ -128,7 +133,7 @@ const BoardDrawer = ({
         )
       }
     >
-      {renderKey === "" && renderDrawerContent}
+      {renderKey === "" && renderDrawerContent(<></>)}
       {renderKey === "info" && (
         <Info owner={owner} selectedBoard={selectedBoard} />
       )}

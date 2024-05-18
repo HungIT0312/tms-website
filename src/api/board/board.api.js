@@ -34,4 +34,6 @@ export const deleteLabel = (data) => {
   const { boardId, labelId } = data;
   return http.delete(`/board/${boardId}/label/${labelId}`);
 };
-
+export const getBoardStats = (boardId) => {
+  return http.get(`/board/${boardId}/stats`);
+};

@@ -9,6 +9,7 @@ import {
   TagsOutlined,
 } from "@ant-design/icons";
 import {
+  Avatar,
   Button,
   Col,
   Collapse,
@@ -36,8 +37,15 @@ import {
   setSelectedCard,
   updateCardDateCompletedUI,
 } from "../../../stores/card/cardSlice";
-import { updateCardInfo, updateDates } from "../../../stores/card/cardThunk";
-import { updateDateCardListUI } from "../../../stores/list/ListSlice";
+import {
+  changeMemberAssign,
+  updateCardInfo,
+  updateDates,
+} from "../../../stores/card/cardThunk";
+import {
+  updateCardMemberUI,
+  updateDateCardListUI,
+} from "../../../stores/list/ListSlice";
 import QuillTextBox from "../../QuillTextBox/QuillTextBox";
 import ActivityAndComment from "./Activity/ActivityAndComment";
 import "./CardDetail.scss";
@@ -47,17 +55,19 @@ const { RangePicker } = DatePicker;
 dayjs.extend(weekday);
 dayjs.extend(localeData);
 dayjs.extend(utc);
+const { Option } = Select;
 const CardDetail = () => {
   const { cardName } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
   const { selectedCard } = useSelector((state) => state.card);
+  const { selectedBoard } = useSelector((state) => state.board);
   const { boardId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
-  // console.log(timeNow);
+  const [description, setDescription] = useState("");
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -129,10 +139,10 @@ const CardDetail = () => {
       );
     });
   const renderDate = () => {
-    if (selectedCard.date.startDate && selectedCard.date.dueDate) {
+    if (selectedCard?.date?.startDate && selectedCard?.date?.dueDate) {
       return [
-        dayjs.utc(selectedCard?.date.startDate),
-        dayjs.utc(selectedCard?.date.dueDate),
+        dayjs.utc(selectedCard?.date?.startDate),
+        dayjs.utc(selectedCard?.date?.dueDate),
       ];
     } else return [];
   };
@@ -193,6 +203,15 @@ const CardDetail = () => {
       const dueDate = dayjs(selectedCard?.date?.dueDate);
       renderDueDateStatus(dueDate);
     }
+  };
+  const triggerCallUpdate = (value) => {
+    const newDes = {
+      boardId: selectedBoard?._id,
+      newValue: value,
+      //  property: boardProperty.DESCRIPTION,
+    };
+    console.log(newDes);
+    //  dispatch(updateBoardInfo(newDes));
   };
   //==============================================================  //==============================================================
 
@@ -295,7 +314,9 @@ const CardDetail = () => {
     {
       key: "2",
       label: "Description",
-      children: <QuillTextBox />,
+      children: (
+        <QuillTextBox getCleanHTML={triggerCallUpdate} content={description} />
+      ),
     },
     {
       key: "3",
@@ -303,10 +324,66 @@ const CardDetail = () => {
       children: <Attachment />,
     },
   ];
+
+  const handleAddPeople = (e) => {
+    const crrMember = selectedBoard?.members.filter((mem) => mem.user == e);
+    const dataAddDate = {
+      boardId: boardId,
+      listId: selectedCard?.owner,
+      cardId: selectedCard?._id,
+      member: crrMember,
+    };
+    dispatch(updateCardMemberUI(dataAddDate));
+    dispatch(changeMemberAssign({ ...dataAddDate, memberId: e }));
+  };
+  const ItemPeople = [
+    {
+      key: "1",
+      label: "Assign to",
+      children: (
+        <Select
+          showSearch
+          placeholder="Assign to"
+          variant="borderless"
+          defaultValue={
+            selectedCard?.members[0]?.user?._id ||
+            selectedCard?.members[0]?.user
+          }
+          style={{
+            flex: 1,
+          }}
+          onChange={handleAddPeople}
+          filterOption={(input, option) =>
+            (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+          }
+        >
+          {selectedBoard?.members?.map((mem) => (
+            <Option
+              key={mem.user}
+              value={mem.user}
+              label={mem.name + " " + mem.surname}
+            >
+              <Flex className="" gap={8}>
+                <Avatar
+                  size={24}
+                  style={{ background: mem?.color, fontSize: 12 }}
+                >
+                  {mem?.name[0] + mem?.surname[0]}
+                </Avatar>
+                <div>{mem.name + " " + mem.surname}</div>
+              </Flex>
+            </Option>
+          ))}
+        </Select>
+      ),
+      span: 4,
+    },
+  ];
   const col2 = [
     {
       key: "1",
       label: "Peoples",
+      children: <Descriptions title="" items={ItemPeople} layout="" />,
     },
     {
       key: "2",

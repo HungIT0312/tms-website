@@ -12,6 +12,7 @@ import "./AddMember.scss";
 import SearchUserItem from "./SearchUserItem/SearchUserItem";
 import { removeMemberInBoard } from "../../../stores/board/boardThunk";
 import { useDispatch, useSelector } from "react-redux";
+import { removeBoardMemberUI } from "../../../stores/list/ListSlice";
 const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
   const [inputText, setInputText] = useState();
   const [keyword, setKeyword] = useState();
@@ -85,13 +86,24 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
 
   // eslint-disable-next-line react/prop-types
   const handleRemoveMember = (id) => {
-    dispatch(
-      removeMemberInBoard({ boardId: board._id.toString(), memberId: id })
-    );
-    api.success({
-      message: `Remove member !`,
-      description: "Successfully",
-      placement: "bottomRight",
+    Modal.confirm({
+      title: "Remove member",
+      content:
+        "Are you sure you want to remove this member ? We will assign all task to the owner.",
+      onOk: () => {
+        dispatch(removeBoardMemberUI({ memberId: id }));
+        dispatch(
+          removeMemberInBoard({ boardId: board._id.toString(), memberId: id })
+        );
+        api.success({
+          message: `Remove member !`,
+          description: "Successfully",
+          placement: "bottomRight",
+        });
+      },
+      okText: "Remove",
+      centered: true,
+      okType: "danger",
     });
   };
   const renderAll = (members = []) => {

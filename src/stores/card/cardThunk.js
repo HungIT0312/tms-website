@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   addCardLabel,
+  changeMemberCard,
   createCard,
   removeCardLabel,
   updateCard,
@@ -69,6 +70,17 @@ export const updateCardDateCompleted = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await updateDateCompleted(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const changeMemberAssign = createAsyncThunk(
+  "board/changeMemberAssign",
+  async (data, thunkApi) => {
+    try {
+      const response = await changeMemberCard(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

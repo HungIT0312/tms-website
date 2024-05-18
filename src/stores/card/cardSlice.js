@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   addALabelToCard,
+  changeMemberAssign,
   // addLabelToCard,
   removeLabelFromCard,
   updateCardInfo,
@@ -111,8 +112,14 @@ const cardSlice = createSlice({
       .addCase(updateDates.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
+      })
+
+      //=====================================================================
+      .addCase(changeMemberAssign.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.selectedCard.members = action.payload.member;
+        state.isLoading = false;
       }),
-  //=====================================================================
 });
 
 export const {

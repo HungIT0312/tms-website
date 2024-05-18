@@ -7,6 +7,7 @@ import {
   createNewList,
   deleteListById,
   getAllListByBoardId,
+  getListsByFilter,
   updateListInfo,
 } from "./ListThunk";
 
@@ -109,6 +110,34 @@ const ListSlice = createSlice({
         }
 
         return list;
+      });
+    },
+    updateCardMemberUI(state, action) {
+      const { cardId, listId, member } = action.payload;
+      state.lists = state.lists.map((list) => {
+        if (list._id === listId) {
+          const updatedCards = list.cards.map((card) => {
+            if (card._id === cardId) {
+              return { ...card, members: member };
+            }
+            return card;
+          });
+          return { ...list, cards: updatedCards };
+        }
+
+        return list;
+      });
+    },
+    removeBoardMemberUI(state, action) {
+      const { memberId } = action.payload;
+      state.lists = state.lists.map((list) => {
+        const updatedCards = list.cards.map((card) => {
+          const updatedMembers = card.members.filter(
+            (member) => member.user._id.toString() != memberId.toString()
+          );
+          return { ...card, members: updatedMembers };
+        });
+        return { ...list, cards: updatedCards };
       });
     },
   },
@@ -244,7 +273,25 @@ const ListSlice = createSlice({
       .addCase(updateCardInfo.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
+      })
+      //=============================================================================;
+      .addCase(getListsByFilter.fulfilled, (state, action) => {
+        state.loading = false;
+        const newList = mapOrder(
+          action.payload,
+          state.lists.map((l) => l._id),
+          "_id"
+        );
+        state.lists = newList.filter((l) => l._destroy === false);
+        // state.storageLists = action.payload.filter((l) => l._destroy === true);
+        state.error = false;
+      })
+      .addCase(getListsByFilter.rejected, (state, action) => {
+        state.loading = false;
+        state.error = true;
+        state.message = action.payload.errMessage;
       });
+
     //=============================================================================;
   },
 });
@@ -252,39 +299,13 @@ const ListSlice = createSlice({
 export const {
   setListsState,
   setCardsState,
-  // setCardInfoInList,
   addACardLabelInList,
   removeACardLabelInList,
   removeLabelFromCardsInAllLists,
   updateDateCardListUI,
   updateLabelInAllCardList,
+  updateCardMemberUI,
+  removeBoardMemberUI,
 } = ListSlice.actions;
 
 export default ListSlice.reducer;
-// setCardInfoInList(state, action) {
-//   const { listId, cardId, labelId, label } = action.payload;
-//   const listToUpdate = state.lists.find((list) => list._id === listId);
-//   if (listToUpdate) {
-//     const updatedCards = listToUpdate.cards.map((card) => {
-//       if (card._id === cardId) {
-//         const updatedLabels = card.labels.map((l) => {
-//           if (l._id === labelId) {
-//             return {
-//               ...l,
-//               selected: label.selected,
-//               text: label.text,
-//               type: label.type,
-//             };
-//           }
-//           return l;
-//         });
-//         return { ...card, labels: updatedLabels };
-//       }
-//       return card;
-//     });
-
-//     state.lists = state.lists.map((list) =>
-//       list._id === listId ? { ...list, cards: updatedCards } : list
-//     );
-//   }
-// },

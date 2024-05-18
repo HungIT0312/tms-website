@@ -1,11 +1,12 @@
 /* eslint-disable react/prop-types */
 import {
+  BarChartOutlined,
   EllipsisOutlined,
   LeftOutlined,
   UserAddOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Divider, Flex, Image, Tooltip } from "antd";
+import { Avatar, Divider, Flex, Image, Popover, Tooltip } from "antd";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -17,10 +18,13 @@ import { EditText } from "react-edit-text";
 import "react-edit-text/dist/index.css";
 import { updateBoardInfo } from "../../../stores/board/boardThunk";
 import boardProperty from "../../../constants/boardProperty";
+import Analysis from "../../Modal/Analysis/Analysis";
+import BoardFilter from "../../Popup/Filter/BoardFilter";
 const BoardHeader = ({ showDrawer }) => {
   const { selectedBoard } = useSelector((state) => state.board);
   const { userInformation } = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,10 +103,34 @@ const BoardHeader = ({ showDrawer }) => {
         />
       </Flex>
       <Flex justify="center" align="center" gap={8}>
-        <Flex gap={8} className="filter-btn" align="center" justify="center">
-          <img width={16} src={images.filterBoard} />
-          <span>Filter</span>
+        <Flex
+          gap={8}
+          className="filter-btn"
+          align="center"
+          justify="center"
+          onClick={() => {
+            setIsOpenModal(true);
+          }}
+        >
+          <BarChartOutlined className="" />
+          <span className="">Analysis</span>
         </Flex>
+        <Divider
+          type="vertical"
+          style={{ color: "#fff", background: "#000" }}
+        />
+        <Popover
+          placement="bottom"
+          title={"Filter"}
+          content={<BoardFilter />}
+          arrow={false}
+          trigger={"click"}
+        >
+          <Flex gap={8} className="filter-btn" align="center" justify="center">
+            <img width={16} src={images.filterBoard} />
+            <span>Filter</span>
+          </Flex>
+        </Popover>
         <Divider
           type="vertical"
           style={{ color: "#fff", background: "#000" }}
@@ -129,6 +157,9 @@ const BoardHeader = ({ showDrawer }) => {
         board={selectedBoard}
         isOwner={isOwner}
       />
+      {isOpenModal && (
+        <Analysis isOpen={isOpenModal} setIsOpen={setIsOpenModal} />
+      )}
     </div>
   );
 };

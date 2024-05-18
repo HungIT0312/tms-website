@@ -37,3 +37,8 @@ export const updateCardOrder = async (cardOrderData) => {
 export const changeListOrder = async (listOrderData) => {
   return http.post(`/list/update-list-order`, listOrderData);
 };
+export const getAllListByFilter = async (data) => {
+  const { boardId, ...rest } = data;
+  return http.post(`/list/${boardId}/filter`, rest);
+};
+// router.post("", listController.getAllListByFilter);

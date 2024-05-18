@@ -1,22 +1,18 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import {
-  BorderOutlined,
-  CheckSquareOutlined,
-  ClockCircleOutlined,
-  EyeOutlined,
-  MessageOutlined,
-  PaperClipOutlined,
+  ClockCircleOutlined
 } from "@ant-design/icons";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Avatar, Flex, Input, Tag, Tooltip } from "antd";
-import { useEffect, useState } from "react";
-import "./CardItem.scss";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setSelectedCard } from "../../../stores/card/cardSlice";
-import _ from "lodash";
 import dayjs from "dayjs";
+import _ from "lodash";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { setSelectedCard } from "../../../stores/card/cardSlice";
+import "./CardItem.scss";
 const CardItem = ({
   card = {},
   isAdd = false,
@@ -115,9 +111,9 @@ const CardItem = ({
         <div className="card-item__title">{card?.title}</div>
         <Flex className="card-item__content" wrap="wrap" align="center" gap={8}>
           <Flex gap={8} align="center" wrap="wrap" style={{ height: 28 }}>
-            <Flex align="center" className="card-item__content-item">
+            {/* <Flex align="center" className="card-item__content-item">
               <EyeOutlined />
-            </Flex>
+            </Flex> */}
             {card?.date?.dueDate && (
               <Tooltip placement="bottom" title={tooltipDate} arrow={false}>
                 <Flex
@@ -127,11 +123,7 @@ const CardItem = ({
                   onMouseEnter={() => setIsEnter(true)}
                   onMouseLeave={() => setIsEnter(false)}
                 >
-                  {isEnter ? (
-                    <BorderOutlined size={12} />
-                  ) : (
-                    <ClockCircleOutlined size={12} />
-                  )}
+                  <ClockCircleOutlined size={12} />
                   <span>
                     {card?.date?.dueDate &&
                       dayjs(card?.date?.dueDate).format("YYYY-MM-DD")}
@@ -139,50 +131,30 @@ const CardItem = ({
                 </Flex>
               </Tooltip>
             )}
-            <Flex align="center" gap={3} className="card-item__content-item">
+            {/* <Flex align="center" gap={3} className="card-item__content-item">
               <PaperClipOutlined />
               <span>2</span>
-            </Flex>
-            <Flex align="center" gap={3} className="card-item__content-item">
+            </Flex> */}
+            {/* <Flex align="center" gap={3} className="card-item__content-item">
               <MessageOutlined />
               <span>2</span>
-            </Flex>
-            <Flex gap={3} align="center" className="card-item__content-item">
+            </Flex> */}
+            {/* <Flex gap={3} align="center" className="card-item__content-item">
               <CheckSquareOutlined />
               <span>2/4</span>
-            </Flex>
+            </Flex> */}
           </Flex>
           <Flex align="center" justify="end" flex={1}>
-            <Avatar.Group
-              maxCount={3}
-              maxStyle={{
-                color: "#f56a00",
-                backgroundColor: "#fde3cf",
-                fontSize: 16,
-              }}
-              size={24}
-            >
-              <Tooltip title="Ant User" placement="bottom">
-                <Avatar size={24} style={{ fontSize: 16 }}>
-                  NH
+            {card?.members[0] && (
+              <Tooltip title="Board User" placement="bottom">
+                <Avatar
+                  size={24}
+                  style={{ fontSize: 13, background: card?.members[0].color }}
+                >
+                  {card?.members[0].name[0] + card?.members[0].surname[0]}
                 </Avatar>
               </Tooltip>
-              <Tooltip title="Ant User" placement="bottom">
-                <Avatar size={24} style={{ fontSize: 16 }}>
-                  NH
-                </Avatar>
-              </Tooltip>
-              <Tooltip title="Ant User" placement="bottom">
-                <Avatar size={24} style={{ fontSize: 16 }}>
-                  NH
-                </Avatar>
-              </Tooltip>
-              <Tooltip title="Ant User" placement="bottom">
-                <Avatar size={24} style={{ fontSize: 16 }}>
-                  NH
-                </Avatar>
-              </Tooltip>
-            </Avatar.Group>
+            )}
           </Flex>
         </Flex>
       </Flex>

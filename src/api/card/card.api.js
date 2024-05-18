@@ -23,20 +23,16 @@ export const updateStartDueDates = (data) => {
 };
 export const updateDateCompleted = (data) => {
   const { cardId, listId, boardId, completed } = data;
-  console.log(data);
   return http.patch(
     `/card/${boardId}/${listId}/${cardId}/date-completed`,
     completed
   );
 };
-// const user = req.user;
-// const { boardId, listId, cardId } = req.params;
-// const { startDate, dueDate, dueTime } = req.body;
-// router.put(
-//   "/:boardId/:listId/:cardId/dates",
-//   cardController.updateStartDueDates
-// );
-// router.put(
-//   "/:boardId/:listId/:cardId/date-completed",
-//   cardController.updateDateCompleted
-// );
+//==================================================================================
+
+export const changeMemberCard = (data) => {
+  const { cardId, listId, boardId, memberId } = data;
+  return http.patch(`/card/${boardId}/${listId}/${cardId}/member`, {
+    memberId,
+  });
+};

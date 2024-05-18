@@ -3,6 +3,7 @@ import {
   changeListOrder,
   createList,
   deleteList,
+  getAllListByFilter,
   getAllLists,
   updateList,
 } from "../../api/list/list.api";
@@ -59,6 +60,17 @@ export const deleteListById = createAsyncThunk(
     try {
       const { boardId, listId } = data;
       const response = await deleteList(boardId, listId);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const getListsByFilter = createAsyncThunk(
+  "board/getListsByFilter",
+  async (data, thunkApi) => {
+    try {
+      const response = await getAllListByFilter(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);
