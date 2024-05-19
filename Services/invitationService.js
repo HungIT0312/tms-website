@@ -8,6 +8,7 @@ const acceptInvitation = async (invitationId, userId, callback) => {
       .findById(invitationId)
       .populate("board", "title description")
       .populate("inviter", "name surname color");
+
     if (!invitation || invitation.invited.toString() !== userId.toString()) {
       return callback({ message: "Invitation not found or invalid." });
     }
@@ -15,10 +16,18 @@ const acceptInvitation = async (invitationId, userId, callback) => {
     // Update invitation status to accepted
     invitation.status = "accepted";
     await invitation.save();
+
     const newMember = await userModel.findById(userId);
+    if (!newMember) {
+      return callback({ message: "User not found." });
+    }
 
     const board = await boardModel.findById(invitation.board);
+    if (!board) {
+      return callback({ message: "Board not found." });
+    }
 
+    // Add new member to board members
     board.members.push({
       user: newMember._id,
       name: newMember.name,
@@ -27,13 +36,20 @@ const acceptInvitation = async (invitationId, userId, callback) => {
       color: newMember.color,
       role: "member",
     });
-    const owner = board.members.filter((mem) => mem.role === "owner");
-    board.activity.push({
-      user: owner ? owner.user : null,
-      action: `added user "${newMember.name}" to this board`,
-    });
+
+    // Add activity for adding new member
+    const owner = board.members.find((mem) => mem.role === "owner");
+    if (owner) {
+      board.activity.push({
+        user: owner.user,
+        action: `added user "${newMember.name}" to this board`,
+      });
+    }
+
+    await newMember.boards.push(board._id); // Add boardId to user's boards
     await newMember.save();
     await board.save();
+
     return callback(false, {
       message: "Invitation accepted!",
       board: board,
@@ -46,6 +62,7 @@ const acceptInvitation = async (invitationId, userId, callback) => {
     });
   }
 };
+
 const rejectInvitation = async (invitationId, userId, callback) => {
   try {
     const invitation = await invitationModel.findById(invitationId);

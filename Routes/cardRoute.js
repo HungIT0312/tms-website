@@ -2,10 +2,7 @@ const cardController = require("../Controllers/cardController");
 const express = require("express");
 const router = express.Router();
 
-router.delete(
-  "/:boardId/:listId/:cardId/delete-card",
-  cardController.deleteById
-);
+router.delete("/:boardId/:listId/:cardId", cardController.deleteById);
 router.put(
   "/:boardId/:listId/:cardId/update-cover",
   cardController.updateCover
@@ -83,7 +80,4 @@ router.delete(
   "/:boardId/:listId/:cardId/comment/:commentId",
   cardController.deleteComment
 );
-// router.put("/:cardId/label", async (req, rs) => {
-//   console.log(req);
-// });
 module.exports = router;

@@ -103,7 +103,9 @@ const deleteById = async (cardId, listId, boardId, user, callback) => {
       false
     );
     if (!validate) {
-      errMessage: "You dont have permission to update this card";
+      callback({
+        errMessage: "You don't have permission to update this card",
+      });
     }
 
     // Delete the card
@@ -118,7 +120,7 @@ const deleteById = async (cardId, listId, boardId, user, callback) => {
     // Add activity log to board
     board.activity.unshift({
       user: user._id,
-      action: `deleted ${result.title} from ${list.title}`,
+      action: `deleted "${result.title}" from "${list.title}" list`,
     });
     await board.save();
 

@@ -242,7 +242,7 @@ const getAllListByFilter = async (
   try {
     const now = new Date();
 
-    // Build the dueDate filter based on the types
+    // Xây dựng bộ lọc dueDate dựa trên các loại
     const dueDateFilter = dueDates
       .map((dueDate) => {
         switch (dueDate.type) {
@@ -261,31 +261,51 @@ const getAllListByFilter = async (
             return {
               "date.dueDate": { $gte: new Date(now.setHours(0, 0, 0, 0)) },
             };
+          case "nodue":
+            return {
+              "date.dueDate": { $exists: false },
+            };
           default:
             return {};
         }
       })
       .filter((filter) => Object.keys(filter).length > 0);
 
-    // Build the query object for cards
+    // Xây dựng điều kiện người dùng
+    const userFilter = userIds.includes("unassign")
+      ? {
+          $or: [
+            { "members.user": { $exists: false } },
+            {
+              "members.user": {
+                $in: userIds.filter((id) => id !== "unassign"),
+              },
+            },
+          ],
+        }
+      : userIds.length > 0
+      ? { "members.user": { $in: userIds } }
+      : {};
+
+    // Xây dựng đối tượng truy vấn cho các card
     const cardQuery = {
       $and: [
-        userIds.length > 0 ? { "members.user": { $in: userIds } } : {},
+        userFilter,
         labelIds.length > 0 ? { labels: { $in: labelIds } } : {},
         ...dueDateFilter,
-      ].filter((query) => Object.keys(query).length > 0), // Filter out empty query objects
+      ].filter((query) => Object.keys(query).length > 0), // Lọc các đối tượng truy vấn rỗng
     };
 
-    // Find lists containing cards that match the query criteria
+    // Tìm danh sách chứa các card phù hợp với tiêu chí truy vấn
     let lists = await listModel
-      .find({ owner: boardId }) // Filter lists by the boardId
+      .find({ owner: boardId }) // Lọc danh sách theo boardId
       .populate({
         path: "cards",
-        match: cardQuery.$and.length > 0 ? cardQuery : {}, // Apply the card query here only if it has conditions
+        match: cardQuery.$and.length > 0 ? cardQuery : {}, // Áp dụng truy vấn card ở đây chỉ khi nó có điều kiện
         populate: [
           {
-            path: "activities.user", // Populate user in activities of each card
-            model: "user", // Name of the user model
+            path: "activities.user", // Populate user trong activities của mỗi card
+            model: "user", // Tên của model user
           },
           {
             path: "labels", // Populate labels
