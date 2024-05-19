@@ -3,15 +3,32 @@ import {
   BorderOutlined,
   CheckSquareOutlined,
   ExclamationCircleOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Flex, Modal, Progress, Row, Statistic, Table } from "antd";
-import { useEffect, useState } from "react";
+import {
+  Card,
+  Col,
+  Flex,
+  Modal,
+  Progress,
+  Row,
+  Statistic,
+  Table,
+  Input,
+  Button,
+  Space,
+} from "antd";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBoardStats } from "../../../api/board/board.api";
 import "./Analysis.scss";
+
 const Analysis = ({ isOpen, setIsOpen }) => {
   const { boardId } = useParams();
   const [boardStats, setBoardStats] = useState();
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef(null);
 
   useEffect(() => {
     try {
@@ -28,15 +45,123 @@ const Analysis = ({ isOpen, setIsOpen }) => {
 
     return () => {};
   }, [boardId]);
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1677ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+  });
+  const data = boardStats?.statsArray?.map((item) => {
+    return {
+      key: item.user._id,
+      name: item?.user?.name + " " + item?.user?.surname,
+      Tasks: item?.tasks?.totalTask,
+      Unresolve: item?.tasks?.unresolve,
+      Resolve: item?.tasks?.complete,
+    };
+  });
+
   const total = boardStats?.totalTask;
   const resolvePercent = Math.floor((boardStats?.completeTask / total) * 100);
-  //   const unresolvePercent = (boardStats?.unResolveTask / total) * 100;
+
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
-
       sorter: (a, b) => a.name.length - b.name.length,
+      ...getColumnSearchProps("name"),
     },
     {
       title: "Tasks",
@@ -54,15 +179,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       sorter: (a, b) => a.Resolve - b.Resolve,
     },
   ];
-  const data = boardStats?.statsArray?.map((item) => {
-    return {
-      key: item.user._id,
-      name: item?.user?.name + " " + item?.user?.surname,
-      Tasks: item?.tasks?.totalTask,
-      Unresolve: item?.tasks?.unresolve,
-      Resolve: item?.tasks?.complete,
-    };
-  });
+
   return (
     <Modal
       title="Analysis"
@@ -75,7 +192,11 @@ const Analysis = ({ isOpen, setIsOpen }) => {
     >
       <Flex gap={16} vertical style={{ marginTop: 12 }}>
         <Row gutter={[16, 16]}>
-          <Col span={12} style={{ display: "flex", justifyContent: "center" }}>
+          <Col
+            style={{ display: "flex", justifyContent: "center" }}
+            sm={24}
+            md={12}
+          >
             <Progress
               percent={resolvePercent}
               success={{
@@ -85,8 +206,8 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               size={240}
             />
           </Col>
-          <Col span={12}>
-            <Row gutter={[16, 16]}>
+          <Col sm={24} md={12}>
+            <Row gutter={[16, 16]} wrap={true}>
               <Col span={12}>
                 <Card>
                   <Statistic title="Total Tasks" value={total} />
@@ -95,12 +216,12 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               <Col span={12}>
                 <Card>
                   <Statistic
-                    title="Un-assign"
+                    title="Un-assigned"
                     value={boardStats?.unassignedTask}
                   />
                 </Card>
               </Col>
-              <Col span={8}>
+              <Col xs={12} sm={12} md={12} lg={8}>
                 <Card>
                   <Statistic
                     title="Resolve"
@@ -112,7 +233,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
                   />
                 </Card>
               </Col>
-              <Col span={8}>
+              <Col xs={12} sm={12} md={12} lg={8}>
                 <Card>
                   <Statistic
                     valueStyle={{
@@ -121,10 +242,11 @@ const Analysis = ({ isOpen, setIsOpen }) => {
                     title="Unresolve"
                     value={boardStats?.unResolveTask}
                     prefix={<BorderOutlined />}
+                    style={{ textWrap: "nowrap", lineBreak: "unset" }}
                   />
                 </Card>
               </Col>
-              <Col span={8}>
+              <Col xs={24} sm={24} md={24} lg={8}>
                 <Card>
                   <Statistic
                     title="Overdue Tasks"

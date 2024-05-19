@@ -73,6 +73,21 @@ const BoardFilter = () => {
             size="small"
             placeholder="user..."
           />
+          <Checkbox value={{ user: "unassign" }}>
+            <Flex gap={8} style={{ width: "100%" }} align="center">
+              <Avatar
+                size={20}
+                style={{
+                  background: "#fff",
+                  border: "1px solid #eee",
+                  fontSize: 12,
+                }}
+              >
+                UA
+              </Avatar>
+              <span>Unassigned</span>
+            </Flex>
+          </Checkbox>
           {filteredUsers?.map((item) => (
             <Checkbox key={item._id} value={item}>
               <Flex gap={8} style={{ width: "100%" }} align="center">
@@ -100,7 +115,17 @@ const BoardFilter = () => {
         </Flex>
         <span className="title-segment">Date</span>
         <Flex gap={8} vertical className="filter-labels">
-          {/* {renderCardLabels} */}
+          <Checkbox value={{ now, type: "nodue" }}>
+            <Flex
+              gap={8}
+              style={{ width: "100%" }}
+              align="center"
+              className="filter-today"
+            >
+              <ClockCircleOutlined />
+              <span>No Due Date</span>
+            </Flex>
+          </Checkbox>
           <Checkbox value={{ now, type: "today" }}>
             <Flex
               gap={8}

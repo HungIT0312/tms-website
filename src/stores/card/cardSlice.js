@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   addALabelToCard,
   changeMemberAssign,
+  deleteCardById,
   // addLabelToCard,
   removeLabelFromCard,
   updateCardInfo,
@@ -19,17 +20,6 @@ const cardSlice = createSlice({
   name: "card",
   initialState,
   reducers: {
-    getCardsStart(state) {
-      state.isLoading = true;
-      state.isError = false;
-    },
-    getCardsSuccess(state, action) {
-      return { ...state, cards: action.payload, isLoading: false };
-    },
-    getCardsFailure(state) {
-      state.isError = true;
-      state.isLoading = false;
-    },
     setSelectedCard(state, action) {
       return { ...state, selectedCard: action.payload };
     },
@@ -119,6 +109,20 @@ const cardSlice = createSlice({
         state.message = action.payload.message;
         state.selectedCard.members = action.payload.member;
         state.isLoading = false;
+      })
+      //=====================================================================
+
+      .addCase(deleteCardById.pending, (state) => {
+        state.error = false;
+        state.message = null;
+      })
+      .addCase(deleteCardById.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.isLoading = false;
+      })
+      .addCase(deleteCardById.rejected, (state, action) => {
+        state.message = action.payload.errMessage;
+        state.error = true;
       }),
 });
 

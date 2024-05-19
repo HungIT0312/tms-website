@@ -140,6 +140,30 @@ const ListSlice = createSlice({
         return { ...list, cards: updatedCards };
       });
     },
+    deleteCardInListById(state, action) {
+      const { listId, cardId } = action.payload;
+      state.lists = state.lists.map((list) => {
+        if (list._id === listId) {
+          const updatedCards = list.cards.filter((card) => card._id !== cardId);
+          return { ...list, cards: updatedCards };
+        }
+        return list;
+      });
+    },
+    updateCardInListById(state, action) {
+      const { listId, cardId, updateObj } = action.payload;
+      state.lists = state.lists.map((list) => {
+        if (list._id === listId) {
+          list.cards = list.cards.map((card) => {
+            if (card._id === cardId) {
+              return { ...card, ...updateObj };
+            }
+            return card;
+          });
+        }
+        return list;
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -306,6 +330,8 @@ export const {
   updateLabelInAllCardList,
   updateCardMemberUI,
   removeBoardMemberUI,
+  deleteCardInListById,
+  updateCardInListById,
 } = ListSlice.actions;
 
 export default ListSlice.reducer;

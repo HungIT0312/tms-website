@@ -3,6 +3,7 @@ import {
   addCardLabel,
   changeMemberCard,
   createCard,
+  deleteCard,
   removeCardLabel,
   updateCard,
   updateDateCompleted,
@@ -81,6 +82,17 @@ export const changeMemberAssign = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await changeMemberCard(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const deleteCardById = createAsyncThunk(
+  "board/deleteCardById",
+  async (data, thunkApi) => {
+    try {
+      const response = await deleteCard(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

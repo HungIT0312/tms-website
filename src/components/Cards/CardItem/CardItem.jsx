@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import {
-  ClockCircleOutlined
-} from "@ant-design/icons";
+import { ClockCircleOutlined } from "@ant-design/icons";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Avatar, Flex, Input, Tag, Tooltip } from "antd";

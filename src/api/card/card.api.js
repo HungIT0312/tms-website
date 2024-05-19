@@ -36,3 +36,7 @@ export const changeMemberCard = (data) => {
     memberId,
   });
 };
+export const deleteCard = (data) => {
+  const { cardId, listId, boardId } = data;
+  return http.delete(`/card/${boardId}/${listId}/${cardId}`);
+};

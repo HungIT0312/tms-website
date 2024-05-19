@@ -27,8 +27,8 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import localeData from "dayjs/plugin/localeData";
-import weekday from "dayjs/plugin/weekday";
 import utc from "dayjs/plugin/utc";
+import weekday from "dayjs/plugin/weekday";
 import { useEffect, useState } from "react";
 import { EditText } from "react-edit-text";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,10 +39,13 @@ import {
 } from "../../../stores/card/cardSlice";
 import {
   changeMemberAssign,
+  deleteCardById,
   updateCardInfo,
   updateDates,
 } from "../../../stores/card/cardThunk";
 import {
+  deleteCardInListById,
+  updateCardInListById,
   updateCardMemberUI,
   updateDateCardListUI,
 } from "../../../stores/list/ListSlice";
@@ -67,7 +70,7 @@ const CardDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
-  const [description, setDescription] = useState("");
+  // const [description, setDescription] = useState("");
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -206,12 +209,30 @@ const CardDetail = () => {
   };
   const triggerCallUpdate = (value) => {
     const newDes = {
-      boardId: selectedBoard?._id,
-      newValue: value,
-      //  property: boardProperty.DESCRIPTION,
+      boardId: boardId,
+      listId: selectedCard?.owner,
+      cardId: selectedCard?._id,
+      updateObj: {
+        ...selectedCard,
+        description: value,
+      },
     };
-    console.log(newDes);
-    //  dispatch(updateBoardInfo(newDes));
+    // console.log(newDes);
+    // dispatch(setCardsState())
+    dispatch(updateCardInListById(newDes));
+    dispatch(updateCardInfo(newDes));
+  };
+  const handleDeleteThisTask = () => {
+    const dataDelete = {
+      boardId: boardId,
+      listId: selectedCard?.owner,
+      cardId: selectedCard?._id,
+    };
+    dispatch(setSelectedCard(null));
+    dispatch(deleteCardInListById(dataDelete));
+    // dispatch(updateCardInListById(dataDelete));
+    msg.success("Delete success!");
+    dispatch(deleteCardById(dataDelete));
   };
   //==============================================================  //==============================================================
 
@@ -241,8 +262,8 @@ const CardDetail = () => {
     },
     {
       key: "2",
-      label: "Telephone",
-      children: "1810000000",
+      label: "List name",
+      children: "",
       span: 4,
     },
   ];
@@ -315,7 +336,10 @@ const CardDetail = () => {
       key: "2",
       label: "Description",
       children: (
-        <QuillTextBox getCleanHTML={triggerCallUpdate} content={description} />
+        <QuillTextBox
+          getCleanHTML={triggerCallUpdate}
+          content={selectedCard?.description}
+        />
       ),
     },
     {
@@ -339,11 +363,11 @@ const CardDetail = () => {
   const ItemPeople = [
     {
       key: "1",
-      label: "Assign to",
+      label: "Assigned to",
       children: (
         <Select
           showSearch
-          placeholder="Assign to"
+          placeholder="Assigned to"
           variant="borderless"
           defaultValue={
             selectedCard?.members[0]?.user?._id ||
@@ -394,23 +418,45 @@ const CardDetail = () => {
   const items = [
     {
       label: "Watch issue",
-      key: "1",
+      key: "watch",
       icon: <EyeOutlined />,
     },
     {
       label: "Labels",
-      key: "12",
+      key: "label",
       icon: <TagsOutlined />,
     },
     {
       label: "Delete",
-      key: "3",
+      key: "delete",
       icon: <DeleteOutlined />,
       danger: true,
     },
   ];
+
+  const handleMenuClick = (e) => {
+    switch (e.key) {
+      case "label":
+        showModal();
+        break;
+      case "delete":
+        Modal.confirm({
+          title: "Are you sure delete this issue?",
+          onOk: () => {
+            handleDeleteThisTask();
+          },
+          okText: "Delete",
+          okType: "danger",
+          centered: true,
+        });
+        break;
+      default:
+        break;
+    }
+  };
   const menuProps = {
     items,
+    onClick: handleMenuClick,
   };
 
   return (
