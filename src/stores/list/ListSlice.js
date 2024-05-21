@@ -3,6 +3,7 @@ import { cloneDeep } from "lodash";
 import { mapOrder } from "../../helpers/mapOrder";
 import { addCard, updateCardInfo } from "../card/cardThunk";
 import {
+  changeCardToDiffList,
   changeListOrderByIds,
   createNewList,
   deleteListById,
@@ -33,6 +34,31 @@ const ListSlice = createSlice({
       if (listToUpdate) {
         listToUpdate.cards = columnCards;
       }
+    },
+    changeCardToAnotherList: (state, action) => {
+      const { newListId, card } = action.payload;
+      const newCard = { ...card, owner: newListId };
+      const oldListIndex = state.lists.findIndex(
+        (list) => list._id === card.owner
+      );
+      const newListIndex = state.lists.findIndex(
+        (list) => list._id === newListId
+      );
+
+      if (oldListIndex === -1 || newListIndex === -1) {
+        return;
+      }
+
+      const updatedOldList = { ...state.lists[oldListIndex] };
+      const updatedNewList = { ...state.lists[newListIndex] };
+
+      updatedOldList.cards = updatedOldList.cards.filter(
+        (c) => c._id !== newCard._id
+      );
+      updatedNewList.cards = [...updatedNewList.cards, newCard];
+
+      state.lists[oldListIndex] = updatedOldList;
+      state.lists[newListIndex] = updatedNewList;
     },
 
     addACardLabelInList(state, action) {
@@ -245,7 +271,7 @@ const ListSlice = createSlice({
           state.lists.splice(indexCrrList, 1);
           state.storageLists.push(changeList);
         } else if (indexCrrList !== -1) {
-          state.lists[indexCrrList].title = changeList.title;
+          state.lists[indexCrrList] = changeList;
         } else {
           const indexArchive = state.storageLists.findIndex(
             (l) => l._id === changeList._id
@@ -314,6 +340,10 @@ const ListSlice = createSlice({
         state.loading = false;
         state.error = true;
         state.message = action.payload.errMessage;
+      })
+      .addCase(changeCardToDiffList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = false;
       });
 
     //=============================================================================;
@@ -332,6 +362,7 @@ export const {
   removeBoardMemberUI,
   deleteCardInListById,
   updateCardInListById,
+  changeCardToAnotherList,
 } = ListSlice.actions;
 
 export default ListSlice.reducer;

@@ -1,16 +1,28 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { ClockCircleOutlined } from "@ant-design/icons";
+import {
+  CheckSquareOutlined,
+  ClockCircleOutlined,
+  EditOutlined,
+  EllipsisOutlined,
+  ExportOutlined,
+  LeftOutlined,
+  MessageOutlined,
+  PaperClipOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Avatar, Flex, Input, Tag, Tooltip } from "antd";
+import { Avatar, Flex, Input, Popover, Tag, Tooltip } from "antd";
 import dayjs from "dayjs";
 import _ from "lodash";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setSelectedCard } from "../../../stores/card/cardSlice";
 import "./CardItem.scss";
+import { changeCardToAnotherList } from "../../../stores/list/ListSlice";
+import { changeCardToDiffList } from "../../../stores/list/ListThunk";
 const CardItem = ({
   card = {},
   isAdd = false,
@@ -24,6 +36,8 @@ const CardItem = ({
   const dispatch = useDispatch();
   const [status, setStatus] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
+  const { lists } = useSelector((state) => state.list);
+  const { boardId } = useParams();
   const {
     attributes,
     listeners,
@@ -38,6 +52,10 @@ const CardItem = ({
     transition,
     opacity: isDragging ? 0.8 : undefined,
     border: isDragging ? "1px solid #2ecc71" : undefined,
+    // overflow: card?.isPlaceHolder ? "hidden" : "unset",
+    // height: card?.isPlaceHolder ? "0px" : "unset",
+    // display: card?.isPlaceHolder ? "none" : "block",
+    // overflow: "unset",
   };
 
   const handleSelectCard = () => {
@@ -90,7 +108,40 @@ const CardItem = ({
         {l?.text}
       </Tag>
     ));
+  const handleEditClick = (e, list) => {
+    e.stopPropagation();
+    const data = {
+      card: card,
+      newListId: list?._id,
+    };
+    dispatch(
+      changeCardToDiffList({
+        boardId: boardId,
+        listId: card?.owner,
+        newListId: list?._id,
+        cardId: card?._id,
+      })
+    );
 
+    dispatch(changeCardToAnotherList(data));
+  };
+  const renderListTitle = lists
+    ?.filter((l) => l._id !== card?.owner)
+    .map((l) => (
+      <Flex
+        className="change-item"
+        key={l._id}
+        onClick={(e) => handleEditClick(e, l)}
+      >
+        {l?.title}
+      </Flex>
+    ));
+  const renderContent = (
+    <Flex vertical gap={8}>
+      <Flex className="change-title">Move to list</Flex>
+      {renderListTitle}
+    </Flex>
+  );
   return !isAdd ? (
     <Flex
       className="card-item"
@@ -101,12 +152,24 @@ const CardItem = ({
       {...listeners}
       onClick={handleSelectCard}
     >
+      <Popover
+        title="Change position"
+        placement="bottomLeft"
+        content={renderContent}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Flex className="edit-Btn" onClick={(e) => e.stopPropagation()}>
+          <EllipsisOutlined />
+        </Flex>
+      </Popover>
+
       <div className="card-item__cover"></div>
       <Flex vertical gap={4}>
         <Flex className="card-item__labels" wrap="wrap" gap={4}>
           {renderLabels}
         </Flex>
         <div className="card-item__title">{card?.title}</div>
+
         <Flex className="card-item__content" wrap="wrap" align="center" gap={8}>
           <Flex gap={8} align="center" wrap="wrap" style={{ height: 28 }}>
             {/* <Flex align="center" className="card-item__content-item">
@@ -130,28 +193,33 @@ const CardItem = ({
               </Tooltip>
             )}
             {/* <Flex align="center" gap={3} className="card-item__content-item">
-              <PaperClipOutlined />
-              <span>2</span>
-            </Flex> */}
-            {/* <Flex align="center" gap={3} className="card-item__content-item">
-              <MessageOutlined />
-              <span>2</span>
-            </Flex> */}
-            {/* <Flex gap={3} align="center" className="card-item__content-item">
-              <CheckSquareOutlined />
-              <span>2/4</span>
-            </Flex> */}
+                <PaperClipOutlined />
+                <span>2</span>
+              </Flex>
+              <Flex align="center" gap={3} className="card-item__content-item">
+                <MessageOutlined />
+                <span>2</span>
+              </Flex>
+              <Flex gap={3} align="center" className="card-item__content-item">
+                <CheckSquareOutlined />
+                <span>2/4</span>
+              </Flex> */}
           </Flex>
-          <Flex align="center" justify="end" flex={1}>
-            {card?.members[0] && (
+          <Flex align="end" justify="end" flex={1}>
+            {card?.members ? (
               <Tooltip title="Board User" placement="bottom">
                 <Avatar
                   size={24}
-                  style={{ fontSize: 13, background: card?.members[0].color }}
+                  style={{
+                    fontSize: 13,
+                    background: card?.members[0]?.color,
+                  }}
                 >
-                  {card?.members[0].name[0] + card?.members[0].surname[0]}
+                  {card?.members[0]?.name[0] + card?.members[0]?.surname[0]}
                 </Avatar>
               </Tooltip>
+            ) : (
+              <></>
             )}
           </Flex>
         </Flex>

@@ -1,5 +1,5 @@
-import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Divider, Flex, Image, Input, Row } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { Button, Col, Divider, Flex, Image, Input, Row, Skeleton } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BoardPreview from "../../components/Board/BoardPreview/BoardPreview";
@@ -7,19 +7,24 @@ import CreateBoard from "../../components/Modal/Board/CreateBoard";
 import images from "../../constants/images";
 import { getAllUserBoard } from "../../stores/board/boardThunk";
 import "./Workspace.scss";
+
 const Workspace = () => {
   const [isOpenCreateModel, setIsOpenCreateModel] = useState(false);
   const [searchKey, setSearchKey] = useState("");
   const [input, setInput] = useState("");
-  const { loading, boards } = useSelector((state) => state.board);
+  const { isLoading, boards } = useSelector((state) => state.board);
   const { userInformation } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
   useEffect(() => {
+
     const fetchBoard = async () => {
       await dispatch(getAllUserBoard());
     };
     fetchBoard();
-  }, [dispatch]);
+
+  }, [dispatch, userInformation._id]);
+
   useEffect(() => {
     const time = setTimeout(() => {
       setSearchKey(input);
@@ -31,7 +36,7 @@ const Workspace = () => {
   }, [input]);
 
   const renderBoards = (role) => {
-    const renderBoardsItem =
+    return (
       boards &&
       boards.filter((board) => {
         return board?.members.some(
@@ -39,15 +44,26 @@ const Workspace = () => {
             member.user.toString() === userInformation._id.toString() &&
             member.role === role
         );
-      });
-    return renderBoardsItem;
+      })
+    );
   };
+
   const searchedBoard = (role) => {
     const boards = renderBoards(role);
-    const searchedBoard = boards.filter((item) => {
+    return boards.filter((item) => {
       return item?.title.toLowerCase().includes(searchKey.toLowerCase().trim());
     });
-    return searchedBoard;
+  };
+
+  const renderSkeletons = (count) => {
+    return Array.from({ length: count }).map((_, index) => (
+      <Col key={index} xs={24} sm={12} md={6} lg={4}>
+        <Skeleton.Button
+          active={isLoading}
+          style={{ height: "200px", width: "240px" }}
+        />
+      </Col>
+    ));
   };
 
   return (
@@ -74,7 +90,7 @@ const Workspace = () => {
       </Flex>
       <div className="workspace__content">
         <Row gutter={[16, 16]}>
-          {!loading && boards.length < 1 && (
+          {!isLoading && boards?.length < 1 && (
             <Flex
               style={{ width: "100vw" }}
               justify="center"
@@ -104,8 +120,9 @@ const Workspace = () => {
               </Button>
             </Flex>
           )}
-          {!loading &&
-            boards &&
+          {isLoading && renderSkeletons(4)}
+          {!isLoading &&
+            boards?.length > 0 &&
             searchedBoard("owner").map((board) => (
               <Col key={board._id} xs={24} sm={12} md={6} lg={4}>
                 <BoardPreview board={board} />
@@ -116,14 +133,14 @@ const Workspace = () => {
               Workspace is participating
             </div>
           </Divider>
-          {!loading &&
-            boards &&
+          {isLoading && renderSkeletons(4)}
+          {!isLoading &&
+            boards?.length > 0 &&
             searchedBoard("member").map((board) => (
               <Col key={board._id} xs={24} sm={12} md={6} lg={4}>
                 <BoardPreview board={board} />
               </Col>
             ))}
-          {loading && <LoadingOutlined />}
         </Row>
       </div>
       <CreateBoard

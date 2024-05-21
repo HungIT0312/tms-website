@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
+  changeCardToAnother,
   changeListOrder,
   createList,
   deleteList,
@@ -46,7 +47,6 @@ export const updateListInfo = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const { boardId, listId, value, property } = data;
-
       const response = await updateList(boardId, listId, value, property);
       return response;
     } catch (error) {
@@ -71,6 +71,17 @@ export const getListsByFilter = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await getAllListByFilter(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const changeCardToDiffList = createAsyncThunk(
+  "board/changeCardToDiffList",
+  async (data, thunkApi) => {
+    try {
+      const response = await changeCardToAnother(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

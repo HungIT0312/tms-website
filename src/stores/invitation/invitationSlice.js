@@ -12,7 +12,11 @@ const initialState = {
 const invitationSlice = createSlice({
   name: "invitation",
   initialState,
-  reducers: {},
+  reducers: {
+    setAddInvitation(state, action) {
+      state.invitations = [...state.invitations, action.payload];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(acceptBoardInvite.pending, (state) => {
@@ -71,6 +75,6 @@ const invitationSlice = createSlice({
   },
 });
 
-// export const {} = invitationSlice.actions;
+export const { setAddInvitation } = invitationSlice.actions;
 
 export default invitationSlice.reducer;

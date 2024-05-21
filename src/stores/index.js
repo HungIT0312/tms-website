@@ -8,6 +8,8 @@ import invitationSlice from "./invitation/invitationSlice";
 import authSlice from "./auth/authSlice";
 import ListSlice from "./list/ListSlice";
 import cardSlice from "./card/cardSlice";
+import noticeSlice from "./notice/noticeSlice";
+
 const rootReducer = combineReducers({
   user: userSlice,
   board: boardSlice,
@@ -15,11 +17,12 @@ const rootReducer = combineReducers({
   auth: authSlice,
   list: ListSlice,
   card: cardSlice,
+  notice: noticeSlice,
 });
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user", "list", "card"],
+  whitelist: ["user", "list", "card", "notification"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

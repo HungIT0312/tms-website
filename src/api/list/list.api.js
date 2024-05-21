@@ -41,4 +41,8 @@ export const getAllListByFilter = async (data) => {
   const { boardId, ...rest } = data;
   return http.post(`/list/${boardId}/filter`, rest);
 };
-// router.post("", listController.getAllListByFilter);
+export const changeCardToAnother = async (data) => {
+  const { boardId, listId, ...rest } = data;
+  return http.post(`/list/${boardId}/${listId}/card-list`, rest);
+};
+// router.post("", listController.getAllListByFilter);/:boardId/:listId/card-list

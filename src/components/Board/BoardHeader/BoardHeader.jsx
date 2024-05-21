@@ -16,8 +16,8 @@ import "./BoardHeader.scss";
 
 import { EditText } from "react-edit-text";
 import "react-edit-text/dist/index.css";
-import { updateBoardInfo } from "../../../stores/board/boardThunk";
 import boardProperty from "../../../constants/boardProperty";
+import { updateBoardInfo } from "../../../stores/board/boardThunk";
 import Analysis from "../../Modal/Analysis/Analysis";
 import BoardFilter from "../../Popup/Filter/BoardFilter";
 const BoardHeader = ({ showDrawer }) => {
@@ -35,6 +35,8 @@ const BoardHeader = ({ showDrawer }) => {
       mem.user.toString() === userInformation._id.toString() &&
       mem.role === "owner"
   );
+ 
+
   const renderMember = members.map((member) => {
     if (member.role === "owner") {
       return (

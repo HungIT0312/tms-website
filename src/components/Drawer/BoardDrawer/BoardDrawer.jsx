@@ -4,8 +4,6 @@ import {
   InfoCircleOutlined,
   MinusOutlined,
   ProjectOutlined,
-  SettingOutlined,
-  TagOutlined,
 } from "@ant-design/icons";
 import { Button, Divider, Drawer, Flex, Image } from "antd";
 import { FiArchive } from "react-icons/fi";
@@ -13,6 +11,7 @@ import "./BoardDrawer.scss";
 import Activities from "./Content/Activities";
 import Archive from "./Content/Archive";
 import Info from "./Content/Info";
+import { useSelector } from "react-redux";
 const BoardDrawer = ({
   open,
   onClose,
@@ -23,6 +22,7 @@ const BoardDrawer = ({
   const owner = (selectedBoard.members || []).filter(
     (member) => member.role === "owner"
   )[0];
+  const { userInformation } = useSelector((state) => state.user);
   const renderDrawerContent = (child) => {
     return (
       <Flex vertical gap={8}>
@@ -66,17 +66,6 @@ const BoardDrawer = ({
           </Flex>
         </Flex>
         <Divider />
-        <Flex
-          gap={12}
-          className="drawer-item"
-          align="center"
-          onClick={() => setRenderKey("labels")}
-        >
-          <TagOutlined className="drawer-item__icon" />
-          <Flex vertical>
-            <span className="drawer-item__name">Labels</span>
-          </Flex>
-        </Flex>
 
         <Flex
           gap={12}
@@ -89,28 +78,20 @@ const BoardDrawer = ({
             <span className="drawer-item__name">Archive lists</span>
           </Flex>
         </Flex>
-        <Flex
-          gap={12}
-          className="drawer-item"
-          align="center"
-          onClick={() => setRenderKey("setting")}
-        >
-          <SettingOutlined className="drawer-item__icon" />
-          <Flex vertical>
-            <span className="drawer-item__name">Setting</span>
+        {owner?.user == userInformation?._id && (
+          <Flex
+            gap={12}
+            className="drawer-item"
+            align="center"
+            // onClick={() => setRenderKey("setting")}
+          >
+            <MinusOutlined className="drawer-item__icon" />
+            <Flex vertical>
+              <span className="drawer-item__name">Close the Board</span>
+            </Flex>
           </Flex>
-        </Flex>
-        <Flex
-          gap={12}
-          className="drawer-item"
-          align="center"
-          // onClick={() => setRenderKey("setting")}
-        >
-          <MinusOutlined className="drawer-item__icon" />
-          <Flex vertical>
-            <span className="drawer-item__name">Close the Board</span>
-          </Flex>
-        </Flex>
+        )}
+
         {child && child}
       </Flex>
     );

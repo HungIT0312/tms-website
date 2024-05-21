@@ -1,31 +1,41 @@
 /* eslint-disable react/prop-types */
-import { Flex, Spin } from "antd";
-import Column from "./Column/Column";
-import "./ListColumns.scss";
 import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { Flex, Skeleton } from "antd";
+import Column from "./Column/Column";
+import "./ListColumns.scss";
 
 const ListColumns = ({ handleCreateList, lists, loading }) => {
   const renderLists = lists?.map((list) => (
     <Column key={list._id} list={list} />
   ));
 
-  const loadingItem = loading
-    ? { align: "center", justify: "center", style: { width: "100vw" } }
-    : {};
+  // const loadingItem = true
+  //   ? { align: "center", justify: "center", style: { width: "100vw" } }
+  //   : {};
 
   const arrId = lists?.map((l) => l._id);
 
+  const renderLoadingSkeletons = () => (
+    <>
+      <Skeleton.Input active={loading} style={{ width: 200, height: 300 }} />
+      <Skeleton.Input active={loading} style={{ width: 200, height: 250 }} />
+      <Skeleton.Input active={loading} style={{ width: 200, height: 400 }} />
+      <Skeleton.Input active={loading} style={{ width: 200, height: 400 }} />
+    </>
+  );
+
   return (
     <SortableContext strategy={horizontalListSortingStrategy} items={arrId}>
-      <Flex gap={12} className="list-columns" {...loadingItem}>
-        {!loading && renderLists}
+      <Flex gap={12} className="list-columns">
+        {loading ? renderLoadingSkeletons() : renderLists}
         {!loading && (
           <Column isAddList={true} handleCreateList={handleCreateList} />
         )}
-        {loading && <Spin size="large" fullscreen />}
+
+        {/* {true && <Spin size="large" style={{ margin: "0 auto" }} />} */}
       </Flex>
     </SortableContext>
   );

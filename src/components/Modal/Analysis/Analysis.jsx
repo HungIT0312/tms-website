@@ -17,6 +17,7 @@ import {
   Input,
   Button,
   Space,
+  Skeleton,
 } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -26,24 +27,28 @@ import "./Analysis.scss";
 const Analysis = ({ isOpen, setIsOpen }) => {
   const { boardId } = useParams();
   const [boardStats, setBoardStats] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
   useEffect(() => {
-    try {
-      const fetchGetBoardStats = async () => {
+    const fetchGetBoardStats = async () => {
+      try {
+        setIsLoading(true);
         const rs = await getBoardStats(boardId);
         if (rs) {
           setBoardStats(rs);
+          setIsLoading(false);
         }
-      };
-      fetchGetBoardStats();
-    } catch (error) {
-      console.log(error);
-    }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => {};
+    fetchGetBoardStats();
   }, [boardId]);
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -51,10 +56,12 @@ const Analysis = ({ isOpen, setIsOpen }) => {
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
   };
+
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -143,6 +150,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       }
     },
   });
+
   const data = boardStats?.statsArray?.map((item) => {
     return {
       key: item.user._id,
@@ -150,6 +158,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       Tasks: item?.tasks?.totalTask,
       Unresolve: item?.tasks?.unresolve,
       Resolve: item?.tasks?.complete,
+      Overdue: item?.tasks?.overdue,
     };
   });
 
@@ -178,6 +187,12 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       dataIndex: "Resolve",
       sorter: (a, b) => a.Resolve - b.Resolve,
     },
+    {
+      title: "Overdue",
+      dataIndex: "Overdue",
+      sorter: (a, b) => a.Overdue - b.Overdue,
+      render: (text) => <div style={{ color: "red" }}>{text}</div>,
+    },
   ];
 
   return (
@@ -190,76 +205,80 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       footer={false}
       className="analysis-model"
     >
-      <Flex gap={16} vertical style={{ marginTop: 12 }}>
-        <Row gutter={[16, 16]}>
-          <Col
-            style={{ display: "flex", justifyContent: "center" }}
-            sm={24}
-            md={12}
-          >
-            <Progress
-              percent={resolvePercent}
-              success={{
-                percent: resolvePercent,
-              }}
-              type="circle"
-              size={240}
-            />
-          </Col>
-          <Col sm={24} md={12}>
-            <Row gutter={[16, 16]} wrap={true}>
-              <Col span={12}>
-                <Card>
-                  <Statistic title="Total Tasks" value={total} />
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card>
-                  <Statistic
-                    title="Un-assigned"
-                    value={boardStats?.unassignedTask}
-                  />
-                </Card>
-              </Col>
-              <Col xs={12} sm={12} md={12} lg={8}>
-                <Card>
-                  <Statistic
-                    title="Resolve"
-                    valueStyle={{
-                      color: "#3f8600",
-                    }}
-                    value={boardStats?.completeTask}
-                    prefix={<CheckSquareOutlined />}
-                  />
-                </Card>
-              </Col>
-              <Col xs={12} sm={12} md={12} lg={8}>
-                <Card>
-                  <Statistic
-                    valueStyle={{
-                      color: "#cf1322",
-                    }}
-                    title="Unresolve"
-                    value={boardStats?.unResolveTask}
-                    prefix={<BorderOutlined />}
-                    style={{ textWrap: "nowrap", lineBreak: "unset" }}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={24} md={24} lg={8}>
-                <Card>
-                  <Statistic
-                    title="Overdue Tasks"
-                    value={boardStats?.overdueTask}
-                    prefix={<ExclamationCircleOutlined />}
-                  />
-                </Card>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-        <Table columns={columns} dataSource={data} pagination={false} />
-      </Flex>
+      {isLoading ? (
+        <Skeleton active paragraph={{ rows: 8 }} />
+      ) : (
+        <Flex gap={16} vertical style={{ marginTop: 12 }}>
+          <Row gutter={[16, 16]}>
+            <Col
+              style={{ display: "flex", justifyContent: "center" }}
+              sm={24}
+              md={12}
+            >
+              <Progress
+                percent={resolvePercent}
+                success={{
+                  percent: resolvePercent,
+                }}
+                type="circle"
+                size={240}
+              />
+            </Col>
+            <Col sm={24} md={12}>
+              <Row gutter={[16, 16]} wrap={true}>
+                <Col span={12}>
+                  <Card>
+                    <Statistic title="Total Tasks" value={total} />
+                  </Card>
+                </Col>
+                <Col span={12}>
+                  <Card>
+                    <Statistic
+                      title="Un-assigned"
+                      value={boardStats?.unassignedTask}
+                    />
+                  </Card>
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={8}>
+                  <Card>
+                    <Statistic
+                      title="Resolve"
+                      valueStyle={{
+                        color: "#3f8600",
+                      }}
+                      value={boardStats?.completeTask}
+                      prefix={<CheckSquareOutlined />}
+                    />
+                  </Card>
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={8}>
+                  <Card>
+                    <Statistic
+                      valueStyle={{
+                        color: "#cf1322",
+                      }}
+                      title="Unresolve"
+                      value={boardStats?.unResolveTask}
+                      prefix={<BorderOutlined />}
+                      style={{ textWrap: "nowrap", lineBreak: "unset" }}
+                    />
+                  </Card>
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={8}>
+                  <Card>
+                    <Statistic
+                      title="Overdue Tasks"
+                      value={boardStats?.overdueTask}
+                      prefix={<ExclamationCircleOutlined />}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <Table columns={columns} dataSource={data} pagination={false} />
+        </Flex>
+      )}
     </Modal>
   );
 };

@@ -6,9 +6,15 @@
   box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
     rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
   border: 1px solid transparent;
+  position: relative;
   &:hover {
     cursor: pointer;
     border: #4793fe 1px solid;
+    .edit-Btn,
+    .right-Btn,
+    .left-Btn {
+      display: flex;
+    }
   }
   &__content {
     &-item {
@@ -66,4 +72,29 @@
       box-shadow: none;
     }
   }
+}
+.edit-Btn {
+  display: none;
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  z-index: 10;
+  background-color: #eeeeee62;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+.change-title {
+  color: #9e9e9e;
+  font-size: 12px;
+  font-weight: 600;
+}
+.change-item {
+  cursor: pointer;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  border-radius: 4px;
+  padding: 4px 12px;
 }
