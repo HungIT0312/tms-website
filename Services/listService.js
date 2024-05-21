@@ -1,10 +1,12 @@
 const listModel = require("../Models/listModel");
 const boardModel = require("../Models/boardModel");
 const cardModel = require("../Models/cardModel");
+const dayjs = require("dayjs");
 
 const create = async (model, user, callback) => {
   try {
     // Create new List
+
     const tempList = await listModel(model);
 
     // Save the new List
@@ -177,20 +179,23 @@ const updateCardOrder = async (
 
 const updateList = async (listId, boardId, user, value, property, callback) => {
   try {
-    // Get board to check the parent of list is this board
     const board = await boardModel.findById(boardId);
-    const list = await listModel.findById(listId.toString()).populate("cards");
-    // Validate the parent of the list
-    const validate = board.lists.filter((list) => list.id === listId);
-    if (!validate)
-      return callback({ errMessage: "List or board information are wrong" });
+    const list = await listModel.findById(listId);
 
-    // Validate whether the owner of the board is the user who sent the request.
-    if (!user.boards.filter((board) => board === boardId))
+    const validate = board.lists.filter((list) => list._id === listId);
+    if (!validate) {
+      return callback({
+        errMessage: "List or board information are wrong",
+      });
+    }
+
+    // Kiểm tra xem người gửi yêu cầu có phải là chủ sở hữu của bảng không
+    if (!user.boards.includes(boardId.toString())) {
       return callback({
         errMessage:
           "You cannot delete a list that does not hosted by your boards",
       });
+    }
 
     list[property] = value;
     if (property === "_destroy") {
@@ -204,7 +209,27 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
     }
 
     await list.save();
-    return callback(false, { message: "Success", list: list });
+    const newlist = await listModel
+      .findById(listId)
+      .populate({
+        path: "cards",
+        populate: [
+          {
+            path: "activities.user",
+            model: "user",
+          },
+          {
+            path: "labels",
+            model: "label",
+          },
+          {
+            path: "members.user",
+            model: "user",
+          },
+        ],
+      })
+      .exec();
+    return callback(false, { message: "Success", list: newlist });
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
@@ -212,6 +237,67 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
     });
   }
 };
+const changeCardToAnotherList = async (
+  listId,
+  boardId,
+  user,
+  newListId,
+  cardId,
+  callback
+) => {
+  try {
+    const board = await boardModel.findById(boardId);
+    const oldList = await listModel.findById(listId);
+    const newList = await listModel.findById(newListId);
+
+    const validateOldList = board.lists.some(
+      (list) => list.toString() === listId
+    );
+    if (!validateOldList) {
+      return callback({
+        errMessage: "List or board information are wrong",
+      });
+    }
+    const validateNewList = board.lists.some(
+      (list) => list.toString() === newListId
+    );
+    if (!validateNewList) {
+      return callback({
+        errMessage: "New list does not belong to this board",
+      });
+    }
+
+    if (!user.boards.includes(boardId.toString())) {
+      return callback({
+        errMessage:
+          "You cannot change a card of a list not hosted by your boards",
+      });
+    }
+
+    const cardIndex = oldList.cards.findIndex(
+      (card) => card.toString() === cardId
+    );
+    if (cardIndex === -1) {
+      return callback({
+        errMessage: "Card does not belong to the old list",
+      });
+    }
+
+    oldList.cards.splice(cardIndex, 1);
+    newList.cards.push(cardId);
+
+    // Save the old and new lists
+    await Promise.all([oldList.save(), newList.save()]);
+
+    return callback(false, { message: "Success" });
+  } catch (error) {
+    return callback({
+      errMessage: "Something went wrong",
+      details: error.message,
+    });
+  }
+};
+
 const changeListOrder = async (boardId, listIds, callback) => {
   try {
     const board = await boardModel.findById(boardId);
@@ -240,26 +326,26 @@ const getAllListByFilter = async (
   callback
 ) => {
   try {
-    const now = new Date();
+    const now = dayjs();
 
-    // Xây dựng bộ lọc dueDate dựa trên các loại
     const dueDateFilter = dueDates
       .map((dueDate) => {
         switch (dueDate.type) {
           case "today":
             return {
               "date.dueDate": {
-                $gte: new Date(now.setHours(0, 0, 0, 0)),
-                $lt: new Date(now.setHours(23, 59, 59, 999)),
+                $gte: dayjs().startOf("day").toDate(),
+                $lt: dayjs().endOf("day").toDate(),
               },
             };
           case "overdue":
             return {
-              "date.dueDate": { $lt: new Date(now.setHours(0, 0, 0, 0)) },
+              "date.dueDate": { $lt: now.startOf("day").toDate() },
+              "date.completed": false,
             };
           case "coming":
             return {
-              "date.dueDate": { $gte: new Date(now.setHours(0, 0, 0, 0)) },
+              "date.dueDate": { $gte: now.startOf("day").toDate() },
             };
           case "nodue":
             return {
@@ -271,7 +357,6 @@ const getAllListByFilter = async (
       })
       .filter((filter) => Object.keys(filter).length > 0);
 
-    // Xây dựng điều kiện người dùng
     const userFilter = userIds.includes("unassign")
       ? {
           $or: [
@@ -287,32 +372,30 @@ const getAllListByFilter = async (
       ? { "members.user": { $in: userIds } }
       : {};
 
-    // Xây dựng đối tượng truy vấn cho các card
     const cardQuery = {
       $and: [
         userFilter,
         labelIds.length > 0 ? { labels: { $in: labelIds } } : {},
         ...dueDateFilter,
-      ].filter((query) => Object.keys(query).length > 0), // Lọc các đối tượng truy vấn rỗng
+      ].filter((query) => Object.keys(query).length > 0),
     };
 
-    // Tìm danh sách chứa các card phù hợp với tiêu chí truy vấn
     let lists = await listModel
-      .find({ owner: boardId }) // Lọc danh sách theo boardId
+      .find({ owner: boardId })
       .populate({
         path: "cards",
-        match: cardQuery.$and.length > 0 ? cardQuery : {}, // Áp dụng truy vấn card ở đây chỉ khi nó có điều kiện
+        match: cardQuery.$and.length > 0 ? cardQuery : {},
         populate: [
           {
-            path: "activities.user", // Populate user trong activities của mỗi card
-            model: "user", // Tên của model user
+            path: "activities.user",
+            model: "user",
           },
           {
-            path: "labels", // Populate labels
+            path: "labels",
             model: "label",
           },
           {
-            path: "members.user", // Populate user
+            path: "members.user",
             model: "user",
           },
         ],
@@ -336,4 +419,5 @@ module.exports = {
   changeListOrder,
   updateList,
   getAllListByFilter,
+  changeCardToAnotherList,
 };

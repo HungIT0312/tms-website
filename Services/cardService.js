@@ -10,6 +10,9 @@ const utc = require("dayjs/plugin/utc");
 dayjs.extend(utc);
 dayjs.extend(weekday);
 dayjs.extend(localeData);
+const { emitToUser } = require("../utils/socket");
+const notificationModal = require("../Models/notificationModal");
+const _ = require("lodash");
 const create = async (title, listId, boardId, user, callback) => {
   try {
     // Get list and board
@@ -38,14 +41,14 @@ const create = async (title, listId, boardId, user, callback) => {
       user: user._id,
       action: `added this card to list "${list.title}"`,
     });
-    card.members.unshift({
-      user: user._id,
-      name: user.name,
-      surname: user.surname,
-      email: user.email,
-      color: user.color,
-      role: "owner",
-    });
+    // card.members.unshift({
+    //   user: user._id,
+    //   name: user.name,
+    //   surname: user.surname,
+    //   email: user.email,
+    //   color: user.color,
+    //   role: "owner",
+    // });
 
     // card.labels = helperMethods.labelsSeedColor;
     await card.save();
@@ -434,9 +437,26 @@ const changeCardMember = async (
       user: user._id,
       action: `change the assigned person to '${member.name}' in card ${card.title}' `,
     });
-
+    const slugB = _.kebabCase(board.title.toLowerCase());
+    const slugC = _.kebabCase(card.title.toLowerCase());
     await board.save();
-
+    const newNotice = await notificationModal.create({
+      user: member._id,
+      message:
+        "<p> You have been added to card <b>" +
+        card.title +
+        "</b> in list <b>" +
+        list.title +
+        "</b>",
+      link: `/board/${boardId}/${slugB}/c/${slugC}`,
+    });
+    const returnNotice = await notificationModal
+      .findById(newNotice._id)
+      .populate("user");
+    emitToUser(member._id.toString(), "changeCardMember", {
+      dataAdd: { member: card.members, listId, cardId, boardId },
+      newNotice: returnNotice,
+    });
     return callback(false, { message: "success", member: card.members });
   } catch (error) {
     return callback({

@@ -9,5 +9,9 @@ router.delete("/:boardId/:listId", listController.deleteById);
 router.post("/change-card-order", listController.updateCardOrder);
 router.post("/update-list-order", listController.changeListOrder);
 router.post("/:boardId/filter", listController.getAllListByFilter);
+router.post(
+  "/:boardId/:listId/card-list",
+  listController.changeCardToAnotherList
+);
 
 module.exports = router;

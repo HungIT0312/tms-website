@@ -8,8 +8,11 @@ const boardRoute = require("./Routes/boardRoute");
 const listRoute = require("./Routes/listRoute");
 const cardRoute = require("./Routes/cardRoute");
 const invitationRoute = require("./Routes/invitationRoute");
+const notificationRoute = require("./Routes/notificationRoute");
 const auth = require("./Middlewares/auth");
 const socketIo = require("socket.io");
+const { initializeSocket } = require("./utils/socket");
+
 
 dotenv.config();
 
@@ -51,7 +54,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log("Database connection is succesfull!");
+    console.log("Database connection is successful");
   })
   .catch((err) => {
     console.log(`Database connection failed!`);
@@ -65,22 +68,18 @@ app.use("/board", boardRoute);
 app.use("/list", listRoute);
 app.use("/card", cardRoute);
 app.use("/invitation", invitationRoute);
+app.use("/notification", notificationRoute);
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`Server is online! Port: ${process.env.PORT}`);
 });
-// const io = socketIo(server, {
-//   cors: {
-//     origin: ["http://localhost:5173", "https://tms-website.netlify.app"],
-//     credentials: true,
-//   },
-// });
-// io.on("connection", (socket) => {
-//   console.log("A user connected");
-
-//   // Handle socket events here
-
-//   socket.on("disconnect", () => {
-//     console.log("User disconnected");
-//   });
-// });
+initializeSocket(server, {
+  cors: {
+    origin: [
+      "http://localhost:5173",
+      "https://tms-website.netlify.app",
+      "https://tms-tphx.onrender.com",
+    ],
+    credentials: true,
+  },
+});

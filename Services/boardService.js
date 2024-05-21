@@ -335,6 +335,7 @@ const getBoardStats = async (boardId, callback) => {
           complete: 0,
           unresolve: 0,
           totalTask: 0,
+          overdue: 0, // Initialize overdue tasks count
         },
       };
     });
@@ -353,6 +354,13 @@ const getBoardStats = async (boardId, callback) => {
         // Check if the task is overdue
         if (card.date.dueDate && dayjs(card.date.dueDate).isBefore(now)) {
           overdueTask += 1;
+          // Increase overdue count for each member assigned to this card
+          card.members.forEach((member) => {
+            const userId = member.user._id.toString();
+            if (userStats[userId]) {
+              userStats[userId].tasks.overdue += 1;
+            }
+          });
         }
       }
       if (card.members.length < 1) {

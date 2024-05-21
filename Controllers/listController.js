@@ -174,6 +174,23 @@ const getAllListByFilter = async (req, res) => {
     });
   }
 };
+const changeCardToAnotherList = async (req, res) => {
+  const { boardId, listId } = req.params;
+  const { newListId, cardId } = req.body;
+  const user = req.user;
+
+  await listService.changeCardToAnotherList(
+    listId,
+    boardId,
+    user,
+    newListId,
+    cardId,
+    (err, result) => {
+      if (err) return res.status(400).send(err);
+      return res.status(200).send(result);
+    }
+  );
+};
 module.exports = {
   create,
   getAll,
@@ -182,4 +199,5 @@ module.exports = {
   changeListOrder,
   updateList,
   getAllListByFilter,
+  changeCardToAnotherList,
 };

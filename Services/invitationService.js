@@ -1,6 +1,7 @@
 const boardModel = require("../Models/boardModel");
 const invitationModel = require("../Models/invitationModel");
 const userModel = require("../Models/userModel");
+const { emitToUser } = require("../utils/socket");
 
 const acceptInvitation = async (invitationId, userId, callback) => {
   try {
@@ -108,6 +109,7 @@ const sentMemberInvitation = async (boardId, member, user, callback) => {
       board: boardId,
     });
     await newInvitation.save();
+
     return callback(false, {
       message: "Invitations sent!",
       data: newInvitation,
