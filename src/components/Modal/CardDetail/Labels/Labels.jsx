@@ -83,6 +83,7 @@ const Labels = ({ card }) => {
         selected: true,
         text: text,
         type: colorSelected,
+        board: boardId,
       },
     };
     if (isAdd && isEdit) {
