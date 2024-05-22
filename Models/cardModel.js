@@ -150,6 +150,16 @@ const cardSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  subTasks: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "card",
+    },
+  ],
+  isSubTaskOf: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "card",
+  },
 });
 
 module.exports = mongoose.model("card", cardSchema);
