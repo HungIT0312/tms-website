@@ -249,6 +249,7 @@ const changeCardToAnotherList = async (
     const board = await boardModel.findById(boardId);
     const oldList = await listModel.findById(listId);
     const newList = await listModel.findById(newListId);
+    const card = await cardModel.findById(cardId);
 
     const validateOldList = board.lists.some(
       (list) => list.toString() === listId
@@ -285,9 +286,9 @@ const changeCardToAnotherList = async (
 
     oldList.cards.splice(cardIndex, 1);
     newList.cards.push(cardId);
-
+    card.owner = newList._id;
     // Save the old and new lists
-    await Promise.all([oldList.save(), newList.save()]);
+    await Promise.all([oldList.save(), newList.save(), card.save()]);
 
     return callback(false, { message: "Success" });
   } catch (error) {

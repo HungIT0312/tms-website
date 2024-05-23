@@ -13,7 +13,14 @@ dayjs.extend(localeData);
 const { emitToUser } = require("../utils/socket");
 const notificationModal = require("../Models/notificationModal");
 const _ = require("lodash");
-const create = async (title, listId, boardId, user, callback) => {
+const create = async (
+  title,
+  listId,
+  boardId,
+  user,
+  parentCardId = null,
+  callback
+) => {
   try {
     // Get list and board
     const list = await listModel.findById(listId);
@@ -27,30 +34,38 @@ const create = async (title, listId, boardId, user, callback) => {
       user,
       true
     );
-    if (!validate)
+    if (!validate) {
       return callback({
         errMessage:
           "You don't have permission to add card to this list or board",
       });
+    }
 
     // Create new card
-    const card = await cardModel({ title: title });
+    const card = new cardModel({ title: title });
     card.owner = listId;
+
+    // Set isSubTaskOf if parentCardId is provided
+    if (parentCardId) {
+      card.isSubTaskOf = parentCardId;
+
+      // Find parent card and add new card to its subTasks
+      const parentCard = await cardModel.findById(parentCardId);
+      if (parentCard) {
+        parentCard.subTasks.push(card._id);
+        await parentCard.save();
+      } else {
+        return callback({
+          errMessage: "Parent card not found",
+        });
+      }
+    }
 
     card.activities.unshift({
       user: user._id,
       action: `added this card to list "${list.title}"`,
     });
-    // card.members.unshift({
-    //   user: user._id,
-    //   name: user.name,
-    //   surname: user.surname,
-    //   email: user.email,
-    //   color: user.color,
-    //   role: "owner",
-    // });
 
-    // card.labels = helperMethods.labelsSeedColor;
     await card.save();
 
     // Add id of the new card to owner list
@@ -63,21 +78,25 @@ const create = async (title, listId, boardId, user, callback) => {
       action: `added "${card.title}" to this board`,
     });
     await board.save();
+
+    // Populate all references
     const updateCard = await cardModel
       .findById(card._id)
       .populate({
         path: "activities.user",
+        select: "name surname email color",
       })
       .populate({
         path: "members.user",
+        select: "name surname email color",
       })
       .populate({
         path: "watchers.user",
+        select: "name",
       })
       .populate({
         path: "labels",
       });
-    // const result = await listModel.findById(listId).populate({ path: 'cards' }).exec();
     return callback(false, {
       message: "Add successful!",
       card: updateCard,
@@ -106,24 +125,39 @@ const deleteById = async (cardId, listId, boardId, user, callback) => {
       false
     );
     if (!validate) {
-      callback({
+      return callback({
         errMessage: "You don't have permission to update this card",
       });
     }
 
-    // Delete the card
-    const result = await cardModel.findByIdAndDelete(cardId);
+    const deleteCardAndSubtasks = async (card) => {
+      const subtasks = await cardModel.find({ isSubTaskOf: card._id });
+      for (const subtask of subtasks) {
+        await deleteCardAndSubtasks(subtask);
+      }
+      await cardModel.findByIdAndDelete(card._id);
+    };
 
-    // Delete the list from lists of board
+    await deleteCardAndSubtasks(card);
+
+    if (card.isSubTaskOf) {
+      const parentCard = await cardModel.findById(card.isSubTaskOf);
+      if (parentCard) {
+        parentCard.subTasks = parentCard.subTasks.filter(
+          (subTaskId) => subTaskId.toString() !== cardId
+        );
+        await parentCard.save();
+      }
+    }
+
     list.cards = list.cards.filter(
       (tempCard) => tempCard.toString() !== cardId
     );
     await list.save();
 
-    // Add activity log to board
     board.activity.unshift({
       user: user._id,
-      action: `deleted "${result.title}" from "${list.title}" list`,
+      action: `deleted "${card.title}" from "${list.title}" list`,
     });
     await board.save();
 
@@ -136,33 +170,39 @@ const deleteById = async (cardId, listId, boardId, user, callback) => {
   }
 };
 
-const getCard = async (cardId, listId, boardId, user, callback) => {
+const getCard = async (cardId, user, callback) => {
   try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
+    const card = await cardModel
+      .findById(cardId)
+      .populate({
+        path: "activities.user",
+        select: "name surname email color",
+      })
+      .populate({
+        path: "members.user",
+        select: "name surname email color",
+      })
+      .populate({
+        path: "watchers.user",
+        select: "name",
+      })
+      .populate("labels")
+      .populate("isSubTaskOf")
+      .populate({
+        path: "subTasks",
+        populate: {
+          path: "activities.user members.user watchers.user labels",
+          select: "name surname email color",
+        },
+      })
+      .exec();
 
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to update this card";
+    if (!card) {
+      return callback({
+        errMessage: "Card not found",
+      });
     }
-
-    let returnObject = {
-      ...card._doc,
-      listTitle: list.title,
-      listId: listId,
-      boardId: boardId,
-    };
-
-    return callback(false, returnObject);
+    return callback(false, card);
   } catch (error) {
     return callback({
       errMessage: "Something went wrong",
