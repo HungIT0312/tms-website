@@ -28,8 +28,6 @@ const Analysis = ({ isOpen, setIsOpen }) => {
   const { boardId } = useParams();
   const [boardStats, setBoardStats] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
   useEffect(() => {
@@ -51,15 +49,12 @@ const Analysis = ({ isOpen, setIsOpen }) => {
     fetchGetBoardStats();
   }, [boardId]);
 
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+  const handleSearch = (selectedKeys, confirm) => {
     confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
   };
 
   const handleReset = (clearFilters) => {
     clearFilters();
-    setSearchText("");
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -83,7 +78,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onPressEnter={() => handleSearch(selectedKeys, confirm)}
           style={{
             marginBottom: 8,
             display: "block",
@@ -92,7 +87,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
         <Space>
           <Button
             type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onClick={() => handleSearch(selectedKeys, confirm)}
             icon={<SearchOutlined />}
             size="small"
             style={{
@@ -117,8 +112,6 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               confirm({
                 closeDropdown: false,
               });
-              setSearchText(selectedKeys[0]);
-              setSearchedColumn(dataIndex);
             }}
           >
             Filter

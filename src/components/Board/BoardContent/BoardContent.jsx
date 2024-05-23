@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { Flex } from "antd";
 import { useEffect, useState } from "react";
@@ -29,7 +30,7 @@ import { setCardsState, setListsState } from "../../../stores/list/ListSlice";
 import { generatePlaceHolder } from "../../../utils/generatePlaceHolderCard";
 import listProperty from "../../../constants/listProperty";
 
-const BoardContent = () => {
+const BoardContent = ({ searchKey }) => {
   const dispatch = useDispatch();
   const { boardId } = useParams();
   const { loading, lists } = useSelector((state) => state.list);
@@ -229,6 +230,12 @@ const BoardContent = () => {
   const handleCreateList = (data) => {
     dispatch(createNewList({ ...data, boardId: boardId }));
   };
+  const renderListsAfterSearch = lists?.map((list) => {
+    const matchingCards = list?.cards.filter((card) =>
+      card?.title.toLowerCase().includes(searchKey.toLowerCase())
+    );
+    return { ...list, cards: matchingCards };
+  });
 
   return (
     <DndContext
@@ -241,7 +248,7 @@ const BoardContent = () => {
       <Flex className="board-content">
         <ListColumns
           handleCreateList={handleCreateList}
-          lists={lists}
+          lists={renderListsAfterSearch}
           loading={loading}
         />
         <DragOverlay dropAnimation={dropAnimation}>

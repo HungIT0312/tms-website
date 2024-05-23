@@ -3,6 +3,7 @@ import {
   addALabelToCard,
   changeMemberAssign,
   deleteCardById,
+  getCardById,
   // addLabelToCard,
   removeLabelFromCard,
   updateCardInfo,
@@ -42,6 +43,9 @@ const cardSlice = createSlice({
     },
     updateCardDateCompletedUI(state, action) {
       state.selectedCard.date.completed = action.payload;
+    },
+    updateCardSubTaskUI(state, action) {
+      state.selectedCard.subTasks.push(action.payload);
     },
   },
   extraReducers: (builder) =>
@@ -123,6 +127,21 @@ const cardSlice = createSlice({
       .addCase(deleteCardById.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
+      })
+      //=======================================================
+      .addCase(getCardById.pending, (state) => {
+        state.error = false;
+        state.isLoading = true;
+        state.message = null;
+      })
+      .addCase(getCardById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.selectedCard = action.payload;
+      })
+      .addCase(getCardById.rejected, (state, action) => {
+        state.message = action.payload.errMessage;
+        state.isLoading = false;
+        state.error = true;
       }),
 });
 
@@ -133,6 +152,7 @@ export const {
   deleteCardLabel,
   addLabelToCardUI,
   updateCardDateCompletedUI,
+  updateCardSubTaskUI,
 } = cardSlice.actions;
 
 export default cardSlice.reducer;

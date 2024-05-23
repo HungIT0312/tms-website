@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import {
+  ApartmentOutlined,
   CommentOutlined,
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
-  EyeOutlined,
   PlusOutlined,
   TagsOutlined,
 } from "@ant-design/icons";
@@ -17,10 +17,12 @@ import {
   Descriptions,
   Dropdown,
   Flex,
+  Input,
   Modal,
   Row,
   Select,
   Space,
+  Spin,
   Tag,
   Tooltip,
   message as msg,
@@ -29,6 +31,7 @@ import dayjs from "dayjs";
 import localeData from "dayjs/plugin/localeData";
 import utc from "dayjs/plugin/utc";
 import weekday from "dayjs/plugin/weekday";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 import { EditText } from "react-edit-text";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,10 +39,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   setSelectedCard,
   updateCardDateCompletedUI,
+  updateCardSubTaskUI,
 } from "../../../stores/card/cardSlice";
 import {
+  addCard,
   changeMemberAssign,
   deleteCardById,
+  getCardById,
   updateCardInfo,
   updateDates,
 } from "../../../stores/card/cardThunk";
@@ -48,11 +54,13 @@ import {
   updateCardInListById,
   updateCardMemberUI,
   updateDateCardListUI,
+  updateParentCardUI,
 } from "../../../stores/list/ListSlice";
 import QuillTextBox from "../../QuillTextBox/QuillTextBox";
 import ActivityAndComment from "./Activity/ActivityAndComment";
 import "./CardDetail.scss";
 import Labels from "./Labels/Labels";
+import SubTask from "./SubTask/SubTask";
 import Attachment from "./UploadAttachment/Attachment";
 const { RangePicker } = DatePicker;
 dayjs.extend(weekday);
@@ -60,17 +68,16 @@ dayjs.extend(localeData);
 dayjs.extend(utc);
 const { Option } = Select;
 const CardDetail = () => {
-  const { cardName } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
-  const { selectedCard } = useSelector((state) => state.card);
+  const { selectedCard, isLoading } = useSelector((state) => state.card);
   const { selectedBoard } = useSelector((state) => state.board);
   const { boardId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState("");
+  const [newCard, setNewCard] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
-  // const [description, setDescription] = useState("");
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -149,6 +156,15 @@ const CardDetail = () => {
       ];
     } else return [];
   };
+  const handleSelectCard = (card) => {
+    const slug = _.kebabCase(card?.title?.toLowerCase());
+    dispatch(setSelectedCard(card));
+    navigate(`${rootLink}/c/${slug}`);
+    dispatch(getCardById(card?._id));
+  };
+  const renderSubTasks = selectedCard?.subTasks?.map((s, idx) => (
+    <SubTask key={idx} handleClick={handleSelectCard} task={s}></SubTask>
+  ));
   //==============================================================  //==============================================================
   const handleDateChange = (e, date) => {
     if (!date[0] || !date[1]) {
@@ -217,8 +233,7 @@ const CardDetail = () => {
         description: value,
       },
     };
-    // console.log(newDes);
-    // dispatch(setCardsState())
+
     dispatch(updateCardInListById(newDes));
     dispatch(updateCardInfo(newDes));
   };
@@ -227,14 +242,56 @@ const CardDetail = () => {
       boardId: boardId,
       listId: selectedCard?.owner,
       cardId: selectedCard?._id,
+      parentCardId: selectedCard?.isSubTaskOf?._id,
     };
     dispatch(setSelectedCard(null));
     dispatch(deleteCardInListById(dataDelete));
-    // dispatch(updateCardInListById(dataDelete));
     msg.success("Delete success!");
+    navigate(rootLink);
     dispatch(deleteCardById(dataDelete));
   };
+  const handleAddNewCard = () => {
+    if (!newCard) return;
+    const data = {
+      title: newCard,
+      listId: selectedCard?.owner,
+      boardId: boardId,
+      parentCardId: selectedCard?._id,
+    };
+    dispatch(addCard(data))
+      .unwrap()
+      .then((rs) => {
+        msg.success("Success!");
+        dispatch(updateParentCardUI({ ...data, newCard: rs.card }));
+        dispatch(updateCardSubTaskUI(rs.card));
+      });
+    setNewCard("");
+  };
+  const handleAddPeople = (e) => {
+    const crrMember = selectedBoard?.members.filter((mem) => mem.user == e);
+    const dataAddDate = {
+      boardId: boardId,
+      listId: selectedCard?.owner,
+      cardId: selectedCard?._id,
+      member: crrMember,
+    };
+    dispatch(updateCardMemberUI(dataAddDate));
+    dispatch(changeMemberAssign({ ...dataAddDate, memberId: e }));
+  };
   //==============================================================  //==============================================================
+  const items = [
+    {
+      label: "Labels",
+      key: "label",
+      icon: <TagsOutlined />,
+    },
+    {
+      label: "Delete",
+      key: "delete",
+      icon: <DeleteOutlined />,
+      danger: true,
+    },
+  ];
 
   const itemDetails = [
     {
@@ -262,8 +319,20 @@ const CardDetail = () => {
     },
     {
       key: "2",
-      label: "List name",
-      children: "",
+      label: "Is Sub Task Of",
+      children:
+        selectedCard?.isSubTaskOf && !selectedCard?.isSubTaskOf?._destroy ? (
+          <Flex
+            onClick={() => handleSelectCard(selectedCard?.isSubTaskOf)}
+            style={{ cursor: "pointer" }}
+          >
+            <Tag icon={<ApartmentOutlined />} bordered={false}>
+              {selectedCard?.isSubTaskOf?.title}
+            </Tag>
+          </Flex>
+        ) : (
+          "None"
+        ),
       span: 4,
     },
   ];
@@ -303,7 +372,7 @@ const CardDetail = () => {
             },
             {
               value: true,
-              label: "Complete",
+              label: "Resolved",
             },
           ]}
         />
@@ -319,6 +388,7 @@ const CardDetail = () => {
       span: 4,
     },
   ];
+
   const subCol = [
     {
       key: "1",
@@ -326,40 +396,7 @@ const CardDetail = () => {
       children: <ActivityAndComment />,
     },
   ];
-  const col1 = [
-    {
-      key: "1",
-      label: "Details",
-      children: <Descriptions title="" items={itemDetails} layout="" />,
-    },
-    {
-      key: "2",
-      label: "Description",
-      children: (
-        <QuillTextBox
-          getCleanHTML={triggerCallUpdate}
-          content={selectedCard?.description}
-        />
-      ),
-    },
-    {
-      key: "3",
-      label: "Attachments",
-      children: <Attachment />,
-    },
-  ];
 
-  const handleAddPeople = (e) => {
-    const crrMember = selectedBoard?.members.filter((mem) => mem.user == e);
-    const dataAddDate = {
-      boardId: boardId,
-      listId: selectedCard?.owner,
-      cardId: selectedCard?._id,
-      member: crrMember,
-    };
-    dispatch(updateCardMemberUI(dataAddDate));
-    dispatch(changeMemberAssign({ ...dataAddDate, memberId: e }));
-  };
   const ItemPeople = [
     {
       key: "1",
@@ -403,6 +440,30 @@ const CardDetail = () => {
       span: 4,
     },
   ];
+
+  const col1 = [
+    {
+      key: "1",
+      label: "Details",
+      children: <Descriptions title="" items={itemDetails} layout="" />,
+    },
+    {
+      key: "2",
+      label: "Description",
+      children: (
+        <QuillTextBox
+          getCleanHTML={triggerCallUpdate}
+          content={selectedCard?.description}
+        />
+      ),
+    },
+    {
+      key: "3",
+      label: "Attachments",
+      children: <Attachment />,
+    },
+  ];
+
   const col2 = [
     {
       key: "1",
@@ -414,23 +475,29 @@ const CardDetail = () => {
       label: "Dates",
       children: <Descriptions title="" items={itemTime} layout="" />,
     },
-  ];
-  const items = [
     {
-      label: "Watch issue",
-      key: "watch",
-      icon: <EyeOutlined />,
-    },
-    {
-      label: "Labels",
-      key: "label",
-      icon: <TagsOutlined />,
-    },
-    {
-      label: "Delete",
-      key: "delete",
-      icon: <DeleteOutlined />,
-      danger: true,
+      key: "3",
+      label: "Sub Tasks",
+      children:
+        selectedCard?.isSubTaskOf && !selectedCard?.isSubTaskOf?._destroy ? (
+          <Flex>This is a subtask.</Flex>
+        ) : (
+          <Flex vertical gap={8}>
+            <Flex gap={8} vertical>
+              {renderSubTasks}
+            </Flex>
+            <Space.Compact style={{ width: "100%" }}>
+              <Input
+                value={newCard}
+                placeholder="Enter card/task title"
+                onChange={(e) => setNewCard(e.target.value)}
+              />
+              <Button prefix={<PlusOutlined />} onClick={handleAddNewCard}>
+                Add
+              </Button>
+            </Space.Compact>
+          </Flex>
+        ),
     },
   ];
 
@@ -470,55 +537,59 @@ const CardDetail = () => {
           onSave={(value) => handleCardTitleChange(value)}
         />
       }
-      style={{
-        top: 20,
-      }}
-      open={cardName && selectedCard ? true : false}
+      open={true}
       onOk={handleOk}
       onCancel={handleClose}
       centered
       footer={false}
       className="card-detail"
     >
-      <div className="card-detail_container">
-        <Row gutter={16}>
-          <Col xs={24} sm={24} md={24} lg={14}>
-            <Flex gap={8}>
-              <Button icon={<EditOutlined />}>Edit</Button>
-              <Button icon={<CommentOutlined />}>Add comment</Button>
-              <Dropdown menu={menuProps}>
-                <Button>
-                  <Space>
-                    More
-                    <DownOutlined />
-                  </Space>
-                </Button>
-              </Dropdown>
-            </Flex>
-            <Collapse defaultActiveKey={["1", "2", "3"]} ghost items={col1} />
-          </Col>
+      {!isLoading && (
+        <div className="card-detail_container">
+          <Row gutter={16}>
+            <Col xs={24} sm={24} md={24} lg={14}>
+              <Flex gap={8}>
+                <Button icon={<EditOutlined />}>Edit</Button>
+                <Button icon={<CommentOutlined />}>Add comment</Button>
+                <Dropdown menu={menuProps}>
+                  <Button>
+                    <Space>
+                      More
+                      <DownOutlined />
+                    </Space>
+                  </Button>
+                </Dropdown>
+              </Flex>
+              <Collapse defaultActiveKey={["1", "2", "3"]} ghost items={col1} />
+            </Col>
 
-          <Col xs={24} sm={24} md={24} lg={10}>
-            <Collapse
-              defaultActiveKey={["1", "2", "3", "4"]}
-              ghost
-              items={col2}
-            />
-          </Col>
-        </Row>
-        <Collapse defaultActiveKey={["1"]} ghost items={subCol} />
-        <Modal
-          title="Label"
-          open={isModalOpen}
-          onOk={handleModalOk}
-          onCancel={handleCancel}
-          centered
-          width={300}
-          footer={false}
-        >
-          <Labels card={selectedCard} />
-        </Modal>
-      </div>
+            <Col xs={24} sm={24} md={24} lg={10}>
+              <Collapse
+                defaultActiveKey={["1", "2", "3", "4"]}
+                ghost
+                items={col2}
+              />
+            </Col>
+          </Row>
+          <Collapse defaultActiveKey={["1"]} ghost items={subCol} />
+          <Modal
+            title="Label"
+            open={isModalOpen}
+            onOk={handleModalOk}
+            onCancel={handleCancel}
+            centered
+            width={300}
+            footer={false}
+          >
+            <Labels card={selectedCard} />
+          </Modal>
+        </div>
+      )}
+      {isLoading && (
+        <Flex justify="center" align="center" style={{ height: 500 }}>
+          <Spin />
+        </Flex>
+      )}
     </Modal>
   );
 };

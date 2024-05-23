@@ -3,11 +3,12 @@ import {
   BarChartOutlined,
   EllipsisOutlined,
   LeftOutlined,
+  SearchOutlined,
   UserAddOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Avatar, Divider, Flex, Image, Popover, Tooltip } from "antd";
-import { useState } from "react";
+import { Avatar, Divider, Flex, Image, Input, Popover, Tooltip } from "antd";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import images from "../../../constants/images";
@@ -20,7 +21,7 @@ import boardProperty from "../../../constants/boardProperty";
 import { updateBoardInfo } from "../../../stores/board/boardThunk";
 import Analysis from "../../Modal/Analysis/Analysis";
 import BoardFilter from "../../Popup/Filter/BoardFilter";
-const BoardHeader = ({ showDrawer }) => {
+const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
   const { selectedBoard } = useSelector((state) => state.board);
   const { userInformation } = useSelector((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
@@ -30,12 +31,12 @@ const BoardHeader = ({ showDrawer }) => {
   const location = useLocation();
   const rootLink = location.pathname?.split("/").slice(0, 1).join("/") + "/";
   const members = selectedBoard.members || [];
+  const inputRef = useRef(null);
   const isOwner = selectedBoard?.members?.some(
     (mem) =>
       mem.user.toString() === userInformation._id.toString() &&
       mem.role === "owner"
   );
- 
 
   const renderMember = members.map((member) => {
     if (member.role === "owner") {
@@ -88,6 +89,11 @@ const BoardHeader = ({ showDrawer }) => {
     };
     dispatch(updateBoardInfo(updateData));
   };
+
+  const onSearch = (event) => {
+    const { value } = event.target;
+    handleSearch(value);
+  };
   return (
     <div className="board-header">
       <Flex gap={8} align="center" className="board-header__title">
@@ -105,6 +111,36 @@ const BoardHeader = ({ showDrawer }) => {
         />
       </Flex>
       <Flex justify="center" align="center" gap={8}>
+        <Popover
+          placement="bottom"
+          title="Find Tasks"
+          content={
+            <Input
+              placeholder="input search text"
+              onChange={onSearch}
+              className="header__search"
+              ref={inputRef}
+              value={searchKey}
+            />
+          }
+          onOpenChange={() => {
+            handleSearch("");
+          }}
+          afterOpenChange={() => {
+            handleSearch("");
+          }}
+          arrow={false}
+          trigger={"click"}
+        >
+          <Flex gap={8} className="filter-btn" align="center" justify="center">
+            <SearchOutlined />
+            <span>Find</span>
+          </Flex>
+        </Popover>
+        <Divider
+          type="vertical"
+          style={{ color: "#fff", background: "#000" }}
+        />
         <Flex
           gap={8}
           className="filter-btn"

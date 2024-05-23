@@ -127,7 +127,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
     <Flex vertical gap={8}>
       <Flex
         className="pop__item"
-        onClick={(e) => {
+        onClick={() => {
           // editTitleRef.current.focus();
         }}
       >
@@ -221,7 +221,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
               inline
               style={{ width: `100%` }}
               onSave={(value) => handleListTitleChange(value)}
-              onChange={(e) => console.log(e)}
+              // onChange={(e) => console.log(e)}
             />
           </Flex>
           <Popover

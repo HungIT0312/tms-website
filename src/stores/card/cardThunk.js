@@ -4,6 +4,7 @@ import {
   changeMemberCard,
   createCard,
   deleteCard,
+  getCard,
   removeCardLabel,
   updateCard,
   updateDateCompleted,
@@ -93,6 +94,17 @@ export const deleteCardById = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await deleteCard(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const getCardById = createAsyncThunk(
+  "board/getCardById",
+  async (data, thunkApi) => {
+    try {
+      const response = await getCard(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

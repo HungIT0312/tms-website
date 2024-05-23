@@ -5,9 +5,6 @@ import Activity from "../../../Activity/Activity";
 const ActivityAndComment = () => {
   const { selectedCard } = useSelector((state) => state.card);
 
-  const onChange = (key) => {
-    // console.log(key);
-  };
   const renderActivities = selectedCard?.activities?.map((activity) => (
     <Activity key={activity._id} activity={activity} />
   ));
@@ -28,7 +25,7 @@ const ActivityAndComment = () => {
       children: <>{renderActivities}</>,
     },
   ];
-  return <Tabs defaultActiveKey="1" items={items} onChange={onChange} />;
+  return <Tabs defaultActiveKey="1" items={items} />;
 };
 
 export default ActivityAndComment;

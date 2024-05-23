@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import {
+  ApartmentOutlined,
   CheckSquareOutlined,
   ClockCircleOutlined,
   EditOutlined,
@@ -23,6 +24,7 @@ import { setSelectedCard } from "../../../stores/card/cardSlice";
 import "./CardItem.scss";
 import { changeCardToAnotherList } from "../../../stores/list/ListSlice";
 import { changeCardToDiffList } from "../../../stores/list/ListThunk";
+import { getCardById } from "../../../stores/card/cardThunk";
 const CardItem = ({
   card = {},
   isAdd = false,
@@ -62,6 +64,7 @@ const CardItem = ({
     const slug = _.kebabCase(card.title.toLowerCase());
     dispatch(setSelectedCard(card));
     navigate(`${rootLink}/c/${slug}`);
+    dispatch(getCardById(card?._id));
   };
   const renderDueDateStatus = (date) => {
     const now = dayjs();
@@ -204,9 +207,15 @@ const CardItem = ({
                 <CheckSquareOutlined />
                 <span>2/4</span>
               </Flex> */}
+            {card?.subTasks?.length > 0 && (
+              <Flex gap={3} align="center" className="card-item__content-item">
+                <ApartmentOutlined />
+                <span>{card?.subTasks?.length}</span>
+              </Flex>
+            )}
           </Flex>
           <Flex align="end" justify="end" flex={1}>
-            {card?.members ? (
+            {card?.members?.length > 0 ? (
               <Tooltip title="Board User" placement="bottom">
                 <Avatar
                   size={24}

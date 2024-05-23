@@ -166,14 +166,51 @@ const ListSlice = createSlice({
         return { ...list, cards: updatedCards };
       });
     },
+
     deleteCardInListById(state, action) {
-      const { listId, cardId } = action.payload;
-      state.lists = state.lists.map((list) => {
-        if (list._id === listId) {
-          const updatedCards = list.cards.filter((card) => card._id !== cardId);
-          return { ...list, cards: updatedCards };
+      const { cardId, parentCardId } = action.payload;
+      if (parentCardId) {
+        state.lists = state.lists.map((list) => {
+          list.cards = list.cards.map((card) => {
+            if (card._id === parentCardId) {
+              return {
+                ...card,
+                subTasks: card.subTasks.filter(
+                  (subTaskId) => subTaskId !== cardId
+                ),
+              };
+            }
+            return card;
+          });
+          return list;
+        });
+      }
+      const cardIdsToRemove = new Set();
+      const getCardAndSubtasks = (cards, cardId) => {
+        for (let card of cards) {
+          if (card._id === cardId) {
+            cardIdsToRemove.add(card._id);
+            if (card.subTasks && card.subTasks.length > 0) {
+              card.subTasks.forEach((subTaskId) =>
+                cardIdsToRemove.add(subTaskId)
+              );
+            }
+            break;
+          }
         }
-        return list;
+      };
+
+      // Iterate through all lists to find the card and its subtasks
+      state.lists.forEach((list) => {
+        getCardAndSubtasks(list.cards, cardId);
+      });
+
+      // Filter out the card and its subtasks from each list
+      state.lists = state.lists.map((list) => {
+        const updatedCards = list.cards.filter(
+          (card) => !cardIdsToRemove.has(card._id)
+        );
+        return { ...list, cards: updatedCards };
       });
     },
     updateCardInListById(state, action) {
@@ -183,6 +220,24 @@ const ListSlice = createSlice({
           list.cards = list.cards.map((card) => {
             if (card._id === cardId) {
               return { ...card, ...updateObj };
+            }
+            return card;
+          });
+        }
+        return list;
+      });
+    },
+    updateParentCardUI(state, action) {
+      const { listId, parentCardId, newCard } = action.payload;
+
+      state.lists = state.lists.map((list) => {
+        if (list._id === listId) {
+          list.cards = list.cards.map((card) => {
+            if (card._id === parentCardId) {
+              return {
+                ...card,
+                subTasks: [...(card.subTasks || []), newCard._id],
+              };
             }
             return card;
           });
@@ -250,8 +305,6 @@ const ListSlice = createSlice({
             action.payload.card,
           ];
           state.lists[listIndex].cards = newCard;
-        } else {
-          console.log("Can't add card to the list."); // eslint-disable-line no-console
         }
         state.error = false;
       })
@@ -341,7 +394,7 @@ const ListSlice = createSlice({
         state.error = true;
         state.message = action.payload.errMessage;
       })
-      .addCase(changeCardToDiffList.fulfilled, (state, action) => {
+      .addCase(changeCardToDiffList.fulfilled, (state) => {
         state.loading = false;
         state.error = false;
       });
@@ -363,6 +416,7 @@ export const {
   deleteCardInListById,
   updateCardInListById,
   changeCardToAnotherList,
+  updateParentCardUI,
 } = ListSlice.actions;
 
 export default ListSlice.reducer;

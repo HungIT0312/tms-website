@@ -16,6 +16,7 @@ const Board = () => {
   const [open, setOpen] = useState(false);
   const boardContainerRef = useRef(null);
   const [renderKey, setRenderKey] = useState("");
+  const [searchKey, setSearchKey] = useState("");
 
   const showDrawer = () => {
     setRenderKey("");
@@ -28,7 +29,9 @@ const Board = () => {
   useEffect(() => {
     dispatch(getBoard(boardId));
   }, [boardId, dispatch]);
-
+  const handleSearch = (value) => {
+    setSearchKey(value);
+  };
   return !isLoading ? (
     <div
       className="board"
@@ -37,8 +40,12 @@ const Board = () => {
       }}
       ref={boardContainerRef}
     >
-      <BoardHeader showDrawer={showDrawer} />
-      <BoardContent />
+      <BoardHeader
+        showDrawer={showDrawer}
+        handleSearch={handleSearch}
+        searchKey={searchKey}
+      />
+      <BoardContent searchKey={searchKey} />
       <Outlet />
       <BoardDrawer
         open={open}

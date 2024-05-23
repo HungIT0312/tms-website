@@ -11,7 +11,6 @@ const ListColumns = ({ handleCreateList, lists, loading }) => {
   const renderLists = lists?.map((list) => (
     <Column key={list._id} list={list} />
   ));
-
   // const loadingItem = true
   //   ? { align: "center", justify: "center", style: { width: "100vw" } }
   //   : {};

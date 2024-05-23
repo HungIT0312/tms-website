@@ -40,3 +40,6 @@ export const deleteCard = (data) => {
   const { cardId, listId, boardId } = data;
   return http.delete(`/card/${boardId}/${listId}/${cardId}`);
 };
+export const getCard = (cardId) => {
+  return http.get(`/card/${cardId}`);
+};
