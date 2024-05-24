@@ -57,7 +57,7 @@ router.post(
 //=========================================================================================
 router.post("/label", cardController.addLabelToCard);
 
-router.delete("/:cardId/label/:labelId", cardController.removeLabelFromCard);
+router.post("/:cardId/label/:labelId", cardController.removeLabelFromCard);
 //=========================================================================================
 
 router.patch(

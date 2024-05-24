@@ -1142,13 +1142,11 @@ const addLabelToCard = async (cardId, labelId, callback) => {
 };
 const removeLabelFromCard = async (cardId, labelId, callback) => {
   try {
-    // Tìm thẻ theo ID
     const card = await cardModel.findById(cardId);
     if (!card) {
       return callback({ errMessage: "Card not found" });
     }
 
-    // // Kiểm tra xem nhãn có tồn tại trong thẻ không
     const labelIndex = card.labels.findIndex(
       (l) => l._id.toString() === labelId.toString()
     );
@@ -1156,7 +1154,6 @@ const removeLabelFromCard = async (cardId, labelId, callback) => {
       return callback({ errMessage: "Label not found in this card" });
     }
 
-    // Xóa nhãn khỏi danh sách nhãn của thẻ
     card.labels.splice(labelIndex, 1);
     await card.save();
 

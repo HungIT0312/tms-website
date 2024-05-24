@@ -329,35 +329,39 @@ const getAllListByFilter = async (
   try {
     const now = dayjs();
 
-    const dueDateFilter = dueDates
-      .map((dueDate) => {
-        switch (dueDate.type) {
-          case "today":
-            return {
-              "date.dueDate": {
-                $gte: dayjs().startOf("day").toDate(),
-                $lt: dayjs().endOf("day").toDate(),
-              },
-            };
-          case "overdue":
-            return {
-              "date.dueDate": { $lt: now.startOf("day").toDate() },
-              "date.completed": false,
-            };
-          case "coming":
-            return {
-              "date.dueDate": { $gte: now.startOf("day").toDate() },
-            };
-          case "nodue":
-            return {
-              "date.dueDate": { $exists: false },
-            };
-          default:
-            return {};
-        }
-      })
-      .filter((filter) => Object.keys(filter).length > 0);
+    // Combine all due date filters using $or
+    const dueDateFilter = {
+      $or: dueDates
+        .map((dueDate) => {
+          switch (dueDate.type) {
+            case "today":
+              return {
+                "date.dueDate": {
+                  $gte: now.startOf("day").toDate(),
+                  $lt: now.endOf("day").toDate(),
+                },
+              };
+            case "overdue":
+              return {
+                "date.dueDate": { $lt: now.toDate() },
+                "date.completed": false,
+              };
+            case "coming":
+              return {
+                "date.dueDate": { $gt: now.toDate() },
+              };
+            case "nodue":
+              return {
+                "date.dueDate": { $exists: false },
+              };
+            default:
+              return {};
+          }
+        })
+        .filter((filter) => Object.keys(filter).length > 0),
+    };
 
+    // Build user filter
     const userFilter = userIds.includes("unassign")
       ? {
           $or: [
@@ -373,14 +377,16 @@ const getAllListByFilter = async (
       ? { "members.user": { $in: userIds } }
       : {};
 
+    // Build the complete card query
     const cardQuery = {
       $and: [
         userFilter,
         labelIds.length > 0 ? { labels: { $in: labelIds } } : {},
-        ...dueDateFilter,
+        dueDateFilter.$or.length > 0 ? dueDateFilter : {},
       ].filter((query) => Object.keys(query).length > 0),
     };
 
+    // Query the lists
     let lists = await listModel
       .find({ owner: boardId })
       .populate({

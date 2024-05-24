@@ -297,7 +297,6 @@ const deleteLabel = async (boardId, labelId, callback) => {
       { labels: labelId },
       { $pull: { labels: labelId } }
     );
-
     return callback(false, { label: deletedLabel });
   } catch (err) {
     return callback({
