@@ -87,6 +87,7 @@ const Labels = ({ card }) => {
       },
     };
     if (isAdd && isEdit) {
+      console.log("update");
       dispatch(updateLabelInAllCardList({ ...data.label, _id: idSelected }));
       dispatch(updateCardLabel({ ...data.label, _id: idSelected }));
       dispatch(updateBoardLabel(data));

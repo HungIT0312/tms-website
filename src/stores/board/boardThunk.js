@@ -81,6 +81,7 @@ export const updateBoardLabel = createAsyncThunk(
   "board/updateBoardLabel",
   async (data, thunkApi) => {
     try {
+      console.log(data);
       const response = await updateLabel(data);
       return response;
     } catch (error) {

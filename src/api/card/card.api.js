@@ -14,7 +14,7 @@ export const addCardLabel = async (data) => {
 };
 export const removeCardLabel = (data) => {
   const { cardId, labelData } = data;
-  return http.delete(`/card/${cardId}/label/${labelData}`);
+  return http.post(`/card/${cardId}/label/${labelData}`);
 };
 //==================================================================================
 export const updateStartDueDates = (data) => {

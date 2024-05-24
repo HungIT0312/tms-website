@@ -189,17 +189,7 @@ const CardDetail = () => {
       .then((rs) => msg.success(rs.message))
       .catch((er) => msg.error(er.message));
   };
-  const handleCardTitleChange = (data) => {
-    if (data.value !== data.previousValue) {
-      const updateData = {
-        boardId: boardId,
-        listId: selectedCard.owner,
-        cardId: selectedCard._id,
-        updateObj: { title: data?.value },
-      };
-      dispatch(updateCardInfo(updateData));
-    }
-  };
+
   const handleCardCompleteChange = (data) => {
     if (selectedCard?.date?.completed !== data) {
       const dataAddDate = {
@@ -221,6 +211,19 @@ const CardDetail = () => {
         .catch((er) => msg.error(er.message));
       const dueDate = dayjs(selectedCard?.date?.dueDate);
       renderDueDateStatus(dueDate);
+    }
+  };
+  const handleCardTitleChange = (data) => {
+    if (data.value !== data.previousValue) {
+      const updateData = {
+        boardId: boardId,
+        listId: selectedCard?.owner,
+        cardId: selectedCard?._id,
+        updateObj: { ...selectedCard, title: data?.value },
+      };
+
+      dispatch(updateCardInListById(updateData));
+      dispatch(updateCardInfo(updateData));
     }
   };
   const triggerCallUpdate = (value) => {
