@@ -11,7 +11,7 @@ const acceptInvitation = async (invitationId, userId, callback) => {
       .populate("inviter", "name surname color");
 
     if (!invitation || invitation.invited.toString() !== userId.toString()) {
-      return callback({ message: "Invitation not found or invalid." });
+      return callback({ message: "Lời mời không tìm thấy hoặc không hợp lệ." });
     }
 
     // Update invitation status to accepted
@@ -20,12 +20,12 @@ const acceptInvitation = async (invitationId, userId, callback) => {
 
     const newMember = await userModel.findById(userId);
     if (!newMember) {
-      return callback({ message: "User not found." });
+      return callback({ message: "Không tìm thấy người dùng." });
     }
 
     const board = await boardModel.findById(invitation.board);
     if (!board) {
-      return callback({ message: "Board not found." });
+      return callback({ message: "Không tìm thấy người bảng." });
     }
 
     // Add new member to board members
@@ -43,7 +43,7 @@ const acceptInvitation = async (invitationId, userId, callback) => {
     if (owner) {
       board.activity.push({
         user: owner.user,
-        action: `added user "${newMember.name}" to this board`,
+        action: `đã thêm thành viên "${newMember.name}" vào bảng`,
       });
     }
 
@@ -52,13 +52,13 @@ const acceptInvitation = async (invitationId, userId, callback) => {
     await board.save();
 
     return callback(false, {
-      message: "Invitation accepted!",
+      message: "Chấp nhận lời mời!",
       board: board,
       invitation: invitation,
     });
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -69,7 +69,7 @@ const rejectInvitation = async (invitationId, userId, callback) => {
     const invitation = await invitationModel.findById(invitationId);
 
     if (!invitation || invitation.invited.toString() !== userId.toString()) {
-      return callback({ message: "Invitation not found or invalid." });
+      return callback({ message: "Lời mời không tìm thấy hoặc không hợp lệ." });
     }
 
     // Xóa lời mời từ cơ sở dữ liệu
@@ -80,12 +80,12 @@ const rejectInvitation = async (invitationId, userId, callback) => {
     // await invitation.save();
 
     return callback(false, {
-      message: "Invitation rejected!",
+      message: "Lời mời bị từ chối!",
       invitationId: invitationId,
     });
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -99,7 +99,7 @@ const sentMemberInvitation = async (boardId, member, user, callback) => {
   if (!isOwner) {
     return callback({
       errMessage:
-        "You are not the owner of this board. Only owners can invite members.",
+        "Bạn không phải là chủ sở hữu của bảng này. Chỉ chủ sở hữu mới có thể mời thành viên.",
     });
   }
   try {
@@ -111,12 +111,12 @@ const sentMemberInvitation = async (boardId, member, user, callback) => {
     await newInvitation.save();
 
     return callback(false, {
-      message: "Invitations sent!",
+      message: "Đã gửi lời mời!",
       data: newInvitation,
     });
   } catch (error) {
     return callback({
-      message: "Something went wrong",
+      message: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -130,7 +130,7 @@ const getAllInvitations = async (userId, callback) => {
     return callback(false, invitations);
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -144,7 +144,7 @@ const getInvitationsPendingByBoard = async (boardId, callback) => {
     return callback(false, invitations);
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }

@@ -8,8 +8,7 @@ const create = async (req, res) => {
   // Validate the inputs
   if (!(title && listId && boardId))
     return res.status(400).send({
-      errMessage:
-        "The create operation could not be completed because there is missing information",
+      errMessage: "Không thể hoàn tất thao tác tạo vì thiếu thông tin",
     });
 
   //Call the card service

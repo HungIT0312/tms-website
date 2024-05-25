@@ -19,7 +19,7 @@ const create = async (req, callback) => {
 
     const user = await userModel.findById(req.user._id);
     if (!user) {
-      return callback({ errMessage: "User not found" });
+      return callback({ errMessage: "Không tìm thấy người dùng" });
     }
     user.boards.unshift(newBoard._id);
     await user.save();
@@ -36,7 +36,7 @@ const create = async (req, callback) => {
 
     newBoard.activity.unshift({
       user: user._id,
-      action: "created this board",
+      action: "đã tạo bảng",
     });
 
     // Tạo và thêm nhãn (labels) cho bảng
@@ -53,7 +53,7 @@ const create = async (req, callback) => {
     return callback(false, newBoard);
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Có lỗi đã xảy ra!",
       details: error.message,
     });
   }
@@ -78,7 +78,7 @@ const getAll = async (userId, callback) => {
 
     return callback(false, boards);
   } catch (error) {
-    return callback({ msg: "Something went wrong", details: error.message });
+    return callback({ msg: "Có lỗi đã xảy ra!", details: error.message });
   }
 };
 
@@ -89,7 +89,7 @@ const getById = async (id, callback) => {
     return callback(false, board);
   } catch (error) {
     return callback({
-      message: "Something went wrong",
+      message: "Có lỗi đã xảy ra!",
       details: error.message,
     });
   }
@@ -105,7 +105,7 @@ const getActivityById = async (boardId, page = 1, limit = 10, callback) => {
     });
     const activities = board.activity.slice(skip, skip + limit);
     if (!board) {
-      return callback({ message: "Board not found" });
+      return callback({ message: "Không tìm thấy bảng" });
     }
 
     return callback(false, {
@@ -116,7 +116,7 @@ const getActivityById = async (boardId, page = 1, limit = 10, callback) => {
     });
   } catch (error) {
     return callback({
-      message: "Something went wrong",
+      message: "Có lỗi đã xảy ra!",
       details: error.message,
     });
   }
@@ -131,7 +131,7 @@ const removeMember = async (boardId, memberId, user, callback) => {
       (member) => member.user.toString() === memberId.toString()
     );
     if (memberIndex === -1) {
-      return callback({ message: "Member not found in board" });
+      return callback({ message: "Không có thành viên trong bảng." });
     }
 
     const removedMember = board.members.splice(memberIndex, 1)[0];
@@ -165,21 +165,21 @@ const removeMember = async (boardId, memberId, user, callback) => {
     // Log the activity
     board.activity.unshift({
       user: user._id,
-      action: `removed user '${
+      action: `xóa người dùng '${
         removedMember.name + " " + removedMember.surname
-      }' from this board`,
+      }' khỏi bảng`,
     });
 
     // Save changes to board
     await board.save();
 
     return callback(false, {
-      message: "Remove member successfully!",
+      message: "Xóa thành công!",
       removedMemberId: removedMember.user,
     });
   } catch (error) {
     return callback({
-      message: "Something went wrong",
+      message: "Có lỗi đã xảy ra!",
       details: error.message,
     });
   }
@@ -201,14 +201,14 @@ const updateBoardProperty = async (
         board.title = newValue;
         board.activity.unshift({
           user: user._id,
-          action: "update title of this board",
+          action: "cập nhật tiêu đề của bảng",
         });
         break;
       case "description":
         board.description = newValue;
         board.activity.unshift({
           user: user._id,
-          action: "update description of this board",
+          action: "cập nhật mô tả của bảng",
         });
         break;
       case "background":
@@ -216,20 +216,20 @@ const updateBoardProperty = async (
         board.isImage = newValue.isImage;
         board.activity.unshift({
           user: user._id,
-          action: "update background of this board",
+          action: "cập nhật ảnh nền của bảng",
         });
         break;
       default:
-        return callback({ message: "Invalid property" });
+        return callback({ message: "Thuộc tính không hợp lệ" });
     }
 
     // Save changes
     await board.save();
 
-    return callback(false, { message: "Success!", property, newValue });
+    return callback(false, { message: "Thành công!", property, newValue });
   } catch (error) {
     return callback({
-      message: "Something went wrong",
+      message: "Có lỗi đã xảy ra!",
       details: error.message,
     });
   }
@@ -240,15 +240,15 @@ const createLabel = async (boardId, labelData, callback) => {
     const newLabel = await labelModel.create(labelData);
 
     const board = await boardModel.findById(boardId);
-    if (!board) return res.status(404).send("Board not found");
+    if (!board) return res.status(404).send("Không tìm thấy bảng");
 
     board.labels.push(newLabel._id);
     await board.save();
 
-    return callback(false, { message: "Successful", label: newLabel });
+    return callback(false, { message: "Thành công !", label: newLabel });
   } catch (err) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Có lỗi đã xảy ra!",
       details: err.message,
     });
   }
@@ -264,12 +264,12 @@ const updateLabel = async (labelId, labelData, callback) => {
       }
     );
     if (!updatedLabel) {
-      return callback({ errMessage: "Label not found" });
+      return callback({ errMessage: "Không tìm thấy nhãn" });
     }
-    return callback(false, { message: "Successful", label: updatedLabel });
+    return callback(false, { message: "Thành công !", label: updatedLabel });
   } catch (err) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Có lỗi đã xảy ra!",
       details: err.message,
     });
   }
@@ -280,13 +280,13 @@ const deleteLabel = async (boardId, labelId, callback) => {
     // Tìm và xoá nhãn
     const deletedLabel = await labelModel.findByIdAndDelete(labelId);
     if (!deletedLabel) {
-      return callback({ errMessage: "Label not found" });
+      return callback({ errMessage: "Không tìm thấy nhãn" });
     }
 
     // Xoá tham chiếu nhãn khỏi bảng
     const board = await boardModel.findById(boardId);
     if (!board) {
-      return callback({ errMessage: "Board not found" });
+      return callback({ errMessage: "Không tìm thấy bảng" });
     }
 
     board.labels.pull(labelId);
@@ -300,7 +300,7 @@ const deleteLabel = async (boardId, labelId, callback) => {
     return callback(false, { label: deletedLabel });
   } catch (err) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Có lỗi đã xảy ra!",
       details: err.message,
     });
   }
@@ -323,7 +323,7 @@ const getBoardStats = async (boardId, callback) => {
     cards = cards.filter((c) => c._destroy === false);
     const board = await boardModel.findById(boardId).populate("members.user");
     if (!board) {
-      return callback({ message: "Board not found" });
+      return callback({ message: "Không tìm thấy bảng" });
     }
     const userStats = {};
     // Populate the userStats object with initial data
@@ -351,7 +351,10 @@ const getBoardStats = async (boardId, callback) => {
       } else {
         unResolveTask += 1;
         // Check if the task is overdue
-        if (card.date.dueDate && dayjs(card.date.dueDate).isBefore(now)) {
+        if (
+          card.date.dueDate &&
+          dayjs(card.date.dueDate).isBefore(now, "day")
+        ) {
           overdueTask += 1;
           // Increase overdue count for each member assigned to this card
           card.members.forEach((member) => {
@@ -393,7 +396,7 @@ const getBoardStats = async (boardId, callback) => {
     });
   } catch (error) {
     return callback({
-      message: "Something went wrong",
+      message: "Có lỗi đã xảy ra!",
       details: error.message,
     });
   }

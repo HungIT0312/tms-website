@@ -5,7 +5,7 @@ const create = async (req, res) => {
   if (!(title && backgroundImageLink))
     return res
       .status(400)
-      .send({ errMessage: "Title and/or image cannot be null" });
+      .send({ errMessage: "Tiêu đề và/hoặc hình ảnh không được trống" });
   await boardService.create(req, (err, result) => {
     if (err) return res.status(500).send(err);
     result.__v = undefined;
@@ -26,7 +26,7 @@ const getById = async (req, res) => {
   if (!validate)
     return res.status(400).send({
       errMessage:
-        "You can not show the this board, you are not a member or owner!",
+        "Bạn không thể hiển thị bảng này, bạn không phải là thành viên hoặc chủ sở hữu!",
     });
 
   await boardService.getById(req.params.id, (err, result) => {
@@ -41,7 +41,7 @@ const getActivityById = async (req, res) => {
   if (!validate)
     return res.status(400).send({
       errMessage:
-        "You can not show the this board, you are not a member or owner!",
+        "Bạn không thể hiển thị bảng này, bạn không phải là thành viên hoặc chủ sở hữu!",
     });
   const { page, limit } = req.query;
   //convert page and limit to number
@@ -63,7 +63,7 @@ const removeMember = async (req, res) => {
   const validate = req.user.boards.filter((board) => board === req.params.id);
   if (!validate)
     return res.status(400).send({
-      errMessage: "You can not remove member you are not owner!",
+      errMessage: "Bạn không thể xóa thành viên bạn không phải là chủ sở hữu!",
     });
   const { boardId } = req.params;
   const { memberId } = req.body;
@@ -85,7 +85,7 @@ const updateBoardProperty = async (req, res) => {
   const validate = req.user.boards.includes(boardId);
   if (!validate) {
     return res.status(400).send({
-      errMessage: `You cannot update ${property} of this board, you are not a member or owner!`,
+      errMessage: `Bạn không thể cập nhật, bạn không phải là thành viên hoặc chủ sở hữu!`,
     });
   }
 

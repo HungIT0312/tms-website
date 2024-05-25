@@ -9,7 +9,7 @@ const registerByEmail = async (req, res) => {
   if (!(name && surname && email && password))
     return res
       .status("400")
-      .send({ errMessage: "Please fill all required areas!" });
+      .send({ errMessage: "Hãy điền vào tất cả thông tin được yêu cầu!" });
 
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
@@ -35,16 +35,14 @@ const login = async (req, res) => {
   if (!(email && password))
     return res
       .status(400)
-      .send({ errMessage: "Please fill all required areas!" });
+      .send({ errMessage: "Hãy điền vào tất cả thông tin được yêu cầu!" });
 
   await userService.login(email, (err, result) => {
     if (err) return res.status(400).send(err);
 
     const hashedPassword = result.password;
     if (!bcrypt.compareSync(password, hashedPassword))
-      return res
-        .status(400)
-        .send({ errMessage: "Your email/password is wrong!" });
+      return res.status(400).send({ errMessage: "Sai email/mật khẩu!" });
     const { accessToken, refreshToken } = auth.generateToken(
       result._id.toString(),
       result.email
@@ -54,7 +52,7 @@ const login = async (req, res) => {
     delete result.password;
     delete result.verificationToken;
     return res.status(200).send({
-      message: "User login successful!",
+      message: "Đăng nhập thành công!",
       user: result,
       tokens: { accessToken, refreshToken },
     });

@@ -2,7 +2,12 @@ const listModel = require("../Models/listModel");
 const boardModel = require("../Models/boardModel");
 const cardModel = require("../Models/cardModel");
 const dayjs = require("dayjs");
-
+const weekday = require("dayjs/plugin/weekday");
+const localeData = require("dayjs/plugin/localeData");
+const utc = require("dayjs/plugin/utc");
+dayjs.extend(utc);
+dayjs.extend(weekday);
+dayjs.extend(localeData);
 const create = async (model, user, callback) => {
   try {
     // Create new List
@@ -21,7 +26,7 @@ const create = async (model, user, callback) => {
     // Add created activity to owner board activities
     ownerBoard.activity.unshift({
       user: user._id,
-      action: `added ${newList.title} to this board`,
+      action: `đã thêm danh sách "${new List.title()}" vào bảng này`,
     });
 
     // Save changes
@@ -32,7 +37,7 @@ const create = async (model, user, callback) => {
   } catch (error) {
     // Return error message
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -71,7 +76,7 @@ const getAll = async (boardId, callback) => {
     return callback(false, responseObject);
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -85,12 +90,12 @@ const deleteById = async (listId, boardId, user, callback) => {
       (list) => list.toString() === listId.toString()
     );
     if (!validate)
-      return callback({ errMessage: "List or board information are wrong" });
+      return callback({ errMessage: "Thông tin của danh sách hoặc bảng sai" });
 
     if (!user.boards.filter((board) => board === boardId))
       return callback({
         errMessage:
-          "You cannot delete a list that does not hosted by your boards",
+          "Bạn không thể xóa danh sách không được lưu trữ trên bảng của bạn",
       });
 
     const result = await listModel.findByIdAndDelete(listId);
@@ -99,19 +104,19 @@ const deleteById = async (listId, boardId, user, callback) => {
 
     board.activity.unshift({
       user: user._id,
-      action: `deleted list "${result.title}"  from this board`,
+      action: `đã xóa danh sách "${result.title}"  khỏi bảng`,
     });
     board.save();
 
     await cardModel.deleteMany({ owner: listId });
 
     return callback(false, {
-      message: "Delete list successfully!",
+      message: "Xóa thành công!",
       list: result,
     });
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -132,7 +137,7 @@ const updateCardOrder = async (
     let validate = board.lists.filter((list) => list.id === sourceId);
     const validate2 = board.lists.filter((list) => list.id === destinationId);
     if (!validate || !validate2)
-      return callback({ errMessage: "List or board information are wrong" });
+      return callback({ errMessage: "Thông tin của danh sách hoặc bảng sai" });
 
     // Validate the parent list of the card
     const sourceList = await listModel.findById(sourceId);
@@ -140,7 +145,7 @@ const updateCardOrder = async (
       (card) => card._id.toString() === cardId
     );
     if (!validate)
-      return callback({ errMessage: "List or card information are wrong" });
+      return callback({ errMessage: "Thông tin của danh sách hoặc thẻ sai" });
 
     // Remove the card from source list and save
     sourceList.cards = sourceList.cards.filter(
@@ -159,7 +164,7 @@ const updateCardOrder = async (
     // Add card activity
     if (sourceId !== destinationId)
       card.activities.unshift({
-        text: `moved this card from ${sourceList.title} to ${destinationList.title}`,
+        text: `di chuyển thẻ này từ ${sourceList.title} tới ${destinationList.title}`,
         userName: user.name,
         color: user.color,
       });
@@ -168,10 +173,10 @@ const updateCardOrder = async (
     card.owner = destinationId;
     await card.save();
 
-    return callback(false, { message: "Success" });
+    return callback(false, { message: "Thành công" });
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -185,7 +190,7 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
     const validate = board.lists.filter((list) => list._id === listId);
     if (!validate) {
       return callback({
-        errMessage: "List or board information are wrong",
+        errMessage: "Thông tin của danh sách hoặc bảng sai",
       });
     }
 
@@ -193,7 +198,7 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
     if (!user.boards.includes(boardId.toString())) {
       return callback({
         errMessage:
-          "You cannot delete a list that does not hosted by your boards",
+          "Bạn không thể xóa danh sách không được lưu trữ trên bảng của bạn",
       });
     }
 
@@ -229,10 +234,10 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
         ],
       })
       .exec();
-    return callback(false, { message: "Success", list: newlist });
+    return callback(false, { message: "Thành công", list: newlist });
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -256,7 +261,7 @@ const changeCardToAnotherList = async (
     );
     if (!validateOldList) {
       return callback({
-        errMessage: "List or board information are wrong",
+        errMessage: "Thông tin của danh sách hoặc bảng sai",
       });
     }
     const validateNewList = board.lists.some(
@@ -264,14 +269,14 @@ const changeCardToAnotherList = async (
     );
     if (!validateNewList) {
       return callback({
-        errMessage: "New list does not belong to this board",
+        errMessage: "Danh sách mới không thuộc về bảng này",
       });
     }
 
     if (!user.boards.includes(boardId.toString())) {
       return callback({
         errMessage:
-          "You cannot change a card of a list not hosted by your boards",
+          "Bạn không thể thay đổi thẻ của danh sách không được quản lý bởi bảng của bạn",
       });
     }
 
@@ -280,7 +285,7 @@ const changeCardToAnotherList = async (
     );
     if (cardIndex === -1) {
       return callback({
-        errMessage: "Card does not belong to the old list",
+        errMessage: "Thẻ không thuộc danh sách cũ",
       });
     }
 
@@ -290,10 +295,10 @@ const changeCardToAnotherList = async (
     // Save the old and new lists
     await Promise.all([oldList.save(), newList.save(), card.save()]);
 
-    return callback(false, { message: "Success" });
+    return callback(false, { message: "Thành công" });
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -311,10 +316,10 @@ const changeListOrder = async (boardId, listIds, callback) => {
     board.lists = listIds;
     await board.save();
 
-    return callback(false, { message: "Success", lists: board.lists });
+    return callback(false, { message: "Thành công", lists: board.lists });
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
@@ -343,8 +348,8 @@ const getAllListByFilter = async (
               };
             case "overdue":
               return {
-                "date.dueDate": { $lt: now.toDate() },
-                "date.completed": false,
+                "date.completed": { $eq: false },
+                "date.dueDate": { $lte: now.subtract(1, "day").toDate() },
               };
             case "coming":
               return {
@@ -412,7 +417,7 @@ const getAllListByFilter = async (
     return callback(false, lists);
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Xảy ra lỗi",
       details: error.message,
     });
   }

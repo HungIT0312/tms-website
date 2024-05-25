@@ -42,26 +42,26 @@ const registerByEmail = async (user, currentURL, callback) => {
         transporter.sendMail(mailOptions, function (error, info) {
           if (error) {
             return callback({
-              errMessage: "Failed to send verification email",
+              errMessage: "Không gửi được email xác minh",
               details: error,
             });
           } else {
             return callback(false, {
               message:
-                "User created successfully! Please check your email for verification.",
+                "Người dùng đã được tạo thành công! Vui lòng kiểm tra email của bạn để xác minh.",
             });
           }
         });
       })
       .catch((err) => {
         return callback({
-          errMessage: "Email already in use!",
+          errMessage: "Email đã được sử dụng!",
           details: err.message,
         });
       });
   } catch (err) {
     return callback({
-      errMessage: "Failed to register user",
+      errMessage: "Không thể đăng ký người dùng",
       details: err.message,
     });
   }
@@ -76,19 +76,20 @@ const verifyEmail = async (verificationToken, callback) => {
       email: decoded.email,
       verificationToken,
     });
-    if (!user) return callback({ errMessage: "Invalid verification token" });
+    if (!user)
+      return callback({ errMessage: "Mã thông báo xác minh không hợp lệ" });
 
     user.verified = true;
     user.verificationToken = null;
     await user.save();
 
     return callback(false, {
-      message: "Email verified successfully!",
+      message: "Email đã được xác minh thành công!",
       verified: true,
     });
   } catch (err) {
     return callback({
-      errMessage: "Failed to verify email",
+      errMessage: "Không thể xác minh email",
       details: err.message,
     });
   }
@@ -97,7 +98,7 @@ const verifyEmail = async (verificationToken, callback) => {
 const login = async (email, callback) => {
   try {
     let user = await userModel.findOne({ email });
-    if (!user) return callback({ errMessage: "Your email/password is wrong!" });
+    if (!user) return callback({ errMessage: "Sai email hoặc mật khẩu!" });
     // if (!user.verified)
     //   return callback({
     //     errMessage: "Please check your email for a verification mail!",
@@ -107,7 +108,7 @@ const login = async (email, callback) => {
     return callback(false, { ...user.toJSON() });
   } catch (err) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: err.message,
     });
   }
@@ -130,7 +131,7 @@ const refreshToken = async (refreshToken, callback) => {
       process.env.REFRESH_TOKEN_SECRET
     );
     const user = await userModel.findById(decoded.id);
-    if (!user) return callback({ errMessage: "User not found!" });
+    if (!user) return callback({ errMessage: "Không tìm thấy người dùng!" });
 
     const { accessToken, ...newRefreshToken } = auth.generateToken(
       user._id,
@@ -140,7 +141,7 @@ const refreshToken = async (refreshToken, callback) => {
     return callback(false, { accessToken, ...newRefreshToken });
   } catch (err) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: err.message,
     });
   }
@@ -149,11 +150,11 @@ const refreshToken = async (refreshToken, callback) => {
 const getUser = async (id, callback) => {
   try {
     let user = await userModel.findById(id);
-    if (!user) return callback({ errMessage: "User not found!" });
+    if (!user) return callback({ errMessage: "Không tìm thấy người dùng!" });
     return callback(false, { ...user.toJSON() });
   } catch (err) {
     return callback({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: err.message,
     });
   }
@@ -168,7 +169,7 @@ const getAllUsersByIds = async (userIds, callback) => {
     );
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong while getting users",
+      errMessage: "Đã có lỗi xảy ra khi lấy thông tin",
       details: error.message,
     });
   }
@@ -189,7 +190,7 @@ const searchUsers = async (query, callback) => {
     return callback(false, searchResults);
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong while searching users",
+      errMessage: "Đã có lỗi xảy ra khi lấy thông tin",
       details: error.message,
     });
   }
@@ -230,7 +231,7 @@ const getUserActivities = async (userId, callback) => {
     return callback(false, activities);
   } catch (error) {
     return callback({
-      errMessage: "Something went wrong while getting user activities",
+      errMessage: "Đã có lỗi xảy ra khi lấy thông tin hoạt động",
       details: error.message,
     });
   }

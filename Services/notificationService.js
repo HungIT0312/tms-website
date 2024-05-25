@@ -7,13 +7,15 @@ const getAllNoticeByUserId = async (userId, callback) => {
     );
 
     if (!notifications) {
-      return callback({ errMessage: "User notifications not found!" });
+      return callback({
+        errMessage: "Không tìm thấy thông báo của người dùng!",
+      });
     }
 
     return callback(false, notifications);
   } catch (err) {
     return callback({
-      errMessage: "Error fetching user notifications",
+      errMessage: "Lỗi tìm nạp thông báo của người dùng",
       details: err.message,
     });
   }
@@ -27,13 +29,13 @@ const updateNoticeByIds = async (noticeIds, callback) => {
     const updatedNotices = await Notification.updateMany(filter, update);
 
     if (!updatedNotices) {
-      return callback({ errMessage: "Notifications not found!" });
+      return callback({ errMessage: "Thông báo không tìm thấy!" });
     }
 
     return callback(false, updatedNotices);
   } catch (err) {
     return callback({
-      errMessage: "Error updating notifications",
+      errMessage: "Lỗi cập nhật thông báo",
       details: err.message,
     });
   }

@@ -150,7 +150,7 @@ const getAllListByFilter = async (req, res) => {
     if (!isValidBoard) {
       return res.status(400).send({
         errMessage:
-          "You cannot get lists because you are not the owner of this board!",
+          "Bạn không thể lấy danh sách vì bạn không phải là chủ sở hữu của diễn đàn này!",
       });
     }
 
@@ -169,7 +169,7 @@ const getAllListByFilter = async (req, res) => {
     );
   } catch (error) {
     return res.status(500).send({
-      errMessage: "Something went wrong",
+      errMessage: "Đã có lỗi xảy ra",
       details: error.message,
     });
   }
