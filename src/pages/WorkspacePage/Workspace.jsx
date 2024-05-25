@@ -17,12 +17,10 @@ const Workspace = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-
     const fetchBoard = async () => {
       await dispatch(getAllUserBoard());
     };
     fetchBoard();
-
   }, [dispatch, userInformation._id]);
 
   useEffect(() => {
@@ -69,11 +67,11 @@ const Workspace = () => {
   return (
     <div className="workspace">
       <Flex justify="space-between" style={{ paddingBottom: 32 }}>
-        <div className="workspace-title">Your workspace</div>
+        <div className="workspace-title">Không gian làm việc của bạn</div>
         <Flex gap={8}>
           <Input
             size="middle"
-            placeholder="Search"
+            placeholder="Tìm kiếm"
             prefix={<SearchOutlined />}
             className="workspace__search"
             value={input}
@@ -84,7 +82,7 @@ const Workspace = () => {
             className="workspace-create"
             onClick={() => setIsOpenCreateModel(true)}
           >
-            Create Board
+            Tạo bảng mới
           </Button>
         </Flex>
       </Flex>
@@ -106,17 +104,17 @@ const Workspace = () => {
                 className="content__msg"
                 style={{ marginTop: 24, fontWeight: 600 }}
               >
-                You {"don't"} have any board here
+                Bạn không có bảng nào ở đây
               </span>
               <span
                 className="content__msg"
                 style={{ margin: 24, maxWidth: 500, textAlign: "center" }}
               >
-                Create a new board, workspace to plan, track, and release great
-                project with your team.
+                Tạo một bảng, không gian làm việc mới để lập kế hoạch, theo dõi
+                và quản lý dự án cùng nhóm của bạn.
               </span>
               <Button type="primary" onClick={() => setIsOpenCreateModel(true)}>
-                Create Board
+                Tạo bảng
               </Button>
             </Flex>
           )}
@@ -130,7 +128,7 @@ const Workspace = () => {
             ))}
           <Divider orientation="left" orientationMargin={12}>
             <div className="workspace-title" style={{ border: "none" }}>
-              Workspace is participating
+              Không gian làm việc đang tham gia
             </div>
           </Divider>
           {isLoading && renderSkeletons(4)}

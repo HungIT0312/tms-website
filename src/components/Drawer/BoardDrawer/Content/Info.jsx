@@ -29,7 +29,7 @@ const Info = ({ owner, selectedBoard }) => {
       <Flex vertical gap={12}>
         <Flex gap={12} className="info__header" align="center">
           <UserOutlined className="info__icon" />
-          <span className="info__title">Board's owner</span>
+          <span className="info__title">Chủ sỡ hữu</span>
         </Flex>
         <Flex className="" align="center" gap={12}>
           <div className="">
@@ -53,14 +53,14 @@ const Info = ({ owner, selectedBoard }) => {
               {owner?.name + " " + owner?.surname}
             </span>
             <span className="info__mail">{owner?.email}</span>
-            {isMe && <Link>Edit information</Link>}
+            {isMe && <Link>Thay đổi thông tin</Link>}
           </Flex>
         </Flex>
       </Flex>
       <Flex gap={12} vertical>
         <Flex gap={12} className="info__header" align="center">
           <FiAlignLeft className="info__icon" />
-          <span className="info__title">Description</span>
+          <span className="info__title">Mô tả</span>
         </Flex>
         <QuillTextBox
           content={selectedBoard?.description || ""}

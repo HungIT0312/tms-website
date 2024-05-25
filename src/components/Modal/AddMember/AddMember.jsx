@@ -70,14 +70,14 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
       if (res) {
         setPendingUsers([...pendingUsers, res.data]);
         api.success({
-          message: `Add new !`,
-          description: res.message,
+          message: `Thêm mới !`,
+          description: "Thêm thành công",
           placement: "bottomRight",
         });
       }
     } catch (error) {
       api.error({
-        message: `Add new !`,
+        message: `Thêm mới !`,
         description: error.errMessage,
         placement: "bottomRight",
       });
@@ -87,23 +87,24 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
   // eslint-disable-next-line react/prop-types
   const handleRemoveMember = (id) => {
     Modal.confirm({
-      title: "Remove member",
+      title: "Xóa thành viên",
       content:
-        "Are you sure you want to remove this member ? We will assign all task to the owner.",
+        "Bạn có chắc chắn muốn xóa thành viên này không? Chúng tôi sẽ hủy bỏ nhiệm vụ được giao cho họ.",
       onOk: () => {
         dispatch(removeBoardMemberUI({ memberId: id }));
         dispatch(
           removeMemberInBoard({ boardId: board._id.toString(), memberId: id })
         );
         api.success({
-          message: `Remove member !`,
-          description: "Successfully",
+          message: `Xóa thành viên !`,
+          description: "Thành công",
           placement: "bottomRight",
         });
       },
-      okText: "Remove",
+      okText: "Loại bỏ",
       centered: true,
       okType: "danger",
+      cancelText: "Hủy",
     });
   };
   const renderAll = (members = []) => {
@@ -124,17 +125,18 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
 
   return (
     <Modal
-      title="Add member"
+      title="Thêm thành viên"
       centered
       open={isOpen}
       onOk={() => setIsOpen(false)}
       onCancel={() => setIsOpen(false)}
       className="modal-container"
+      footer={false}
     >
       {contextHolder}
       <Input
         size="large"
-        placeholder="Email or name"
+        placeholder="Email hoặc tên"
         prefix={<UserAddOutlined />}
         value={inputText}
         onChange={(e) => setInputText(e.target.value)}

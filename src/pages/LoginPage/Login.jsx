@@ -22,7 +22,7 @@ const Login = () => {
       .then((rs) => {
         if (rs) {
           api.success({
-            message: `Login successfully !`,
+            message: `Đăng nhập thành công !`,
             description: rs.message,
             placement: "topRight",
           });
@@ -30,7 +30,7 @@ const Login = () => {
       })
       .catch((err) => {
         api.error({
-          message: `Login error !`,
+          message: `Đăng nhập không thành công !`,
           description: err.errMessage,
           placement: "topRight",
         });
@@ -56,11 +56,11 @@ const Login = () => {
         rules={[
           {
             type: "email",
-            message: "The input is not valid E-mail!",
+            message: "Đầu vào email không hợp lệ !",
           },
           {
             required: true,
-            message: "Please input your E-mail!",
+            message: "Vui lòng nhập email của bạn!",
           },
         ]}
       >
@@ -75,7 +75,7 @@ const Login = () => {
         rules={[
           {
             required: true,
-            message: "Please input your Password!",
+            message: "Vui lòng nhập mật khẩu!",
           },
         ]}
       >
@@ -86,18 +86,12 @@ const Login = () => {
           placeholder="Password"
         />
       </Form.Item>
-      {/* <Form.Item>
-        <Form.Item name="remember" valuePropName="checked" noStyle>
-          <Checkbox>Remember me</Checkbox>
-        </Form.Item>
-      </Form.Item> */}
 
       <Form.Item>
         <Button type="primary" htmlType="submit" className="login-form-button">
-          Log in
+          Đăng nhập
         </Button>
-        You {"don't"} have an account ?{" "}
-        <Link to={"/auth/register"}>Register now !</Link>
+        Bạn chưa có tài khoản? <Link to={"/auth/register"}>Đăng ký ngay !</Link>
       </Form.Item>
     </Form>
   );

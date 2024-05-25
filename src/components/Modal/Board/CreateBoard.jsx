@@ -26,8 +26,8 @@ const CreateBoard = ({ isOpen, showModal }) => {
       };
       dispatch(createNewBoard(value)).then(() => {
         api.success({
-          message: `Add new !`,
-          description: "Added successful",
+          message: `Tạo mới !`,
+          description: "Thêm thành công",
           placement: "bottomRight",
         });
       });
@@ -60,11 +60,13 @@ const CreateBoard = ({ isOpen, showModal }) => {
   return (
     <Modal
       centered
-      title="Create board"
+      title="Tạo bảng"
       open={isOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       className="create-board"
+      okText={"Tạo"}
+      cancelText={"Hủy"}
     >
       {contextHolder}
       <Flex
@@ -75,7 +77,7 @@ const CreateBoard = ({ isOpen, showModal }) => {
       >
         <Flex gap={16} justify="center" align="center">
           <Flex vertical justify="center" align="center">
-            <label>Preview</label>
+            <label>Xem trước</label>
             <div
               className="create-board__preview"
               style={{ background: `url(${bgLink})  no-repeat center/cover` }}
@@ -97,15 +99,15 @@ const CreateBoard = ({ isOpen, showModal }) => {
         <div style={{ width: 320, marginTop: 4 }}>
           <Form name="createBoard" layout="vertical" form={form}>
             <Form.Item
-              label="Board title"
+              label="Tiêu đề"
               name="title"
               rules={[
-                { required: true, message: "Please input the board title!" },
+                { required: true, message: "Vui lòng nhập tiêu đề bảng!" },
               ]}
             >
               <Input className="create-board__inputTitle" />
             </Form.Item>
-            <Form.Item label="Description" name="description">
+            <Form.Item label="Mô tả" name="description">
               <Input.TextArea
                 className="create-board__description"
                 rows={4}

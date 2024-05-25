@@ -34,8 +34,8 @@ const BoardDrawer = ({
         >
           <InfoCircleOutlined className="drawer-item__icon" />
           <Flex vertical>
-            <span className="drawer-item__name">About this board</span>
-            <span className="drawer-item__sub">Add board's description</span>
+            <span className="drawer-item__name">Về bảng này</span>
+            <span className="drawer-item__sub">Thêm mô tả của bảng</span>
           </Flex>
         </Flex>
         <Flex
@@ -46,7 +46,7 @@ const BoardDrawer = ({
         >
           <ProjectOutlined className="drawer-item__icon" />
           <Flex vertical>
-            <span className="drawer-item__name">Activities</span>
+            <span className="drawer-item__name">Các hoạt động</span>
           </Flex>
         </Flex>
         <Flex
@@ -62,7 +62,7 @@ const BoardDrawer = ({
             style={{ borderRadius: 4 }}
           />
           <Flex vertical>
-            <span className="drawer-item__name">Change background</span>
+            <span className="drawer-item__name">Thay đổi nền</span>
           </Flex>
         </Flex>
         <Divider />
@@ -75,7 +75,7 @@ const BoardDrawer = ({
         >
           <FiArchive className="drawer-item__icon" />
           <Flex vertical>
-            <span className="drawer-item__name">Archive lists</span>
+            <span className="drawer-item__name">Danh sách lưu trữ</span>
           </Flex>
         </Flex>
         {owner?.user == userInformation?._id && (
@@ -87,7 +87,7 @@ const BoardDrawer = ({
           >
             <MinusOutlined className="drawer-item__icon" />
             <Flex vertical>
-              <span className="drawer-item__name">Close the Board</span>
+              <span className="drawer-item__name">Đóng dự án</span>
             </Flex>
           </Flex>
         )}
@@ -108,7 +108,7 @@ const BoardDrawer = ({
         renderKey !== "analysis" && (
           <Flex>
             <Button type="text" onClick={() => setRenderKey("")}>
-              Back
+              Trờ lại
             </Button>
           </Flex>
         )

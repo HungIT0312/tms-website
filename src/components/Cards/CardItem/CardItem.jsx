@@ -25,6 +25,12 @@ import "./CardItem.scss";
 import { changeCardToAnotherList } from "../../../stores/list/ListSlice";
 import { changeCardToDiffList } from "../../../stores/list/ListThunk";
 import { getCardById } from "../../../stores/card/cardThunk";
+import localeData from "dayjs/plugin/localeData";
+import weekday from "dayjs/plugin/weekday";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+dayjs.extend(utc);
 const CardItem = ({
   card = {},
   isAdd = false,
@@ -68,12 +74,12 @@ const CardItem = ({
   };
   const renderDueDateStatus = (date) => {
     const now = dayjs();
-    if (date.isBefore(now)) {
+    if (now.isAfter(date, "day")) {
       setStatus("error");
-      setTooltipDate("Over due");
+      setTooltipDate("Quá hạn");
     } else if (date.isSame(now, "day")) {
       setStatus("warning");
-      setTooltipDate("Due date is today");
+      setTooltipDate("Đến hạn hôm nay");
     } else {
       setStatus("");
       setTooltipDate("");
@@ -141,7 +147,7 @@ const CardItem = ({
     ));
   const renderContent = (
     <Flex vertical gap={8}>
-      <Flex className="change-title">Move to list</Flex>
+      <Flex className="change-title">Chuyển đến</Flex>
       {renderListTitle}
     </Flex>
   );
@@ -216,18 +222,18 @@ const CardItem = ({
           </Flex>
           <Flex align="end" justify="end" flex={1}>
             {card?.members?.length > 0 ? (
-              <Tooltip title="Board User" placement="bottom">
-                <Avatar
-                  size={24}
-                  style={{
-                    fontSize: 13,
-                    background: card?.members[0]?.color,
-                  }}
-                >
-                  {card?.members[0]?.name[0] + card?.members[0]?.surname[0]}
-                </Avatar>
-              </Tooltip>
+              // <Tooltip title="Thành viên" placement="bottom">
+              <Avatar
+                size={24}
+                style={{
+                  fontSize: 13,
+                  background: card?.members[0]?.color,
+                }}
+              >
+                {card?.members[0]?.name[0] + card?.members[0]?.surname[0]}
+              </Avatar>
             ) : (
+              // {/* </Tooltip> */}
               <></>
             )}
           </Flex>
@@ -238,7 +244,7 @@ const CardItem = ({
     <Flex className="card-item" vertical>
       <Input
         className="card-item__input"
-        placeholder="Type new title"
+        placeholder="Tiêu đề mới"
         value={newTaskTitle}
         onChange={(e) => setNewTaskTitle(e.target.value)}
       />

@@ -19,16 +19,15 @@ const ProfileModal = ({ isOpen, callback }) => {
   return (
     <Modal
       centered
-      title="Profile"
+      title="Thông tin cá nhân"
       open={isOpen}
       onOk={handleOk}
       onCancel={handleCancel}
       okButtonProps={{
         disabled: true,
       }}
-      cancelButtonProps={{
-        disabled: true,
-      }}
+      cancelButtonProps={{}}
+      cancelText={"Trở lại"}
     >
       <Form
         className="login__input__form"
@@ -63,7 +62,7 @@ const ProfileModal = ({ isOpen, callback }) => {
         </Form.Item>
         <Form.Item
           name="name"
-          label="Name"
+          label="Tên"
           rules={[
             {
               required: true,
@@ -79,7 +78,7 @@ const ProfileModal = ({ isOpen, callback }) => {
         </Form.Item>
         <Form.Item
           name="surname"
-          label="Surname"
+          label="Họ"
           rules={[
             {
               required: true,

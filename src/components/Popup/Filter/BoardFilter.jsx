@@ -65,13 +65,13 @@ const BoardFilter = () => {
       onChange={handleFilterByMem}
     >
       <Flex gap={16} vertical className="filter-content">
-        <span className="title-segment">Assign to</span>
+        <span className="title-segment">Chỉ định cho</span>
         <Flex gap={8} vertical>
           <Input
             type="text"
             onChange={handleChangeUserSearch}
             size="small"
-            placeholder="user..."
+            placeholder="người dùng..."
           />
           <Checkbox value={{ user: "unassign" }}>
             <Flex gap={8} style={{ width: "100%" }} align="center">
@@ -85,7 +85,7 @@ const BoardFilter = () => {
               >
                 UA
               </Avatar>
-              <span>Unassigned</span>
+              <span>Chưa chỉ định</span>
             </Flex>
           </Checkbox>
           {filteredUsers?.map((item) => (
@@ -102,18 +102,18 @@ const BoardFilter = () => {
             </Checkbox>
           ))}
         </Flex>
-        <span className="title-segment">Label/Status</span>
+        <span className="title-segment">Nhãn</span>
         <Flex gap={8} vertical className="">
           <Input
             type="text"
             onChange={handleChangeLabelSearch}
             size="small"
-            placeholder="label..."
+            placeholder="nhãn..."
           />
 
           {renderCardLabels}
         </Flex>
-        <span className="title-segment">Date</span>
+        <span className="title-segment">Ngày</span>
         <Flex gap={8} vertical className="filter-labels">
           <Checkbox value={{ now, type: "nodue" }}>
             <Flex
@@ -123,7 +123,7 @@ const BoardFilter = () => {
               className="filter-today"
             >
               <ClockCircleOutlined />
-              <span>No Due Date</span>
+              <span>Không có hạn</span>
             </Flex>
           </Checkbox>
           <Checkbox value={{ now, type: "today" }}>
@@ -134,7 +134,7 @@ const BoardFilter = () => {
               className="filter-today"
             >
               <ClockCircleOutlined />
-              <span>Today due</span>
+              <span>Đến hạn hôm nay</span>
             </Flex>
           </Checkbox>
           <Checkbox value={{ now, type: "overdue" }}>
@@ -145,7 +145,7 @@ const BoardFilter = () => {
               className="filter-overdue"
             >
               <ClockCircleOutlined />
-              <span>Over due</span>
+              <span>Quá hạn</span>
             </Flex>
           </Checkbox>
           <Checkbox value={{ now, type: "coming" }}>
@@ -156,7 +156,7 @@ const BoardFilter = () => {
               className="filter-coming"
             >
               <ClockCircleOutlined />
-              <span>Due date is coming</span>
+              <span>Đang đến</span>
             </Flex>
           </Checkbox>
         </Flex>

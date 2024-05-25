@@ -1,13 +1,16 @@
 import { Image } from "antd";
 import { Outlet, useLocation } from "react-router-dom";
 import images from "../../constants/images";
-import changeTitle, { capitalizeFirstLetter } from "../../helpers/changeTitle";
+import changeTitle from "../../helpers/changeTitle";
 
 const AuthLayout = () => {
   const getCurrentPathName = (pathname) => {
     const pathParts = pathname.split("/");
     const lastPart = pathParts[pathParts.length - 1];
-    return capitalizeFirstLetter(lastPart);
+    if (lastPart == "register") {
+      return "Đăng ký";
+    } else return "Đăng nhập";
+    // return capitalizeFirstLetter(lastPart);
   };
   const { pathname } = useLocation();
   changeTitle(pathname);
@@ -30,7 +33,7 @@ const AuthLayout = () => {
           />
           {/* <div className="login__sitename">TMS</div> */}
         </div>
-        <div className="">{getCurrentPathName(pathname)} to continue</div>
+        <div className="">{getCurrentPathName(pathname)} để tiếp tục</div>
         <Outlet />
       </div>
       <div>

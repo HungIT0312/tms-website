@@ -44,7 +44,7 @@ const Activities = ({ selectedBoard }) => {
         ))}
       {activityLength > 10 && (
         <Button type="text" onClick={handleSeeMore}>
-          {isMore ? "See more" : "See less"}
+          {isMore ? "Xem thêm" : "Ít hơn"}
         </Button>
       )}
     </Flex>
@@ -52,4 +52,3 @@ const Activities = ({ selectedBoard }) => {
 };
 
 export default Activities;
-

@@ -106,12 +106,12 @@ const CardDetail = () => {
     if (!selectedCard?.date?.dueDate || selectedCard?.date?.completed) {
       setStatus("");
       setTooltipDate("");
-    } else if (dueDate.isBefore(now)) {
+    } else if (now.isAfter(dueDate, "day")) {
       setStatus("error");
-      setTooltipDate("Over due");
+      setTooltipDate("Quá hạn");
     } else if (dueDate.isSame(now, "day")) {
       setStatus("warning");
-      setTooltipDate("Due date is today");
+      setTooltipDate("Tới hạn hôm nay");
     } else {
       setStatus("");
       setTooltipDate("");
@@ -130,10 +130,10 @@ const CardDetail = () => {
     }
     if (date.isBefore(now)) {
       setStatus("error");
-      setTooltipDate("Over due");
+      setTooltipDate("Quá hạn");
     } else if (date.isSame(now, "day")) {
       setStatus("warning");
-      setTooltipDate("Due date is today");
+      setTooltipDate("Tới hạn hôm nay");
     } else {
       setStatus("");
       setTooltipDate("");
@@ -249,7 +249,7 @@ const CardDetail = () => {
     };
     dispatch(setSelectedCard(null));
     dispatch(deleteCardInListById(dataDelete));
-    msg.success("Delete success!");
+    msg.success("Xóa thành công!");
     navigate(rootLink);
     dispatch(deleteCardById(dataDelete));
   };
@@ -264,7 +264,7 @@ const CardDetail = () => {
     dispatch(addCard(data))
       .unwrap()
       .then((rs) => {
-        msg.success("Success!");
+        msg.success("Thành công!");
         dispatch(updateParentCardUI({ ...data, newCard: rs.card }));
         dispatch(updateCardSubTaskUI(rs.card));
       });
@@ -284,12 +284,12 @@ const CardDetail = () => {
   //==============================================================  //==============================================================
   const items = [
     {
-      label: "Labels",
+      label: "Nhãn",
       key: "label",
       icon: <TagsOutlined />,
     },
     {
-      label: "Delete",
+      label: "Xóa",
       key: "delete",
       icon: <DeleteOutlined />,
       danger: true,
@@ -299,7 +299,7 @@ const CardDetail = () => {
   const itemDetails = [
     {
       key: "1",
-      label: "Labels",
+      label: "Nhãn",
       children: (
         <Flex align="center" wrap="wrap" gap={4}>
           {renderLabels}
@@ -314,7 +314,7 @@ const CardDetail = () => {
             type="text"
             icon={<PlusOutlined />}
           >
-            Add
+            Thêm
           </Button>
         </Flex>
       ),
@@ -322,7 +322,7 @@ const CardDetail = () => {
     },
     {
       key: "2",
-      label: "Is Sub Task Of",
+      label: "Task phụ của",
       children:
         selectedCard?.isSubTaskOf && !selectedCard?.isSubTaskOf?._destroy ? (
           <Flex
@@ -334,7 +334,7 @@ const CardDetail = () => {
             </Tag>
           </Flex>
         ) : (
-          "None"
+          "Không có"
         ),
       span: 4,
     },
@@ -343,11 +343,11 @@ const CardDetail = () => {
   const itemTime = [
     {
       key: "1",
-      label: "Date start",
+      label: "Ngày làm",
       children: (
         <Tooltip placement="top" title={tooltipDate} arrow={false}>
           <RangePicker
-            showTime
+            showTime={false}
             onChange={handleDateChange}
             defaultValue={renderDate()}
             status={status}
@@ -358,10 +358,10 @@ const CardDetail = () => {
     },
     {
       key: "2",
-      label: "Status",
+      label: "Trạng thái",
       children: (
         <Select
-          placeholder="Status"
+          placeholder="Trạng thái"
           variant="borderless"
           defaultValue={selectedCard?.date?.completed}
           onChange={handleCardCompleteChange}
@@ -371,11 +371,11 @@ const CardDetail = () => {
           options={[
             {
               value: false,
-              label: "Unresolved",
+              label: "Chưa giải quyết",
             },
             {
               value: true,
-              label: "Resolved",
+              label: "Đã hoàn thành",
             },
           ]}
         />
@@ -384,7 +384,7 @@ const CardDetail = () => {
     },
     {
       key: "3",
-      label: "Created at",
+      label: "Ngày tạo",
       children: (
         <DatePicker disabled defaultValue={dayjs(selectedCard?.createdAt)} />
       ),
@@ -395,7 +395,7 @@ const CardDetail = () => {
   const subCol = [
     {
       key: "1",
-      label: "Activity",
+      label: "Hoạt động",
       children: <ActivityAndComment />,
     },
   ];
@@ -403,11 +403,11 @@ const CardDetail = () => {
   const ItemPeople = [
     {
       key: "1",
-      label: "Assigned to",
+      label: "Chỉ định cho",
       children: (
         <Select
           showSearch
-          placeholder="Assigned to"
+          placeholder="Chỉ định"
           variant="borderless"
           defaultValue={
             selectedCard?.members[0]?.user?._id ||
@@ -447,12 +447,12 @@ const CardDetail = () => {
   const col1 = [
     {
       key: "1",
-      label: "Details",
+      label: "Chi tiết",
       children: <Descriptions title="" items={itemDetails} layout="" />,
     },
     {
       key: "2",
-      label: "Description",
+      label: "Mô tả",
       children: (
         <QuillTextBox
           getCleanHTML={triggerCallUpdate}
@@ -462,7 +462,7 @@ const CardDetail = () => {
     },
     {
       key: "3",
-      label: "Attachments",
+      label: "Đính kèm",
       children: <Attachment />,
     },
   ];
@@ -470,20 +470,20 @@ const CardDetail = () => {
   const col2 = [
     {
       key: "1",
-      label: "Peoples",
+      label: "Người dùng",
       children: <Descriptions title="" items={ItemPeople} layout="" />,
     },
     {
       key: "2",
-      label: "Dates",
+      label: "Ngày",
       children: <Descriptions title="" items={itemTime} layout="" />,
     },
     {
       key: "3",
-      label: "Sub Tasks",
+      label: "Task phụ",
       children:
         selectedCard?.isSubTaskOf && !selectedCard?.isSubTaskOf?._destroy ? (
-          <Flex>This is a subtask.</Flex>
+          <Flex>Đây là một task phụ.</Flex>
         ) : (
           <Flex vertical gap={8}>
             <Flex gap={8} vertical>
@@ -492,11 +492,11 @@ const CardDetail = () => {
             <Space.Compact style={{ width: "100%" }}>
               <Input
                 value={newCard}
-                placeholder="Enter card/task title"
+                placeholder="Nhập tên thẻ mới."
                 onChange={(e) => setNewCard(e.target.value)}
               />
               <Button prefix={<PlusOutlined />} onClick={handleAddNewCard}>
-                Add
+                Thêm
               </Button>
             </Space.Compact>
           </Flex>
@@ -511,13 +511,14 @@ const CardDetail = () => {
         break;
       case "delete":
         Modal.confirm({
-          title: "Are you sure delete this issue?",
+          title: "Bạn có muốn xóa task này không?",
           onOk: () => {
             handleDeleteThisTask();
           },
-          okText: "Delete",
+          okText: "Xóa",
           okType: "danger",
           centered: true,
+          cancelText: "Hủy",
         });
         break;
       default:
@@ -552,12 +553,11 @@ const CardDetail = () => {
           <Row gutter={16}>
             <Col xs={24} sm={24} md={24} lg={14}>
               <Flex gap={8}>
-                <Button icon={<EditOutlined />}>Edit</Button>
-                <Button icon={<CommentOutlined />}>Add comment</Button>
+                <Button icon={<CommentOutlined />}>Thêm bình luận</Button>
                 <Dropdown menu={menuProps}>
                   <Button>
                     <Space>
-                      More
+                      Thêm
                       <DownOutlined />
                     </Space>
                   </Button>
@@ -576,7 +576,7 @@ const CardDetail = () => {
           </Row>
           <Collapse defaultActiveKey={["1"]} ghost items={subCol} />
           <Modal
-            title="Label"
+            title="Nhãn"
             open={isModalOpen}
             onOk={handleModalOk}
             onCancel={handleCancel}

@@ -22,7 +22,7 @@ const ProfilePopup = (props) => {
   };
   return (
     <div className="profilePopup">
-      <div className=" profilePopup__title">Account</div>
+      <div className=" profilePopup__title">Tài khoản</div>
       <Flex
         className="profilePopup__item"
         align="center"
@@ -35,21 +35,21 @@ const ProfilePopup = (props) => {
         </div>
         <Flex vertical className="profilePopup__info">
           <span className="profilePopup__name">
-            {userInformation.name + userInformation.surname}
+            {userInformation.name + " " + userInformation.surname}
           </span>
           <span className="profilePopup__mail">{userInformation.email}</span>
         </Flex>
       </Flex>
       <hr />
       <div className="profilePopup__item" onClick={handleChangeAccount}>
-        Change account
+        Chuyển tài khoản
       </div>
       <Flex
         className="profilePopup__logout profilePopup__item"
         onClick={handleLogOut}
         gap={8}
       >
-        <span>Log out</span>
+        <span>Đăng xuất</span>
         <LogoutOutlined />
       </Flex>
     </div>

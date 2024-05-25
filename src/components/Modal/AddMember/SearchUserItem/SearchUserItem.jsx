@@ -29,7 +29,7 @@ const SearchUserItem = ({
       </Flex>
       {member.role && member.role === "owner" && (
         <Button className="owner-btn" type="default">
-          Owner
+          Chủ sở hữu
         </Button>
       )}
       {member.role && member.role === "member" && (
@@ -37,10 +37,12 @@ const SearchUserItem = ({
           icon={<UserDeleteOutlined />}
           disabled={!isOwner}
           className="remove-btn"
-          title={`${!isOwner ? "Only  the owner can remove members" : ""}`}
+          title={`${
+            !isOwner ? "Chỉ chủ sở hữu mới có thể xóa thành viên" : ""
+          }`}
           onClick={() => handleRemoveMember(member.user.toString())}
         >
-          Remove
+          Xóa
         </Button>
       )}
       {!member.role && !isPending && (
@@ -49,12 +51,12 @@ const SearchUserItem = ({
           icon={<MailOutlined />}
           onClick={() => handleInvite(member)}
         >
-          Invite
+          Mời
         </Button>
       )}
       {!member.role && isPending && (
         <Button type="default" icon={<MailOutlined />} loading>
-          Pending
+          Đang chờ
         </Button>
       )}
     </Flex>

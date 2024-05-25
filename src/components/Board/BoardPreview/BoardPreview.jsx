@@ -23,7 +23,7 @@ const BoardPreview = ({ board }) => {
         <img src={board.backgroundImageLink} className="BoardPreview__cover" />
         <img className="image" src={images.taskBg} />
         <div className="BoardPreview__button-detail" type="primary">
-          See Detail
+          Xem chi tiết
         </div>
       </Flex>
       <Flex className="BoardPreview__content" vertical>

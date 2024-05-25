@@ -131,7 +131,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
           // editTitleRef.current.focus();
         }}
       >
-        Change title
+        Thay đổi tiêu đề
       </Flex>
       <Flex
         className="pop__item pop__item--delete"
@@ -142,19 +142,20 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
                 style={{ color: "#FF4D4", fontSize: "20px" }}
               />
             ),
-            title: "Are you sure to delete this list?",
-            okText: "Delete",
-            cancelText: "Cancel",
+            title: "Bạn có muốn lưu trữ danh sách này không?",
+            okText: "Lưu trữ",
+            cancelText: "Hủy",
             onOk: handleListStateChange,
             centered: true,
-            content: "This list will be archived",
+            content:
+              "Danh sách này sẽ được lưu trữ và bạn có thể khôi phục tại bảng này",
             okButtonProps: {
               danger: true,
             },
           });
         }}
       >
-        Archive
+        Lưu trữ
       </Flex>
     </Flex>
   );
@@ -172,7 +173,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
           onClick={() => setIsAddNew(true)}
         >
           <PlusOutlined />
-          <span className="List-column__title">Add new List</span>
+          <span className="List-column__title">Danh sách mới</span>
         </Flex>
       )}
       {isAddNew && (
@@ -191,14 +192,14 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
             align="center"
           >
             <Button type="primary" className="btn-add" onClick={handleCreate}>
-              Add
+              Thêm
             </Button>
             <Button
               type="text"
               className="btn-add"
               onClick={() => setIsAddNew(false)}
             >
-              Cancel
+              Hủy
             </Button>
           </Flex>
         </>
@@ -229,7 +230,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
             content={content}
             title={
               <Flex justify="space-between" align="center">
-                <Flex>Actions</Flex>
+                <Flex>Hoạt động</Flex>
                 <CloseOutlined onClick={hide} />
               </Flex>
             }
@@ -258,7 +259,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
             onClick={() => setIsAddNewTask(true)}
           >
             <PlusOutlined />
-            <span>Add new task</span>
+            <span>Thêm mới</span>
           </Flex>
         )}
         {isAddNewTask && (
@@ -273,14 +274,14 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
               className="btn-add"
               onClick={() => handleAddNewTask()}
             >
-              Add
+              Thêm
             </Button>
             <Button
               type="text"
               className="btn-cancel"
               onClick={() => setIsAddNewTask(false)}
             >
-              Cancel
+              Hủy
             </Button>
           </Flex>
         )}

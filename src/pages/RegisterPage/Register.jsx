@@ -21,7 +21,7 @@ const Register = () => {
   const validateName = (_, value) => {
     const regex = /^[a-zA-Z\s]*$/;
     if (!regex.test(value)) {
-      return Promise.reject(new Error("Should contain only letters!"));
+      return Promise.reject(new Error("Chỉ nên chứa các chữ cái!"));
     }
     return Promise.resolve();
   };
@@ -38,11 +38,11 @@ const Register = () => {
         <Col xs={24} md={12} lg={12}>
           <Form.Item
             name="name"
-            label="Name"
+            label="Tên"
             rules={[
               {
                 required: true,
-                message: "Please input your name!",
+                message: "Vui lòng nhập tên của bạn!",
                 whitespace: true,
               },
               {
@@ -56,11 +56,11 @@ const Register = () => {
         <Col xs={24} md={12} lg={12}>
           <Form.Item
             name="surname"
-            label="Surname"
+            label="Họ"
             rules={[
               {
                 required: true,
-                message: "Please input your surname!",
+                message: "Vui lòng nhập họ của bạn!",
                 whitespace: true,
               },
               {
@@ -78,11 +78,11 @@ const Register = () => {
         rules={[
           {
             type: "email",
-            message: "The input is not valid E-mail!",
+            message: "Đầu vào email không hợp lệ!",
           },
           {
             required: true,
-            message: "Please input your E-mail!",
+            message: "Vui lòng nhập email của bạnl!",
           },
         ]}
       >
@@ -91,15 +91,15 @@ const Register = () => {
 
       <Form.Item
         name="password"
-        label="Password"
+        label="Mật khẩu"
         rules={[
           {
             required: true,
-            message: "Please input your password!",
+            message: "Vui lòng nhập mật khẩu!",
           },
           {
             min: 6,
-            message: "Password must be at least 6 characters.",
+            message: "Mật khẩu phải có ít nhất 6 ký tự.",
           },
         ]}
         hasFeedback
@@ -109,22 +109,20 @@ const Register = () => {
 
       <Form.Item
         name="confirm"
-        label="Confirm Password"
+        label="Nhập lại mật khẩu"
         dependencies={["password"]}
         hasFeedback
         rules={[
           {
             required: true,
-            message: "Please confirm your password!",
+            message: "Vui lòng xác nhận mật khẩu của bạn!",
           },
           ({ getFieldValue }) => ({
             validator(_, value) {
               if (!value || getFieldValue("password") === value) {
                 return Promise.resolve();
               }
-              return Promise.reject(
-                new Error("The new password that you entered do not match!")
-              );
+              return Promise.reject(new Error("Mật khẩu mới nhập không khớp!"));
             },
           }),
         ]}
@@ -134,10 +132,10 @@ const Register = () => {
 
       <Form.Item>
         <Button type="primary" htmlType="submit" className="login-form-button">
-          Register
+          Đăng ký
         </Button>
         <Divider plain></Divider>
-        Already have an account ? <Link to={"/auth/login"}>Log in !</Link>
+        Đã có tài khoản ? <Link to={"/auth/login"}>Đăng nhập !</Link>
       </Form.Item>
     </Form>
   );

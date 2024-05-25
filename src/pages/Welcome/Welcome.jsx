@@ -11,8 +11,7 @@ const Welcome = () => {
     <div className="welcome">
       <div className="welcome__nav">
         <div className="welcome__nav--item" onClick={() => navigate("/home")}>
-          <Image width={60} src={images.logo} preview={false} />
-          <div className="sitename">TMS</div>
+          <Image width={80} src={images.logo} preview={false} />
         </div>
 
         <div className="welcome__nav--item">
@@ -20,27 +19,32 @@ const Welcome = () => {
             className="welcome__nav--btn welcome__nav--login"
             onClick={() => navigate("/auth/login")}
           >
-            Log In
+            Đăng nhập
           </div>
           <div
             className="welcome__nav--btn welcome__nav--signup"
             onClick={() => navigate("/auth/register")}
           >
-            Sign Up
+            Đăng ký
           </div>
         </div>
       </div>
       <div className="welcome__wrap">
         <div className="welcome__title">
-          TMS brings all your tasks, teammates, and tools together.
+          TMS là công cụ để cộng tác, quản lý dự án và nâng cao năng suất.
         </div>
         <div className="welcome__intro">
-          Collaborate, manage projects and reach new productivity peaks. From
-          high rises to the home office, the way your team work is
-          unique--accomplish it all with TMS
+          Với các tính năng linh hoạt và dễ sử dụng, TMS mang đến một trải
+          nghiệm làm việc liền mạch, giúp bạn theo dõi tiến độ, phân công nhiệm
+          vụ và đảm bảo mọi công việc đều hoàn thành đúng hạn. Hãy để TMS trở
+          thành trợ thủ đắc lực của bạn trên con đường chinh phục thành công.
         </div>
-        <Button type="primary" className="welcome__button">
-          Sign up - {"it's"} free
+        <Button
+          type="primary"
+          className="welcome__button"
+          onClick={() => navigate("/auth/register")}
+        >
+          Đăng ký ngay
         </Button>
       </div>
       <div className="welcome__image">

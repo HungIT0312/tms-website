@@ -73,7 +73,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       >
         <Input
           ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
+          placeholder={`Tìm kiếm tên`}
           value={selectedKeys[0]}
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -94,7 +94,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               width: 90,
             }}
           >
-            Search
+            Tìm kiếm
           </Button>
           <Button
             onClick={() => clearFilters && handleReset(clearFilters)}
@@ -103,7 +103,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               width: 90,
             }}
           >
-            Reset
+            Xóa
           </Button>
           <Button
             type="link"
@@ -114,7 +114,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               });
             }}
           >
-            Filter
+            Lọc
           </Button>
           <Button
             type="link"
@@ -123,7 +123,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               close();
             }}
           >
-            close
+            Đóng
           </Button>
         </Space>
       </div>
@@ -160,28 +160,28 @@ const Analysis = ({ isOpen, setIsOpen }) => {
 
   const columns = [
     {
-      title: "Name",
+      title: "Họ và tên",
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Tasks",
+      title: "Thẻ",
       dataIndex: "Tasks",
       sorter: (a, b) => a.Tasks - b.Tasks,
     },
     {
-      title: "Unresolve",
+      title: "Chưa giải quyết",
       dataIndex: "Unresolve",
       sorter: (a, b) => a.Unresolve - b.Unresolve,
     },
     {
-      title: "Resolve",
+      title: "Đã hoàn thành",
       dataIndex: "Resolve",
       sorter: (a, b) => a.Resolve - b.Resolve,
     },
     {
-      title: "Overdue",
+      title: "Quá hạn",
       dataIndex: "Overdue",
       sorter: (a, b) => a.Overdue - b.Overdue,
       render: (text) => <div style={{ color: "red" }}>{text}</div>,
@@ -190,7 +190,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
 
   return (
     <Modal
-      title="Analysis"
+      title="Phân tích"
       centered
       open={isOpen}
       onOk={() => setIsOpen(false)}
@@ -221,13 +221,13 @@ const Analysis = ({ isOpen, setIsOpen }) => {
               <Row gutter={[16, 16]} wrap={true}>
                 <Col span={12}>
                   <Card>
-                    <Statistic title="Total Tasks" value={total} />
+                    <Statistic title="Tổng các thẻ" value={total} />
                   </Card>
                 </Col>
                 <Col span={12}>
                   <Card>
                     <Statistic
-                      title="Un-assigned"
+                      title="Chưa được chỉ định"
                       value={boardStats?.unassignedTask}
                     />
                   </Card>
@@ -235,7 +235,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
                 <Col xs={12} sm={12} md={12} lg={8}>
                   <Card>
                     <Statistic
-                      title="Resolve"
+                      title="Đã hoàn thành"
                       valueStyle={{
                         color: "#3f8600",
                       }}
@@ -250,7 +250,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
                       valueStyle={{
                         color: "#cf1322",
                       }}
-                      title="Unresolve"
+                      title="Chưa giải quyết"
                       value={boardStats?.unResolveTask}
                       prefix={<BorderOutlined />}
                       style={{ textWrap: "nowrap", lineBreak: "unset" }}
@@ -260,7 +260,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
                 <Col xs={24} sm={24} md={24} lg={8}>
                   <Card>
                     <Statistic
-                      title="Overdue Tasks"
+                      title="Quá hạn"
                       value={boardStats?.overdueTask}
                       prefix={<ExclamationCircleOutlined />}
                     />

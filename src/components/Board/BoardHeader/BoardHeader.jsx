@@ -44,16 +44,16 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
         <div
           key={member._id}
           className="owner"
-          title={`${member.name + " " + member.surname} is the owner.`}
+          title={`${member.name + " " + member.surname}.`}
         >
           <Avatar style={{ background: `${member.color}`, fontSize: 10 }}>
             {member.name[0] + member.surname[0]}
           </Avatar>
-          <span title="This member is the owner." className="owner__badge">
+          <span title="Chủ sỡ hữu." className="owner__badge">
             <Image
               src={images.owner}
               alt="owner."
-              title="This member is the owner."
+              title="Chủ sỡ hữu."
               preview={false}
               width={9}
             />
@@ -113,10 +113,10 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
       <Flex justify="center" align="center" gap={8}>
         <Popover
           placement="bottom"
-          title="Find Tasks"
+          title="Tìm kiếm thẻ"
           content={
             <Input
-              placeholder="input search text"
+              placeholder="tìm kiếm"
               onChange={onSearch}
               className="header__search"
               ref={inputRef}
@@ -134,7 +134,7 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
         >
           <Flex gap={8} className="filter-btn" align="center" justify="center">
             <SearchOutlined />
-            <span>Find</span>
+            <span>Tìm kiếm</span>
           </Flex>
         </Popover>
         <Divider
@@ -151,7 +151,7 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
           }}
         >
           <BarChartOutlined className="" />
-          <span className="">Analysis</span>
+          <span className="">Phân tích</span>
         </Flex>
         <Divider
           type="vertical"
@@ -159,14 +159,13 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
         />
         <Popover
           placement="bottom"
-          title={"Filter"}
           content={<BoardFilter />}
           arrow={false}
           trigger={"click"}
         >
           <Flex gap={8} className="filter-btn" align="center" justify="center">
             <img width={16} src={images.filterBoard} />
-            <span>Filter</span>
+            <span>Bộ lọc</span>
           </Flex>
         </Popover>
         <Divider
@@ -181,7 +180,7 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
           onClick={() => setIsOpen(true)}
         >
           <UserAddOutlined size={16} />
-          <span>Add member</span>
+          <span>Thành viên</span>
         </Flex>
         <Avatar.Group maxCount={4}>{renderMember}</Avatar.Group>
         <EllipsisOutlined
