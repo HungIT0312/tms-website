@@ -43,3 +43,19 @@ export const deleteCard = (data) => {
 export const getCard = (cardId) => {
   return http.get(`/card/${cardId}`);
 };
+//==================================================================================
+export const uploadAttachment = (data) => {
+  const { cardId, listId, boardId, ...rest } = data;
+  return http.post(`/card/${boardId}/${listId}/${cardId}/attachment`, rest);
+};
+export const deleteAttachment = (data) => {
+  const { cardId, listId, boardId, attachmentId } = data;
+  return http.post(
+    `/card/${boardId}/${listId}/${cardId}/attachment/${attachmentId}`
+  );
+};
+
+export const getActivities = (data) => {
+  const { cardId, type } = data;
+  return http.get(`/card/${cardId}/${type}`);
+};

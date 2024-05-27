@@ -8,6 +8,7 @@ import {
   removeLabelFromCard,
   updateCardInfo,
   updateDates,
+  uploadFile,
 } from "./cardThunk";
 
 const initialState = {
@@ -46,6 +47,12 @@ const cardSlice = createSlice({
     },
     updateCardSubTaskUI(state, action) {
       state.selectedCard.subTasks.push(action.payload);
+    },
+    removeAttachment(state, action) {
+      const index = state.selectedCard.attachments.findIndex(
+        (a) => a._id == action.payload
+      );
+      state.selectedCard.attachments.splice(index, 1);
     },
   },
   extraReducers: (builder) =>
@@ -142,6 +149,28 @@ const cardSlice = createSlice({
         state.message = action.payload.errMessage;
         state.isLoading = false;
         state.error = true;
+      })
+      .addCase(uploadFile.fulfilled, (state, action) => {
+        const newData = action.payload.attachment;
+        const loadingData = state.selectedCard.attachments.findIndex(
+          (a) => a == "upload"
+        );
+        state.selectedCard.attachments.splice(loadingData, 1);
+        state.selectedCard.attachments.push(newData);
+      })
+      .addCase(uploadFile.pending, (state) => {
+        state.selectedCard.attachments.push({
+          _id: "upload",
+          name: "uploading",
+          link: "",
+          status: "uploading",
+        });
+      })
+      .addCase(uploadFile.rejected, (state) => {
+        const loadingData = state.selectedCard.attachments.findIndex(
+          (a) => a == "upload"
+        );
+        state.selectedCard.attachments.splice(loadingData, 1);
       }),
 });
 
@@ -153,6 +182,8 @@ export const {
   addLabelToCardUI,
   updateCardDateCompletedUI,
   updateCardSubTaskUI,
+  removeAttachment,
+  uploadFileUI,
 } = cardSlice.actions;
 
 export default cardSlice.reducer;

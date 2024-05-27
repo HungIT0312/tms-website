@@ -1,38 +1,107 @@
+/* eslint-disable react/prop-types */
 import { InboxOutlined } from "@ant-design/icons";
 import { message } from "antd";
 import Dragger from "antd/es/upload/Dragger";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { removeAttachment } from "../../../../stores/card/cardSlice";
+import { deleteFile, uploadFile } from "../../../../stores/card/cardThunk";
+import getAudioUpload from "../../../../utils/UploadFile";
 
 const Attachment = () => {
-  const props = {
-    name: "file",
-    multiple: true,
-    action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
-    onChange(info) {
-      const { status } = info.file;
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
+  const [initFiles, setInitFiles] = useState([]);
+  const { selectedCard } = useSelector((state) => state.card);
+  const { boardId } = useParams();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const initAttachment = selectedCard?.attachments?.map((a) => {
+      return {
+        uid: a._id,
+        name: a.name,
+        status: a.status ? "uploading" : "success",
+        url: a.link,
+        thumbUrl: a.link,
+      };
+    });
+    setInitFiles(initAttachment);
+  }, [selectedCard?.attachments]);
+
+  const onDrop = (e) => {
+    console.log("Dropped files", e.dataTransfer.files);
+  };
+  const onChange = async (info) => {
+    if (info.fileList?.length < initFiles?.length) {
+      const data = {
+        boardId: boardId,
+        listId: selectedCard?.owner,
+        cardId: selectedCard?._id,
+        attachmentId: info.file.uid,
+      };
+      dispatch(deleteFile(data));
+      dispatch(removeAttachment(info?.file.uid));
+      message.success(`Đã gỡ tệp ${info.file.name} .`);
+    }
+    if (info.fileList?.length > initFiles?.length) {
+      const rs = await getAudioUpload(info?.file);
+      if (rs) {
+        dispatch(
+          uploadFile({
+            boardId: boardId,
+            listId: selectedCard?.owner,
+            cardId: selectedCard?._id,
+            link: rs.url,
+            name: rs.original_filename + "." + rs.format,
+          })
+        );
+        message.success(`${info.file.name} tải lên thành công.`);
       }
-      if (status === "done") {
-        message.success(`${info.file.name} file uploaded successfully.`);
-      } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
-    },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
+    }
+  };
+  const onPreview = async (file) => {
+    window.open(file.url, "_blank");
+  };
+
+  const beforeUpload = (file) => {
+    const isFile =
+      file.type === "image/jpeg" ||
+      file.type === "image/png" ||
+      file.type === "image/gif";
+    if (!isFile) {
+      message.error("Bạn chỉ có thể tải lên tệp ảnh!");
+      return true;
+    }
+    const maxSizeFile = 1024 * 1024 * 7;
+    const isLt2M = file.size && file.size < maxSizeFile;
+    if (!isLt2M) {
+      message.error("Tệp phải nhỏ hơn 7MB!");
+      return true;
+    }
+    return false;
   };
   return (
-    <Dragger {...props}>
+    <Dragger
+      name="file"
+      listType="picture"
+      multiple
+      action={"https://localhost:5173"}
+      accept=".png,.gif,.jpg"
+      beforeUpload={beforeUpload}
+      defaultFileList={initFiles}
+      fileList={initFiles}
+      onChange={onChange}
+      onDrop={onDrop}
+      onPreview={onPreview}
+      withCredentials={true}
+      // onRemove={onRemove}
+    >
       <p className="ant-upload-drag-icon">
         <InboxOutlined />
       </p>
-      <p className="ant-upload-text">
-        Click or drag file to this area to upload
-      </p>
+      <p className="ant-upload-text">Bấm hoặc thả tệp vào đây để tải lên</p>
       <p className="ant-upload-hint">
-        Support for a single or bulk upload. Strictly prohibited from uploading
-        company data or other banned files.
+        Hỗ trợ tải lên một lần hoặc hàng loạt. Nghiêm cấm tải lên dữ liệu công
+        ty hoặc các tập tin bị cấm khác.
       </p>
     </Dragger>
   );

@@ -4,7 +4,6 @@ import {
   CommentOutlined,
   DeleteOutlined,
   DownOutlined,
-  EditOutlined,
   PlusOutlined,
   TagsOutlined,
 } from "@ant-design/icons";
@@ -281,6 +280,7 @@ const CardDetail = () => {
     dispatch(updateCardMemberUI(dataAddDate));
     dispatch(changeMemberAssign({ ...dataAddDate, memberId: e }));
   };
+
   //==============================================================  //==============================================================
   const items = [
     {
@@ -463,7 +463,7 @@ const CardDetail = () => {
     {
       key: "3",
       label: "Đính kèm",
-      children: <Attachment />,
+      children: <Attachment selectedCard={selectedCard} />,
     },
   ];
 

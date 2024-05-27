@@ -3,12 +3,14 @@ import {
   addCardLabel,
   changeMemberCard,
   createCard,
+  deleteAttachment,
   deleteCard,
   getCard,
   removeCardLabel,
   updateCard,
   updateDateCompleted,
   updateStartDueDates,
+  uploadAttachment,
 } from "../../api/card/card.api";
 
 export const addCard = createAsyncThunk(
@@ -105,6 +107,28 @@ export const getCardById = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await getCard(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const uploadFile = createAsyncThunk(
+  "board/uploadFile",
+  async (data, thunkApi) => {
+    try {
+      const response = await uploadAttachment(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const deleteFile = createAsyncThunk(
+  "board/deleteFile",
+  async (data, thunkApi) => {
+    try {
+      const response = await deleteAttachment(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);
