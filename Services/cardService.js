@@ -506,316 +506,6 @@ const changeCardMember = async (
   }
 };
 
-const createChecklist = async (
-  cardId,
-  listId,
-  boardId,
-  user,
-  title,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to add Checklist this card";
-    }
-
-    //Add checklist
-    card.checklists.push({
-      title: title,
-    });
-    await card.save();
-
-    const checklistId = card.checklists[card.checklists.length - 1]._id;
-
-    //Add to board activity
-    board.activity.unshift({
-      user: user._id,
-      action: `đã thêm '${title}' vào ${card.title}`,
-    });
-    board.save();
-
-    return callback(false, { checklistId: checklistId });
-  } catch (error) {
-    return callback({
-      errMessage: "Đã có lỗi xảy ra",
-      details: error.message,
-    });
-  }
-};
-
-const deleteChecklist = async (
-  cardId,
-  listId,
-  boardId,
-  checklistId,
-  user,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to delete this checklist";
-    }
-    let cl = card.checklists.filter(
-      (l) => l._id.toString() === checklistId.toString()
-    );
-    //Delete checklist
-    card.checklists = card.checklists.filter(
-      (list) => list._id.toString() !== checklistId.toString()
-    );
-    await card.save();
-
-    //Add to board activity
-    board.activity.unshift({
-      user: user._id,
-      action: `removed '${cl.title}' from ${card.title}`,
-    });
-    board.save();
-
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      errMessage: "Đã có lỗi xảy ra",
-      details: error.message,
-    });
-  }
-};
-
-const addChecklistItem = async (
-  cardId,
-  listId,
-  boardId,
-  user,
-  checklistId,
-  text,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to add item this checklist";
-    }
-
-    //Add checklistItem
-    card.checklists = card.checklists.map((list) => {
-      if (list._id.toString() == checklistId.toString()) {
-        list.items.push({ text: text });
-      }
-      return list;
-    });
-    await card.save();
-
-    // Get to created ChecklistItem's id
-    let checklistItemId = "";
-    card.checklists = card.checklists.map((list) => {
-      if (list._id.toString() == checklistId.toString()) {
-        checklistItemId = list.items[list.items.length - 1]._id;
-      }
-      return list;
-    });
-    return callback(false, { checklistItemId: checklistItemId });
-  } catch (error) {
-    return callback({
-      errMessage: "Đã có lỗi xảy ra",
-      details: error.message,
-    });
-  }
-};
-
-const setChecklistItemCompleted = async (
-  cardId,
-  listId,
-  boardId,
-  user,
-  checklistId,
-  checklistItemId,
-  completed,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to set complete of this checklist item";
-    }
-    let clItem = "";
-    //Update completed of checklistItem
-    card.checklists = card.checklists.map((list) => {
-      if (list._id.toString() == checklistId.toString()) {
-        list.items = list.items.map((item) => {
-          if (item._id.toString() === checklistItemId) {
-            item.completed = completed;
-            clItem = item.text;
-          }
-          return item;
-        });
-      }
-      return list;
-    });
-    await card.save();
-
-    //Add to board activity
-    board.activity.unshift({
-      user: user._id,
-      action: completed
-        ? `completed '${clItem}' on ${card.title}`
-        : `marked as uncompleted to '${clItem}' on ${card.title}`,
-    });
-    board.save();
-
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      errMessage: "Đã có lỗi xảy ra",
-      details: error.message,
-    });
-  }
-};
-
-const setChecklistItemText = async (
-  cardId,
-  listId,
-  boardId,
-  user,
-  checklistId,
-  checklistItemId,
-  text,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to set text of this checklist item";
-    }
-
-    //Update text of checklistItem
-    card.checklists = card.checklists.map((list) => {
-      if (list._id.toString() == checklistId.toString()) {
-        list.items = list.items.map((item) => {
-          if (item._id.toString() === checklistItemId) {
-            item.text = text;
-          }
-          return item;
-        });
-      }
-      return list;
-    });
-    await card.save();
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      errMessage: "Đã có lỗi xảy ra",
-      details: error.message,
-    });
-  }
-};
-
-const deleteChecklistItem = async (
-  cardId,
-  listId,
-  boardId,
-  user,
-  checklistId,
-  checklistItemId,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      errMessage: "You dont have permission to delete this checklist item";
-    }
-
-    //Delete checklistItem
-    card.checklists = card.checklists.map((list) => {
-      if (list._id.toString() == checklistId.toString()) {
-        list.items = list.items.filter(
-          (item) => item._id.toString() !== checklistItemId
-        );
-      }
-      return list;
-    });
-    await card.save();
-    return callback(false, { message: "Success!" });
-  } catch (error) {
-    return callback({
-      errMessage: "Đã có lỗi xảy ra",
-      details: error.message,
-    });
-  }
-};
-
 const updateStartDueDates = async (
   cardId,
   listId,
@@ -973,8 +663,7 @@ const addAttachment = async (
     board.save();
 
     return callback(false, {
-      attachmentId:
-        card.attachments[card.attachments.length - 1]._id.toString(),
+      attachment: card.attachments[card.attachments.length - 1],
     });
   } catch (error) {
     return callback({
@@ -1175,7 +864,34 @@ const removeLabelFromCard = async (cardId, labelId, callback) => {
     });
   }
 };
-
+const getActivitiesById = async (cardId, type, callback) => {
+  try {
+    const card = await cardModel.findById(cardId).populate("activities.user");
+    if (!card) {
+      return callback({ errMessage: "Không tìm thấy thẻ" });
+    }
+    if (type == "comment") {
+      const newAc = card.activities.filter(
+        (activity) => activity.isComment == true
+      );
+      return callback(false, {
+        activities: newAc,
+      });
+    } else {
+      const newAc = card.activities.filter(
+        (activity) => activity.isComment == false
+      );
+      return callback(false, {
+        activities: newAc,
+      });
+    }
+  } catch (err) {
+    return callback({
+      errMessage: "Đã có lỗi xảy ra",
+      details: err.message,
+    });
+  }
+};
 module.exports = {
   create,
   update,
@@ -1185,12 +901,6 @@ module.exports = {
   updateComment,
   deleteComment,
   changeCardMember,
-  createChecklist,
-  deleteChecklist,
-  addChecklistItem,
-  setChecklistItemCompleted,
-  setChecklistItemText,
-  deleteChecklistItem,
   updateStartDueDates,
   updateDateCompleted,
   addAttachment,
@@ -1199,4 +909,5 @@ module.exports = {
   updateCover,
   addLabelToCard,
   removeLabelFromCard,
+  getActivitiesById,
 };

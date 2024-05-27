@@ -8,11 +8,8 @@ router.put(
   cardController.updateCover
 );
 //=========================================================================================
-router.put(
-  "/:boardId/:listId/:cardId/attachment/:attachmentId",
-  cardController.updateAttachment
-);
-router.delete(
+
+router.post(
   "/:boardId/:listId/:cardId/attachment/:attachmentId",
   cardController.deleteAttachment
 );
@@ -28,31 +25,6 @@ router.put(
 router.patch(
   "/:boardId/:listId/:cardId/date-completed",
   cardController.updateDateCompleted
-);
-//=========================================================================================
-router.post(
-  "/:boardId/:listId/:cardId/checklist/:checklistId/item",
-  cardController.addChecklistItem
-);
-router.delete(
-  "/:boardId/:listId/:cardId/checklist/:checklistId/item/:checklistItemId",
-  cardController.deleteChecklistItem
-);
-router.put(
-  "/:boardId/:listId/:cardId/checklist/:checklistId/item/:checklistItemId/text",
-  cardController.setChecklistItemText
-);
-router.put(
-  "/:boardId/:listId/:cardId/checklist/:checklistId/item/:checklistItemId/complete",
-  cardController.setChecklistItemCompleted
-);
-router.delete(
-  "/:boardId/:listId/:cardId/checklist/:checklistId",
-  cardController.deleteChecklist
-);
-router.post(
-  "/:boardId/:listId/:cardId/checklist",
-  cardController.createChecklist
 );
 //=========================================================================================
 router.post("/label", cardController.addLabelToCard);
@@ -80,4 +52,7 @@ router.delete(
   "/:boardId/:listId/:cardId/comment/:commentId",
   cardController.deleteComment
 );
+//=============================================================
+router.get("/:cardId/:type", cardController.getActivitiesById);
+
 module.exports = router;
