@@ -265,7 +265,7 @@ const update = async (cardId, listId, boardId, user, updatedObj, callback) => {
   }
 };
 
-const addComment = async (cardId, listId, boardId, user, body, callback) => {
+const addComment = async (cardId, listId, boardId, user, text, callback) => {
   try {
     // Get models
     const card = await cardModel.findById(cardId);
@@ -289,23 +289,23 @@ const addComment = async (cardId, listId, boardId, user, body, callback) => {
     //Add comment
     card.activities.unshift({
       user: user._id,
-      action: body.text,
+      action: text,
       actionType: "comment",
       cardTitle: card.title,
       isComment: true,
     });
     await card.save();
-
+    const newComments = await cardModel
+      .findById(cardId)
+      .populate("activities.user");
     //Add comment to board activity
     board.activity.unshift({
       user: user._id,
-      action: body.text,
-      actionType: "comment",
-      cardTitle: card.title,
+      action: `đã thêm một bình luận trong thẻ "${card.title}"`,
     });
     board.save();
 
-    return callback(false, card.activities);
+    return callback(false, newComments.activities[0]);
   } catch (error) {
     return callback({
       errMessage: "Đã có lỗi xảy ra",
@@ -320,7 +320,7 @@ const updateComment = async (
   boardId,
   commentId,
   user,
-  body,
+  text,
   callback
 ) => {
   try {
@@ -350,7 +350,7 @@ const updateComment = async (
               "Bạn không thể chỉnh sửa bình luận mà bạn chưa thực hiện",
           });
         }
-        activity.action = body.text; // Update the comment text
+        activity.action = text; // Update the comment text
         activity.isComment = true; // Mark the activity as a comment
       }
       return activity;
@@ -360,10 +360,7 @@ const updateComment = async (
     //Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: body.text,
-      actionType: "comment",
-      edited: true,
-      cardTitle: card.title,
+      action: `đã thay đổi một bình luận trong thẻ "${card.title}"`,
     });
     board.save();
 
@@ -411,7 +408,7 @@ const deleteComment = async (
     //Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: `đã xóa nhận xét của chính mình khỏi ${card.title}`,
+      action: `đã xóa nhận xét của ra khỏi ${card.title}`,
     });
     board.save();
 
@@ -545,73 +542,42 @@ const updateStartDueDates = async (
     if (dueTime) {
       card.date.dueTime = dueTime;
     }
-    card.activities.unshift({
-      user: user._id,
-      action: `đã cập nhật ngày đến hạn từ ${dayjs(startDate)
-        .toDate()
-        .toDateString()} đến ${dayjs(dueDate).toDate().toDateString()}`,
-    });
-    card.date.completed = completed;
-    if (dueDate === null) card.date.completed = false;
-    await card.save();
-    return callback(false, { message: "Cập nhật thành công!" });
-  } catch (error) {
-    return callback({
-      errMessage: "Đã có lỗi xảy ra",
-      details: error.message,
-    });
-  }
-};
-
-const updateDateCompleted = async (
-  cardId,
-  listId,
-  boardId,
-  user,
-  completed,
-  callback
-) => {
-  try {
-    // Get models
-    const card = await cardModel.findById(cardId);
-    const list = await listModel.findById(listId);
-    const board = await boardModel.findById(boardId);
-
-    // Validate owner
-    const validate = await helperMethods.validateCardOwners(
-      card,
-      list,
-      board,
-      user,
-      false
-    );
-    if (!validate) {
-      callback({
-        errMessage: "You dont have permission to update date of this card",
+    if (startDate || dueDate) {
+      card.activities.unshift({
+        user: user._id,
+        action: `đã cập nhật ngày đến hạn từ ${
+          startDate
+            ? dayjs(startDate).toDate().toDateString()
+            : "không có ngày bắt đầu"
+        } đến ${
+          dueDate
+            ? dayjs(dueDate).toDate().toDateString()
+            : "không có ngày kết thúc"
+        }`,
       });
     }
+    if (card.date.completed !== completed) {
+      card.date.completed = completed;
+      if (completed) {
+        card.date.resolvedAt = Date.now();
+        card.activities.unshift({
+          user: user._id,
+          action: `đã cập nhật trạng thái của thẻ là hoàn thành`,
+        });
+      } else {
+        card.date.resolvedAt = null;
+        if (dueDate === null) {
+          card.date.completed = false;
+        }
+        card.activities.unshift({
+          user: user._id,
+          action: `đã cập nhật trạng thái của thẻ là chưa hoàn thành`,
+        });
+      }
+    }
 
-    //Update date completed event
-    card.date.completed = completed;
-    card.activities.unshift({
-      user: user._id,
-      action: `đã cập nhật trạng thái của thẻ  ${
-        completed ? "đã hoàn thành" : "chưa giải quyết"
-      }`,
-    });
     await card.save();
-
-    //Add to board activity
-    board.activity.unshift({
-      user: user._id,
-      action: `đã cập nhật trạng thái của thẻ ${card.title} ${
-        completed ? "đã hoàn thành" : "chưa giải quyết"
-      }`,
-    });
-
-    await board.save();
-
-    return callback(false, { message: "Thành công!" });
+    return callback(false, { message: "Cập nhật thành công!" });
   } catch (error) {
     return callback({
       errMessage: "Đã có lỗi xảy ra",
@@ -902,7 +868,6 @@ module.exports = {
   deleteComment,
   changeCardMember,
   updateStartDueDates,
-  updateDateCompleted,
   addAttachment,
   deleteAttachment,
   updateAttachment,

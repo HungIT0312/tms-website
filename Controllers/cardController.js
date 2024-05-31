@@ -69,15 +69,15 @@ const update = async (req, res) => {
 const addComment = async (req, res) => {
   // Get params
   const user = req.user;
-  const { boardId, listId, cardId } = req.params;
-
+  const { cardId } = req.params;
+  const { boardId, listId, text } = req.body;
   // Call the card service
   await cardService.addComment(
     cardId,
     listId,
     boardId,
     user,
-    req.body,
+    text,
     (err, result) => {
       if (err) return res.status(500).send(err);
       return res.status(200).send(result);
@@ -88,7 +88,8 @@ const addComment = async (req, res) => {
 const updateComment = async (req, res) => {
   // Get params
   const user = req.user;
-  const { boardId, listId, cardId, commentId } = req.params;
+  const { cardId, commentId } = req.params;
+  const { text, listId, boardId } = req.body;
 
   // Call the card service
   await cardService.updateComment(
@@ -97,7 +98,7 @@ const updateComment = async (req, res) => {
     boardId,
     commentId,
     user,
-    req.body,
+    text,
     (err, result) => {
       if (err) return res.status(500).send(err);
       return res.status(200).send(result);
@@ -108,7 +109,8 @@ const updateComment = async (req, res) => {
 const deleteComment = async (req, res) => {
   // Get params
   const user = req.user;
-  const { boardId, listId, cardId, commentId } = req.params;
+  const { cardId, commentId } = req.params;
+  const { listId, boardId } = req.body;
 
   // Call the card service
   await cardService.deleteComment(
@@ -157,23 +159,6 @@ const updateStartDueDates = async (req, res) => {
     startDate,
     dueDate,
     dueTime,
-    completed,
-    (err, result) => {
-      if (err) return res.status(500).send(err);
-      return res.status(200).send(result);
-    }
-  );
-};
-
-const updateDateCompleted = async (req, res) => {
-  const user = req.user;
-  const { boardId, listId, cardId } = req.params;
-  const completed = req.body;
-  await cardService.updateDateCompleted(
-    cardId,
-    listId,
-    boardId,
-    user,
     completed,
     (err, result) => {
       if (err) return res.status(500).send(err);
@@ -280,7 +265,6 @@ module.exports = {
   updateComment,
   deleteComment,
   updateStartDueDates,
-  updateDateCompleted,
   addAttachment,
   deleteAttachment,
   updateCover,

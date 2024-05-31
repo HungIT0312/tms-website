@@ -135,7 +135,7 @@ const getAllListByFilter = async (req, res) => {
   try {
     // Extract parameters from the request body
     const { boardId } = req.params;
-    const { users, labels, dueDates } = req.body;
+    const { users, labels, dueDates, completed } = req.body;
 
     // Extract user IDs from the users array
     const userIds = users.map((user) => user.user);
@@ -160,6 +160,7 @@ const getAllListByFilter = async (req, res) => {
       userIds,
       labelIds,
       dueDates,
+      completed,
       (err, result) => {
         if (err) {
           return res.status(500).send(err);
@@ -184,6 +185,7 @@ const changeCardToAnotherList = async (req, res) => {
     boardId,
     user,
     newListId,
+    completed,
     cardId,
     (err, result) => {
       if (err) return res.status(400).send(err);

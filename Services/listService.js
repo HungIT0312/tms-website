@@ -10,32 +10,18 @@ dayjs.extend(weekday);
 dayjs.extend(localeData);
 const create = async (model, user, callback) => {
   try {
-    // Create new List
-
     const tempList = await listModel(model);
-
-    // Save the new List
     const newList = await tempList.save();
-
-    // Get owner board
     const ownerBoard = await boardModel.findById(model.owner);
-
-    // Add newList's id to owner board
     ownerBoard.lists.push(newList.id);
 
-    // Add created activity to owner board activities
     ownerBoard.activity.unshift({
       user: user._id,
-      action: `đã thêm danh sách "${new List.title()}" vào bảng này`,
+      action: `đã thêm danh sách "${newList.title}" vào bảng này`,
     });
-
-    // Save changes
     ownerBoard.save();
-
-    // Return new list
     return callback(false, newList);
   } catch (error) {
-    // Return error message
     return callback({
       errMessage: "Đã có lỗi xảy ra",
       details: error.message,
@@ -329,6 +315,7 @@ const getAllListByFilter = async (
   userIds,
   labelIds,
   dueDates,
+  completed,
   callback
 ) => {
   try {
@@ -381,13 +368,15 @@ const getAllListByFilter = async (
       : userIds.length > 0
       ? { "members.user": { $in: userIds } }
       : {};
-
+    const completedFilter =
+      completed !== undefined ? { "date.completed": completed } : {};
     // Build the complete card query
     const cardQuery = {
       $and: [
         userFilter,
         labelIds.length > 0 ? { labels: { $in: labelIds } } : {},
         dueDateFilter.$or.length > 0 ? dueDateFilter : {},
+        completedFilter,
       ].filter((query) => Object.keys(query).length > 0),
     };
 

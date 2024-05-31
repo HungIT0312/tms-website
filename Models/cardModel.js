@@ -62,6 +62,13 @@ const cardSchema = mongoose.Schema({
       type: Boolean,
       default: false,
     },
+    resolvedAt: {
+      type: Date,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   attachments: [
     {
@@ -161,5 +168,8 @@ const cardSchema = mongoose.Schema({
     ref: "card",
   },
 });
-
+cardSchema.pre("save", function (next) {
+  this.date.updatedAt = Date.now();
+  next();
+});
 module.exports = mongoose.model("card", cardSchema);

@@ -22,10 +22,7 @@ router.put(
   "/:boardId/:listId/:cardId/dates",
   cardController.updateStartDueDates
 );
-router.patch(
-  "/:boardId/:listId/:cardId/date-completed",
-  cardController.updateDateCompleted
-);
+
 //=========================================================================================
 router.post("/label", cardController.addLabelToCard);
 
@@ -43,15 +40,9 @@ router.get("/:cardId", cardController.getCard);
 router.put("/:boardId/:listId/:cardId", cardController.update);
 //=========================================================================================
 
-router.post("/:boardId/:listId/:cardId/comment", cardController.addComment);
-router.put(
-  "/:boardId/:listId/:cardId/comment/:commentId",
-  cardController.updateComment
-);
-router.delete(
-  "/:boardId/:listId/:cardId/comment/:commentId",
-  cardController.deleteComment
-);
+router.post("/:cardId/comment", cardController.addComment);
+router.patch("/:cardId/comment/:commentId", cardController.updateComment);
+router.post("/:cardId/comment/:commentId", cardController.deleteComment);
 //=============================================================
 router.get("/:cardId/:type", cardController.getActivitiesById);
 
