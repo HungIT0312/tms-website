@@ -31,7 +31,7 @@ import localeData from "dayjs/plugin/localeData";
 import utc from "dayjs/plugin/utc";
 import weekday from "dayjs/plugin/weekday";
 import _ from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EditText } from "react-edit-text";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -77,6 +77,8 @@ const CardDetail = () => {
   const [status, setStatus] = useState("");
   const [newCard, setNewCard] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
+  const cmtRef = useRef(null);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -351,6 +353,7 @@ const CardDetail = () => {
             onChange={handleDateChange}
             defaultValue={renderDate()}
             status={status}
+            allowClear={false}
           />
         </Tooltip>
       ),
@@ -383,10 +386,27 @@ const CardDetail = () => {
       span: 4,
     },
     {
+      key: "4",
+      label: "Cập nhật lúc",
+      children: (
+        <DatePicker
+          defaultValue={dayjs(selectedCard?.date?.updatedAt)}
+          minDate={dayjs(selectedCard?.date?.updatedAt)}
+          maxDate={dayjs(selectedCard?.date?.updatedAt)}
+          allowClear={false}
+        />
+      ),
+      span: 4,
+    },
+    {
       key: "3",
       label: "Ngày tạo",
       children: (
-        <DatePicker disabled defaultValue={dayjs(selectedCard?.createdAt)} />
+        <DatePicker
+          disabled
+          defaultValue={dayjs(selectedCard?.createdAt)}
+          allowClear={false}
+        />
       ),
       span: 4,
     },
@@ -396,7 +416,11 @@ const CardDetail = () => {
     {
       key: "1",
       label: "Hoạt động",
-      children: <ActivityAndComment />,
+      children: (
+        <div ref={cmtRef}>
+          <ActivityAndComment />
+        </div>
+      ),
     },
   ];
 
@@ -553,7 +577,18 @@ const CardDetail = () => {
           <Row gutter={16}>
             <Col xs={24} sm={24} md={24} lg={14}>
               <Flex gap={8}>
-                <Button icon={<CommentOutlined />}>Thêm bình luận</Button>
+                <Button
+                  icon={<CommentOutlined />}
+                  onClick={() => {
+                    if (cmtRef.current) {
+                      cmtRef.current.scrollIntoView({
+                        behavior: "smooth",
+                      });
+                    }
+                  }}
+                >
+                  Thêm bình luận
+                </Button>
                 <Dropdown menu={menuProps}>
                   <Button>
                     <Space>

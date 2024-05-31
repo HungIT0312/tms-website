@@ -162,7 +162,7 @@ const CardItem = ({
       onClick={handleSelectCard}
     >
       <Popover
-        title="Change position"
+        title="Thay đổi vị trí"
         placement="bottomLeft"
         content={renderContent}
         onClick={(e) => e.stopPropagation()}

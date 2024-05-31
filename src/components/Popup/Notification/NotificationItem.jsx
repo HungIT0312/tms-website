@@ -1,13 +1,23 @@
 /* eslint-disable react/prop-types */
 import { Flex } from "antd";
 import "./notice.scss";
+import formatDateTime from "../../../helpers/formatDatetime";
 const NotificationItem = ({ notice = {} }) => {
-  const date = new Date(notice.createdAt).toLocaleDateString("en-GB");
-
   return (
     <Flex vertical className="notice-item">
-      <div dangerouslySetInnerHTML={{ __html: notice?.message }}></div>
-      <div className="invitation__date">At {date}</div>
+      <div
+        style={{
+          fontSize: 14,
+        }}
+        dangerouslySetInnerHTML={{ __html: notice?.message }}
+      ></div>
+      <small
+        style={{
+          fontSize: 14,
+        }}
+      >
+        {formatDateTime(notice.createdAt)}
+      </small>
     </Flex>
   );
 };

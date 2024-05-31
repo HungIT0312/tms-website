@@ -2,19 +2,16 @@ import { BellFilled, MailFilled } from "@ant-design/icons";
 import { Avatar, Badge, Flex, Image } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import images from "../../constants/images";
+import { socket } from "../../main";
+import { setAddInvitation } from "../../stores/invitation/invitationSlice";
 import { getAllInvite } from "../../stores/invitation/invitationThunk";
-import ProfileModal from "../Modal/Profile/ProfileModal";
+import { getAllNoticeById } from "../../stores/notice/noticeThunk";
 import InvitationPopup from "../Popup/Ivitation/InvitationPopup";
+import NotificationPopup from "../Popup/Notification/NotificationPopup";
 import ProfilePopup from "../Popup/Profile/ProfilePopup";
 import "./Header.scss";
-import { useNavigate } from "react-router-dom";
-import { socket } from "../../main";
-import { setNotifications } from "../../stores/notice/noticeSlice";
-import { getAllNoticeById } from "../../stores/notice/noticeThunk";
-import NotificationPopup from "../Popup/Notification/NotificationPopup";
-import { updateCardMemberUI } from "../../stores/list/ListSlice";
-import { setAddInvitation } from "../../stores/invitation/invitationSlice";
 
 export const Header = () => {
   const [isPopup, setIsPopup] = useState(false);
@@ -133,7 +130,7 @@ export const Header = () => {
         </div>
         {isPopup && (
           <div className="header__popup" ref={popupRef}>
-            <ProfilePopup showModal={showModal} />
+            <ProfilePopup />
           </div>
         )}
         {isInvitationPop && (
@@ -152,7 +149,6 @@ export const Header = () => {
             />
           </div>
         )}
-        <ProfileModal isOpen={open} callback={setOpen} />
       </div>
     </Flex>
   );

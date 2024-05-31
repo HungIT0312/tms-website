@@ -59,3 +59,20 @@ export const getActivities = (data) => {
   const { cardId, type } = data;
   return http.get(`/card/${cardId}/${type}`);
 };
+//=============================================================
+export const addComment = (data) => {
+  const { cardId, ...rest } = data;
+  return http.post(`/card/${cardId}/comment`, rest);
+};
+
+export const updateComment = (data) => {
+  const { cardId, commentId, ...rest } = data;
+  return http.patch(`/card/${cardId}/comment/${commentId}`, rest);
+};
+export const deleteComment = (data) => {
+  const { cardId, commentId, ...rest } = data;
+  return http.post(`/card/${cardId}/comment/${commentId}`, rest);
+};
+// router.post("/:cardId/comment", cardController.addComment);
+// router.put("/:cardId/comment/:commentId", cardController.updateComment);
+// router.delete("/:cardId/comment/:commentId", cardController.deleteComment);

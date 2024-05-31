@@ -8,6 +8,7 @@ import Workspace from "../pages/WorkspacePage/Workspace";
 import Board from "../pages/BoardPage/Board";
 import VerifiedMail from "../pages/VerifiedPage/VerifiedMail";
 import CardDetail from "../components/Modal/CardDetail/CardDetail";
+import UserPage from "../pages/UserPage/UserPage";
 
 const routes = createBrowserRouter([
   {
@@ -58,7 +59,7 @@ const routes = createBrowserRouter([
         children: [
           {
             path: "",
-            element: <></>,
+            element: <UserPage />,
           },
           {
             path: "activity",

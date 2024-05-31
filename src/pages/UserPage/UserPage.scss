@@ -1,0 +1,39 @@
+.user-page {
+  position: relative;
+  padding: 48px 0px 0px 0px;
+  height: calc(100vh - 48px);
+  position: relative;
+  &__verified {
+    background-color: #fff;
+    border-radius: 40px;
+    color: green;
+  }
+  .ant-input[disabled] {
+    background-color: #ffffff !important;
+    color: rgba(0, 0, 0, 0.85); // Optional: Change text color if needed
+  }
+
+  .ant-input-password[disabled] .ant-input {
+    background-color: #ffffff !important;
+  }
+
+  .edit-text[disabled] {
+    background-color: #ffffff !important;
+  }
+  width: 100vw;
+  &__form {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    padding: 24px 128px;
+    border-radius: 8px;
+  }
+  &__avatar {
+    // width: 100%;
+    padding: 24px 0px;
+  }
+  .title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .back {
+  }
+}

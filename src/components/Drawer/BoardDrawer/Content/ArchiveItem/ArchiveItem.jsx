@@ -33,7 +33,7 @@ const ArchiveItem = ({ list }) => {
     };
     dispatch(deleteListById(deleteData));
     message.success({
-      content: "Successfully deleted the archive.",
+      content: "Xóa thành công.",
     });
   };
   const handleListStateChange = () => {
@@ -57,17 +57,17 @@ const ArchiveItem = ({ list }) => {
                 style={{ color: "#FF4D4", fontSize: "20px" }}
               />
             ),
-            title: "Are you sure to restore this list?",
-            okText: "Restore",
-            cancelText: "Cancel",
+            title: "Bạn có muốn khôi phục danh sách này không?",
+            okText: "Khôi phục",
+            cancelText: "Hủy",
             onOk: handleListStateChange,
             centered: true,
-            content: "This list will be back to board ",
+            content: "Danh sách này sẽ quay trở lại bảng",
           });
         }}
       >
         <SyncOutlined />
-        Restore
+        Khôi phục
       </Flex>
       <Flex
         gap={8}
@@ -79,12 +79,12 @@ const ArchiveItem = ({ list }) => {
                 style={{ color: "#FF4D4", fontSize: "20px" }}
               />
             ),
-            title: "Are you sure to delete this list?",
-            okText: "Delete",
-            cancelText: "Cancel",
+            title: "Bạn có muốn xóa danh sách này không?",
+            okText: "Xóa",
+            cancelText: "Hủy",
             onOk: handleDelete,
             centered: true,
-            content: "This list will be delete from website",
+            content: "Danh sách này sẽ bị xóa khỏi bảng",
             okButtonProps: {
               danger: true,
             },
@@ -92,7 +92,7 @@ const ArchiveItem = ({ list }) => {
         }}
       >
         <DeleteOutlined />
-        Delete
+        Xóa vĩnh viễn
       </Flex>
     </Flex>
   );
@@ -100,14 +100,14 @@ const ArchiveItem = ({ list }) => {
     <Flex className="archive-item" justify="space-between" align="center">
       <Flex gap={16}>
         <span className="archive-item__title">{list?.title}</span>/
-        <span>{list?.cards.length} cards</span>
+        <span>{list?.cards.length} thẻ</span>
       </Flex>
       <Popover
         placement="bottomLeft"
         content={content}
         title={
           <Flex justify="space-between" align="center">
-            <Flex>Actions</Flex>
+            <Flex>Hành động</Flex>
             <CloseOutlined onClick={hide} />
           </Flex>
         }

@@ -1,10 +1,13 @@
-import { Button, Flex, Spin, Tabs } from "antd";
-import { useSelector } from "react-redux";
-import Activity from "../../../Activity/Activity";
-import { useEffect, useRef, useState } from "react";
-import { getActivities } from "../../../../api/card/card.api";
+import { Button, Flex, Spin, Tabs, message } from "antd";
 import { cloneDeep } from "lodash";
+import { useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { getActivities } from "../../../../api/card/card.api";
+import { addCommentToCard } from "../../../../stores/card/cardThunk";
+import Activity from "../../../Activity/Activity";
+import Comment from "../../../Comment/Comment";
 
 const ActivityAndComment = () => {
   const { selectedCard } = useSelector((state) => state.card);
@@ -13,6 +16,9 @@ const ActivityAndComment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [defaultkey, setDefault] = useState("comment");
   const quillRef = useRef(null);
+  const dispatch = useDispatch();
+  const { boardId } = useParams();
+  const [editComment, setEditComment] = useState(null);
   useEffect(() => {
     try {
       setIsLoading(true);
@@ -36,12 +42,42 @@ const ActivityAndComment = () => {
   const onHandleRetrieve = (value) => {
     setDefault(value);
   };
+  const handleEditComment = async (comment) => {
+    await setIsAdd(true);
+    await setEditComment(comment);
+    quillRef.current.editor.root.innerHTML = comment?.action; // Set the Quill editor content
+  };
   const renderActivities = activities?.map((activity) => (
     <Activity key={activity._id} activity={activity} />
   ));
+  const renderComments = activities?.map((activity) => (
+    <Comment
+      isEdit={editComment?._id === activity?._id}
+      key={activity._id}
+      activity={activity}
+      onEdit={handleEditComment}
+    />
+  ));
   const renderEmpty = <Flex>Chưa có bình luận.</Flex>;
   const handleBlur = () => {
-    console.log(quillRef.current.editor.root.innerHTML);
+    const data = {
+      boardId: boardId,
+      listId: selectedCard?.owner,
+      cardId: selectedCard?._id,
+      text: quillRef.current.editor.root.innerHTML,
+    };
+    if (editComment) {
+      // Update existing comment
+      console.log(editComment);
+      console.log("edit");
+    } else {
+      // Add new comment
+      dispatch(addCommentToCard(data))
+        .unwrap()
+        .then((rs) => setActivities([rs, ...activities]));
+    }
+    message.success("Hoàn tất");
+    setIsAdd(false);
   };
   const items = [
     {
@@ -49,9 +85,18 @@ const ActivityAndComment = () => {
       label: "Bình luận",
       children: (
         <Flex vertical>
-          {isLoading && <Spin />}
-          {!isLoading && activities.length > 0 && renderActivities}
-          {!isLoading && activities.length < 1 && renderEmpty}
+          <Flex
+            vertical
+            style={{
+              maxHeight: 300,
+              overflowY: "auto",
+            }}
+          >
+            {isLoading && <Spin />}
+            {!isLoading && activities.length > 0 && renderComments}
+            {!isLoading && activities.length < 1 && renderEmpty}
+          </Flex>
+
           {!isAdd && (
             <Flex style={{ margin: "16px 0" }}>
               <Button onClick={() => setIsAdd(true)}>Thêm bình luận</Button>
@@ -75,7 +120,13 @@ const ActivityAndComment = () => {
                 <Button type="primary" onClick={handleBlur}>
                   Lưu
                 </Button>
-                <Button type="" onClick={() => setIsAdd(false)}>
+                <Button
+                  type=""
+                  onClick={() => {
+                    setIsAdd(false);
+                    setEditComment(null);
+                  }}
+                >
                   Hủy
                 </Button>
               </Flex>
@@ -88,7 +139,14 @@ const ActivityAndComment = () => {
       key: "activities",
       label: "Hoạt động",
       children: (
-        <Flex vertical>
+        <Flex
+          vertical
+          gap={8}
+          style={{
+            maxHeight: 300,
+            overflowY: "auto",
+          }}
+        >
           {!isLoading && activities.length > 0 && renderActivities}
           {!isLoading && activities.length < 1 && renderEmpty}
           {isLoading && <Spin />}

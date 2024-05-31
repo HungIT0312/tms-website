@@ -4,7 +4,7 @@ import formatDateTime from "../../helpers/formatDatetime";
 
 const Activity = ({ activity }) => {
   return (
-    <Flex gap={12} justify="start" align="start">
+    <Flex gap={12} justify="start" align="center">
       <div>
         <Avatar
           size={36}

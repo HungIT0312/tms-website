@@ -14,12 +14,20 @@ const BoardFilter = () => {
   const [labelSearch, setLabelSearch] = useState("");
 
   const handleFilterByMem = (e) => {
+    const completedItems = e.filter(
+      (item) => item.completed === true || item.completed === false
+    );
+    const completed =
+      completedItems.length > 0 ? completedItems[0].completed : undefined;
+
     const data = {
       boardId: boardId,
       users: e?.filter((item) => item.user) || [],
       labels: e?.filter((item) => item.board) || [],
       dueDates: e?.filter((item) => item.now) || [],
+      completed: completed,
     };
+    console.log(data);
     dispatch(getListsByFilter(data));
   };
   const handleChangeUserSearch = (e) => {
@@ -56,6 +64,7 @@ const BoardFilter = () => {
         </Checkbox>
       </Flex>
     ));
+
   const now = dayjs();
   return (
     <Checkbox.Group
@@ -101,6 +110,27 @@ const BoardFilter = () => {
               </Flex>
             </Checkbox>
           ))}
+        </Flex>
+        <span className="title-segment">Trạng thái</span>
+        <Flex gap={8} vertical className="">
+          <Flex justify="space-between">
+            <Checkbox
+              key={{ completed: true }}
+              value={{ completed: true }}
+              className="check-box__item"
+            >
+              Hoàn thành
+            </Checkbox>
+          </Flex>
+          <Flex justify="space-between">
+            <Checkbox
+              key={{ completed: false }}
+              value={{ completed: false }}
+              className="check-box__item"
+            >
+              Chưa hoàn thành
+            </Checkbox>
+          </Flex>
         </Flex>
         <span className="title-segment">Nhãn</span>
         <Flex gap={8} vertical className="">

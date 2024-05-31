@@ -18,13 +18,13 @@ const Register = () => {
         msg.error(error.errMessage);
       });
   };
-  const validateName = (_, value) => {
-    const regex = /^[a-zA-Z\s]*$/;
-    if (!regex.test(value)) {
-      return Promise.reject(new Error("Chỉ nên chứa các chữ cái!"));
-    }
-    return Promise.resolve();
-  };
+  // const validateName = (_, value) => {
+  //   const regex = /^[a-zA-Z\s]*$/;
+  //   if (!regex.test(value)) {
+  //     return Promise.reject(new Error("Chỉ nên chứa các chữ cái!"));
+  //   }
+  //   return Promise.resolve();
+  // };
   return (
     <Form
       form={form}
@@ -46,7 +46,7 @@ const Register = () => {
                 whitespace: true,
               },
               {
-                validator: validateName,
+                // validator: validateName,
               },
             ]}
           >
@@ -64,7 +64,7 @@ const Register = () => {
                 whitespace: true,
               },
               {
-                validator: validateName,
+                // validator: validateName,
               },
             ]}
           >

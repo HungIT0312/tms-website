@@ -1,0 +1,21 @@
+.comment {
+  border-bottom: 0.5px solid #eee;
+  padding: 8px 16px;
+  border-radius: 8px;
+  &:hover {
+    background: #eee !important;
+  }
+  p {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .btn {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .delete {
+    &:hover {
+      color: red;
+    }
+  }
+}

@@ -6,6 +6,7 @@ import "./InvitationItem.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { acceptBoardInvite } from "../../../../stores/board/boardThunk";
 import { rejectInvite } from "../../../../stores/invitation/invitationThunk";
+import formatDateTime from "../../../../helpers/formatDatetime";
 // eslint-disable-next-line no-unused-vars
 const InvitationItem = ({ invitation }) => {
   const { message } = useSelector((state) => state.board);
@@ -24,7 +25,6 @@ const InvitationItem = ({ invitation }) => {
   const handleReject = async () => {
     dispatch(rejectInvite(invitation._id));
   };
-  const date = new Date(invitation.createdAt).toLocaleDateString("en-GB");
   return (
     <Flex className="invitation" align="center" justify="space-between" gap={8}>
       {contextHolder}
@@ -39,11 +39,13 @@ const InvitationItem = ({ invitation }) => {
             <span>
               {invitation.inviter.name + " " + invitation.inviter.surname}
             </span>
-            <span> invited you to join "</span>
+            <span> đã mời bạn vào bảng "</span>
             <strong>{invitation.board.title}</strong>".
           </span>
           <Flex justify="space-between" align="center">
-            <div className="invitation__date">Invited at {date}</div>
+            <div className="invitation__date">
+              {formatDateTime(invitation?.createdAt)}
+            </div>
           </Flex>
         </Flex>
       </Flex>
@@ -61,7 +63,9 @@ const InvitationItem = ({ invitation }) => {
           />
         </Flex>
       )}
-      {invitation.status === "accepted" && <Tag color="success">Accepted</Tag>}
+      {invitation.status === "accepted" && (
+        <Tag color="success">Đã chấp nhận</Tag>
+      )}
     </Flex>
   );
 };

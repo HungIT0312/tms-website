@@ -75,29 +75,41 @@ const CreateBoard = ({ isOpen, showModal }) => {
         align="center"
         vertical
       >
-        <Flex gap={16} justify="center" align="center">
-          <Flex vertical justify="center" align="center">
-            <label>Xem trước</label>
-            <div
-              className="create-board__preview"
-              style={{ background: `url(${bgLink})  no-repeat center/cover` }}
-            >
-              <Image src={images.taskBg} preview={false} />
-            </div>
-          </Flex>
-
-          <Flex vertical>
-            <div style={{ width: 200 }}>
-              <Row gutter={[8, 8]}>{renderBg(bgImages)}</Row>
-            </div>
-            <div style={{ width: 200, marginTop: 8 }}>
-              <Row gutter={[8, 8]}>{renderBg(bgColors)}</Row>
-            </div>
-          </Flex>
+        <Flex justify="center" align="center">
+          <Row gutter={[16, 16]}>
+            <Col lg={12} md={12} sm={24} xs={24}>
+              <Flex vertical justify="center" align="center">
+                <label>Xem trước</label>
+                <div
+                  className="create-board__preview"
+                  style={{
+                    background: `url(${bgLink})  no-repeat center/cover`,
+                  }}
+                >
+                  <Image src={images.taskBg} preview={false} />
+                </div>
+              </Flex>
+            </Col>
+            <Col lg={12} md={12} sm={24} xs={24}>
+              <Flex vertical justify="center" align="center">
+                <div style={{ width: 200 }}>
+                  <Row gutter={[8, 8]}>{renderBg(bgImages)}</Row>
+                </div>
+                <div style={{ width: 200, marginTop: 8 }}>
+                  <Row gutter={[8, 8]}>{renderBg(bgColors)}</Row>
+                </div>
+              </Flex>
+            </Col>
+          </Row>
         </Flex>
 
-        <div style={{ width: 320, marginTop: 4 }}>
-          <Form name="createBoard" layout="vertical" form={form}>
+        <div style={{ marginTop: 4, width: "100%" }}>
+          <Form
+            className="createBoard"
+            name="createBoard"
+            layout="vertical"
+            form={form}
+          >
             <Form.Item
               label="Tiêu đề"
               name="title"

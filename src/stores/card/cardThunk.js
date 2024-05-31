@@ -1,13 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   addCardLabel,
+  addComment,
   changeMemberCard,
   createCard,
   deleteAttachment,
   deleteCard,
+  deleteComment,
   getCard,
   removeCardLabel,
   updateCard,
+  updateComment,
   updateDateCompleted,
   updateStartDueDates,
   uploadAttachment,
@@ -129,6 +132,39 @@ export const deleteFile = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const response = await deleteAttachment(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const addCommentToCard = createAsyncThunk(
+  "board/addCommentToCard",
+  async (data, thunkApi) => {
+    try {
+      const response = await addComment(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const deleteCommentById = createAsyncThunk(
+  "board/deleteCommentById",
+  async (data, thunkApi) => {
+    try {
+      const response = await deleteComment(data);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const updateCommentById = createAsyncThunk(
+  "board/updateCommentById",
+  async (data, thunkApi) => {
+    try {
+      const response = await updateComment(data);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

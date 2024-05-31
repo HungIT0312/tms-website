@@ -6,7 +6,7 @@ import { logOut } from "../../../stores/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-const ProfilePopup = (props) => {
+const ProfilePopup = () => {
   const { userInformation } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
@@ -20,13 +20,14 @@ const ProfilePopup = (props) => {
     dispatch(logOut());
     navigate("/auth/login");
   };
+  const removedEmail = userInformation?.email.split("@")[0];
   return (
     <div className="profilePopup">
       <div className=" profilePopup__title">Tài khoản</div>
       <Flex
         className="profilePopup__item"
         align="center"
-        onClick={props?.showModal}
+        onClick={() => navigate(`/user/${removedEmail}`)}
       >
         <div className="profilePopup__avatar">
           <Avatar style={{ background: `${userInformation.color}` }}>
