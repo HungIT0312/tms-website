@@ -165,9 +165,9 @@ const removeMember = async (boardId, memberId, user, callback) => {
     // Log the activity
     board.activity.unshift({
       user: user._id,
-      action: `xóa người dùng '${
+      action: `xóa người dùng "${
         removedMember.name + " " + removedMember.surname
-      }' khỏi bảng`,
+      }" khỏi bảng`,
     });
 
     // Save changes to board
@@ -201,22 +201,21 @@ const updateBoardProperty = async (
         board.title = newValue;
         board.activity.unshift({
           user: user._id,
-          action: "cập nhật tiêu đề của bảng",
+          action: "đã cập nhật tiêu đề của bảng",
         });
         break;
       case "description":
         board.description = newValue;
         board.activity.unshift({
           user: user._id,
-          action: "cập nhật mô tả của bảng",
+          action: "đã cập nhật mô tả của bảng",
         });
         break;
       case "background":
-        board.backgroundImageLink = newValue.link;
-        board.isImage = newValue.isImage;
+        board.backgroundImageLink = newValue;
         board.activity.unshift({
           user: user._id,
-          action: "cập nhật ảnh nền của bảng",
+          action: "đã cập nhật ảnh nền của bảng",
         });
         break;
       default:
@@ -401,6 +400,79 @@ const getBoardStats = async (boardId, callback) => {
     });
   }
 };
+const updateLockBoard = async (boardId, isLocked, user, callback) => {
+  try {
+    const board = await boardModel.findById(boardId);
+
+    if (!board) {
+      return callback({ message: "Không tìm thấy bảng" });
+    }
+
+    board._destroy = isLocked;
+    await board.save();
+
+    await listModel.updateMany({ owner: boardId }, { _destroy: isLocked });
+
+    const lists = await listModel.find({ owner: boardId });
+    const listIds = lists.map((list) => list._id);
+    await cardModel.updateMany(
+      { owner: { $in: listIds } },
+      { _destroy: isLocked }
+    );
+
+    const action = isLocked ? "đã khóa bảng" : "đã mở khóa bảng";
+    board.activity.unshift({
+      user: user._id,
+      action: action,
+    });
+    await board.save();
+
+    return callback(false, {
+      message: isLocked ? "Khóa bảng thành công!" : "Mở khóa bảng thành công!",
+    });
+  } catch (error) {
+    return callback({
+      message: "Có lỗi đã xảy ra!",
+      details: error.message,
+    });
+  }
+};
+
+const deleteBoard = async (boardId, callback) => {
+  try {
+    const board = await boardModel.findById(boardId);
+
+    if (!board) {
+      return callback({ message: "Không tìm thấy bảng" });
+    }
+
+    // Xóa bảng khỏi danh sách boards của tất cả người dùng liên quan
+    await userModel.updateMany(
+      { boards: boardId },
+      { $pull: { boards: boardId } }
+    );
+
+    // Tìm tất cả các list thuộc bảng và lấy danh sách list IDs
+    const lists = await listModel.find({ owner: boardId });
+    const listIds = lists.map((list) => list._id);
+
+    // Xóa tất cả các card thuộc các list này
+    await cardModel.deleteMany({ owner: { $in: listIds } });
+
+    // Xóa tất cả các list thuộc bảng
+    await listModel.deleteMany({ owner: boardId });
+
+    // Xóa bảng
+    await boardModel.findByIdAndDelete(boardId);
+
+    return callback(false, { message: "Xóa bảng thành công!" });
+  } catch (error) {
+    return callback({
+      message: "Có lỗi đã xảy ra!",
+      details: error.message,
+    });
+  }
+};
 
 module.exports = {
   create,
@@ -413,4 +485,6 @@ module.exports = {
   deleteLabel,
   updateLabel,
   getBoardStats,
+  updateLockBoard,
+  deleteBoard,
 };

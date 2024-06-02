@@ -134,6 +134,23 @@ const getBoardStats = async (req, res) => {
     return res.status(201).send(result);
   });
 };
+const updateLockBoard = async (req, res) => {
+  const { boardId } = req.params;
+  const { isLocked } = req.body;
+  const user = req.user;
+  await boardService.updateLockBoard(boardId, isLocked, user, (err, result) => {
+    if (err) return res.status(400).send(err);
+    return res.status(200).send(result);
+  });
+};
+const deleteBoard = async (req, res) => {
+  const { boardId } = req.params;
+  const user = req.user;
+  await boardService.deleteBoard(boardId, user, (err, result) => {
+    if (err) return res.status(500).send(err);
+    return res.status(201).send(result);
+  });
+};
 module.exports = {
   create,
   getAll,
@@ -145,4 +162,6 @@ module.exports = {
   deleteLabel,
   updateLabel,
   getBoardStats,
+  updateLockBoard,
+  deleteBoard,
 };

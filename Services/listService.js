@@ -8,6 +8,14 @@ const utc = require("dayjs/plugin/utc");
 dayjs.extend(utc);
 dayjs.extend(weekday);
 dayjs.extend(localeData);
+const transformUser = (doc, ret) => {
+  delete ret.password;
+  delete ret.verificationToken;
+  delete ret.verified;
+  delete ret.__v;
+  delete ret.boards;
+  return ret;
+};
 const create = async (model, user, callback) => {
   try {
     const tempList = await listModel(model);
@@ -37,16 +45,13 @@ const getAll = async (boardId, callback) => {
         path: "cards",
         populate: [
           {
-            path: "activities.user", // Populate user trong activities của mỗi card
-            model: "user", // Tên của modal user
-          },
-          {
             path: "labels", // Populate labels
             model: "label",
           },
           {
             path: "members.user", // Populate user
             model: "user",
+            select: "-password -verificationToken -verified -__v -boards",
           },
         ],
       })
@@ -390,6 +395,7 @@ const getAllListByFilter = async (
           {
             path: "activities.user",
             model: "user",
+            select: "-password -verificationToken -verified -__v -boards",
           },
           {
             path: "labels",
@@ -398,11 +404,29 @@ const getAllListByFilter = async (
           {
             path: "members.user",
             model: "user",
+            select: "-password -verificationToken -verified -__v -boards",
           },
         ],
       })
       .exec();
-
+    lists = lists.map((list) => {
+      list.cards = list.cards.map((card) => {
+        card.activities = card.activities.map((activity) => {
+          if (activity.user) {
+            const activityObj = activity.toObject();
+            delete activityObj.user.password;
+            delete activityObj.user.verificationToken;
+            delete activityObj.user.verified;
+            delete activityObj.user.__v;
+            delete activityObj.user.boards;
+            return activityObj;
+          }
+          return activity;
+        });
+        return card;
+      });
+      return list;
+    });
     return callback(false, lists);
   } catch (error) {
     return callback({

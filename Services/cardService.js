@@ -173,10 +173,10 @@ const getCard = async (cardId, user, callback) => {
   try {
     const card = await cardModel
       .findById(cardId)
-      .populate({
-        path: "activities.user",
-        select: "name surname email color",
-      })
+      // .populate({
+      //   path: "activities.user",
+      //   select: "name surname email color",
+      // })
       .populate({
         path: "members.user",
         select: "name surname email color",
@@ -201,6 +201,8 @@ const getCard = async (cardId, user, callback) => {
         errMessage: "Không tìm thấy thẻ",
       });
     }
+    card.activities = undefined;
+    delete card.activities;
     return callback(false, card);
   } catch (error) {
     return callback({
@@ -232,11 +234,11 @@ const update = async (cardId, listId, boardId, user, updatedObj, callback) => {
     }
     card.activities.unshift({
       user: user._id,
-      action: `cập nhật thẻ này trong danh sách "${list.title}"`,
+      action: `đã cập nhật thẻ này trong danh sách "${list.title}"`,
     });
     board.activity.unshift({
       user: user._id,
-      action: `cập nhật thẻ trong danh sách "${list.title}"`,
+      action: `đã cập nhật thẻ trong danh sách "${list.title}"`,
     });
     //Update card
     await card.updateOne(updatedObj);
@@ -298,7 +300,6 @@ const addComment = async (cardId, listId, boardId, user, text, callback) => {
     const newComments = await cardModel
       .findById(cardId)
       .populate("activities.user");
-    //Add comment to board activity
     board.activity.unshift({
       user: user._id,
       action: `đã thêm một bình luận trong thẻ "${card.title}"`,
@@ -408,7 +409,7 @@ const deleteComment = async (
     //Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: `đã xóa nhận xét của ra khỏi ${card.title}`,
+      action: `đã xóa nhận xét của ra khỏi "${card.title}"`,
     });
     board.save();
 
@@ -464,7 +465,7 @@ const changeCardMember = async (
     ];
     card.activities.unshift({
       user: user._id,
-      action: `thay đổi người được chỉ định thành '${member.name}' trong thẻ ${card.title}`,
+      action: `thay đổi người được chỉ định thành "${member.surname} ${member.name}" trong thẻ "${card.title}"`,
     });
 
     await card.save();
@@ -472,7 +473,7 @@ const changeCardMember = async (
     // Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: `thay đổi người được chỉ định thành '${member.name}' trong thẻ ${card.title}' `,
+      action: `thay đổi người được chỉ định thành "${member.surname} ${member.name}" trong thẻ "${card.title}"`,
     });
     const slugB = _.kebabCase(board.title.toLowerCase());
     const slugC = _.kebabCase(card.title.toLowerCase());
@@ -619,12 +620,16 @@ const addAttachment = async (
       : "http://" + link;
 
     card.attachments.push({ link: validLink, name: name });
+    card.activities.unshift({
+      user: user._id,
+      action: `đã thêm tệp đính kèm "${name}"`,
+    });
     await card.save();
 
     //Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: `thêm tệp đính kèm ${validLink} vào ${card.title}`,
+      action: `đã thêm tệp đính kèm ${name} vào ${card.title}`,
     });
     board.save();
 
@@ -678,7 +683,7 @@ const deleteAttachment = async (
     //Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: `đã xóa ${attachmentObj[0].link} tệp đính kèm khỏi ${card.title}`,
+      action: `đã xóa tệp đính kèm khỏi thẻ "${card.title}"`,
     });
     board.save();
 
@@ -707,7 +712,6 @@ const updateAttachment = async (
     const list = await listModel.findById(listId);
     const board = await boardModel.findById(boardId);
 
-    // Validate owner
     const validate = await helperMethods.validateCardOwners(
       card,
       list,
@@ -719,7 +723,6 @@ const updateAttachment = async (
       errMessage: "You dont have permission to update attachment of this card";
     }
 
-    //Update date completed event
     card.attachments = card.attachments.map((attachment) => {
       if (attachment._id.toString() === attachmentId.toString()) {
         attachment.link = link;
@@ -729,7 +732,7 @@ const updateAttachment = async (
     });
 
     await card.save();
-    return callback(false, { message: "Success!" });
+    return callback(false, { message: "Thành công!" });
   } catch (error) {
     return callback({
       errMessage: "Đã có lỗi xảy ra",
@@ -748,12 +751,10 @@ const updateCover = async (
   callback
 ) => {
   try {
-    // Get models
     const card = await cardModel.findById(cardId);
     const list = await listModel.findById(listId);
     const board = await boardModel.findById(boardId);
 
-    // Validate owner
     const validate = await helperMethods.validateCardOwners(
       card,
       list,
@@ -765,12 +766,11 @@ const updateCover = async (
       errMessage: "You dont have permission to update attachment of this card";
     }
 
-    //Update date cover color
     card.cover.color = color;
     card.cover.isSizeOne = isSizeOne;
 
     await card.save();
-    return callback(false, { message: "Success!" });
+    return callback(false, { message: "Thành công!" });
   } catch (error) {
     return callback({
       errMessage: "Đã có lỗi xảy ra",
@@ -780,18 +780,15 @@ const updateCover = async (
 };
 const addLabelToCard = async (cardId, labelId, callback) => {
   try {
-    // Tìm thẻ theo ID
     const card = await cardModel.findById(cardId);
     if (!card) {
       return callback({ errMessage: "Thẻ không tìm thấy" });
     }
 
-    // Kiểm tra xem nhãn đã tồn tại trong thẻ chưa
     if (card.labels.includes(labelId)) {
       return callback({ errMessage: "Nhãn đã được thêm vào thẻ này" });
     }
 
-    // Thêm nhãn vào danh sách nhãn của thẻ
     card.labels.push(labelId);
     await card.save();
 
@@ -836,21 +833,25 @@ const getActivitiesById = async (cardId, type, callback) => {
     if (!card) {
       return callback({ errMessage: "Không tìm thấy thẻ" });
     }
-    if (type == "comment") {
-      const newAc = card.activities.filter(
-        (activity) => activity.isComment == true
-      );
-      return callback(false, {
-        activities: newAc,
+
+    const filteredActivities = card.activities
+      .filter((activity) => activity.isComment == (type === "comment"))
+      .map((activity) => {
+        const activityObj = activity.toObject();
+        if (activityObj.user) {
+          delete activityObj.user.password;
+          delete activityObj.user.verificationToken;
+          delete activityObj.user.verified;
+          delete activityObj.user.__v;
+          delete activityObj.user.boards;
+          delete activityObj.user.invitations;
+        }
+        return activityObj;
       });
-    } else {
-      const newAc = card.activities.filter(
-        (activity) => activity.isComment == false
-      );
-      return callback(false, {
-        activities: newAc,
-      });
-    }
+
+    return callback(false, {
+      activities: filteredActivities,
+    });
   } catch (err) {
     return callback({
       errMessage: "Đã có lỗi xảy ra",
@@ -858,6 +859,7 @@ const getActivitiesById = async (cardId, type, callback) => {
     });
   }
 };
+
 module.exports = {
   create,
   update,

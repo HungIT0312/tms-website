@@ -177,16 +177,37 @@ const getAllUsersByIds = async (userIds, callback) => {
 
 const searchUsers = async (query, callback) => {
   try {
-    const users = await userModel.find({
-      $or: [
-        { name: { $regex: query, $options: "i" } },
-        { email: { $regex: query, $options: "i" } },
-      ],
-    });
+    const users = await userModel.aggregate([
+      {
+        $project: {
+          fullName: { $concat: ["$name", " ", "$surname"] },
+          name: 1,
+          surname: 1,
+          email: 1,
+          avatar: 1,
+          color: 1,
+          boards: 1,
+          invitations: 1,
+          _destroy: 1,
+          verified: 1,
+          verificationToken: 1,
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { fullName: { $regex: query, $options: "i" } },
+            { email: { $regex: query, $options: "i" } },
+          ],
+        },
+      },
+    ]);
+
     const searchResults = users.map((user) => {
-      const { password, __v, ...userData } = user.toJSON();
+      const { password, __v, ...userData } = user;
       return userData;
     });
+
     return callback(false, searchResults);
   } catch (error) {
     return callback({

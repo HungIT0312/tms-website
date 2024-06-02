@@ -12,4 +12,6 @@ route.post("/:boardId/label", boardController.createLabel);
 route.delete("/:boardId/label/:labelId", boardController.deleteLabel);
 route.put("/:boardId/label/:labelId", boardController.updateLabel);
 route.get("/:boardId/stats", boardController.getBoardStats);
+route.post("/:boardId/lock", boardController.updateLockBoard);
+route.delete("/:boardId", boardController.deleteBoard);
 module.exports = route;

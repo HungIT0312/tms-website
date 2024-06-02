@@ -4,7 +4,6 @@ const userSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
-
   },
   surname: {
     type: String,
@@ -49,5 +48,9 @@ const userSchema = mongoose.Schema({
     type: String,
   },
 });
+userSchema.virtual("fullName").get(function () {
+  return `${this.surname} ${this.name}`;
+});
 
+userSchema.set("toJSON", { virtuals: true });
 module.exports = mongoose.model("user", userSchema);

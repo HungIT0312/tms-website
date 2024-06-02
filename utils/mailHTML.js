@@ -37,9 +37,9 @@ const emailHTML = (currentURL, verificationToken) => {
     <body>
       <div class="container">
         <div class="card">
-          <h2>Email Verification</h2>
-          <p>Thank you for signing up! Please verify your email address by clicking the button below:</p>
-          <a href="${currentURL}/auth/verify-mail?verificationToken=${verificationToken}" target="_blank" class="button">Verify Email</a>
+          <h2>Email xác thực</h2>
+          <p>Cảm ơn bạn đã đăng ký với website TMS của chúng tôi! Vui lòng xác minh địa chỉ email của bạn bằng cách nhấp vào nút bên dưới:</p>
+          <a href="${currentURL}/auth/verify-mail?verificationToken=${verificationToken}" target="_blank" class="button">Xác nhận Email</a>
         </div>
       </div>
     </body>
