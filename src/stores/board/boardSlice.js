@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import boardProperty from "../../constants/boardProperty";
 import {
   acceptBoardInvite,
   createBoardLabel,
@@ -27,6 +26,9 @@ const boardSlice = createSlice({
   reducers: {
     addBoardLabelUI(state, action) {
       state.selectedBoard.labels.push(action.payload);
+    },
+    changeBg(state, action) {
+      state.selectedBoard.backgroundImageLink = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -132,10 +134,10 @@ const boardSlice = createSlice({
       .addCase(updateBoardInfo.fulfilled, (state, action) => {
         state.isLoading = false;
         const payload = action.payload;
-        if (payload.property === boardProperty.BACKGROUND) {
-          state.selectedBoard.backgroundImageLink = payload.newValue.link;
-          state.selectedBoard.isImage = payload.newValue.isImage;
-        } else state.selectedBoard[payload.property] = payload.newValue;
+        // if (payload.property === boardProperty.BACKGROUND) {
+        //   state.selectedBoard.backgroundImageLink = payload.newValue.link;
+        //   state.selectedBoard.isImage = payload.newValue.isImage;
+        // } else state.selectedBoard[payload.property] = payload.newValue;
         state.message = payload.message;
       })
       .addCase(updateBoardInfo.rejected, (state, action) => {
@@ -202,6 +204,6 @@ const boardSlice = createSlice({
   },
 });
 
-export const { addBoardLabelUI } = boardSlice.actions;
+export const { addBoardLabelUI, changeBg } = boardSlice.actions;
 
 export default boardSlice.reducer;

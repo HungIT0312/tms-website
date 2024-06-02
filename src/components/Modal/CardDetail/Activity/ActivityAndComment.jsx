@@ -5,7 +5,10 @@ import ReactQuill from "react-quill";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { getActivities } from "../../../../api/card/card.api";
-import { addCommentToCard } from "../../../../stores/card/cardThunk";
+import {
+  addCommentToCard,
+  updateCommentById,
+} from "../../../../stores/card/cardThunk";
 import Activity from "../../../Activity/Activity";
 import Comment from "../../../Comment/Comment";
 
@@ -42,6 +45,32 @@ const ActivityAndComment = () => {
   const onHandleRetrieve = (value) => {
     setDefault(value);
   };
+  const deleteAct = (value) => {
+    const newAct = activities.filter((item) => item._id !== value);
+    setActivities([...newAct]);
+  };
+  const updateCmt = () => {
+    const data = {
+      boardId: boardId,
+      listId: selectedCard?.owner,
+      cardId: selectedCard?._id,
+      commentId: editComment?._id,
+      text: quillRef.current.editor.root.innerHTML,
+    };
+    const crrActIndex = activities.findIndex(
+      (item) => item._id === editComment._id
+    );
+    if (crrActIndex !== -1) {
+      const newActivities = cloneDeep(activities);
+      newActivities[crrActIndex] = {
+        ...newActivities[crrActIndex],
+        action: quillRef.current.editor.root.innerHTML,
+      };
+      setActivities(newActivities);
+      setEditComment(null);
+    }
+    dispatch(updateCommentById(data));
+  };
   const handleEditComment = async (comment) => {
     await setIsAdd(true);
     await setEditComment(comment);
@@ -56,6 +85,7 @@ const ActivityAndComment = () => {
       key={activity._id}
       activity={activity}
       onEdit={handleEditComment}
+      deleteAct={deleteAct}
     />
   ));
   const renderEmpty = <Flex>Chưa có bình luận.</Flex>;
@@ -67,9 +97,8 @@ const ActivityAndComment = () => {
       text: quillRef.current.editor.root.innerHTML,
     };
     if (editComment) {
-      // Update existing comment
-      console.log(editComment);
-      console.log("edit");
+      // handleEditComment();
+      updateCmt();
     } else {
       // Add new comment
       dispatch(addCommentToCard(data))

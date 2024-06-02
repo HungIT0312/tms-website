@@ -20,11 +20,11 @@ const SearchUserItem = ({
     >
       <Flex align="center" gap={8}>
         <Avatar style={{ background: member.color }}>
-          {member.name[0] + member.surname[0]}
+          {member.surname[0] + member.name[0]}
         </Avatar>
         <Flex vertical>
           <span className="">{member.email}</span>
-          <span className="">{member.name + " " + member.surname}</span>
+          <span className="">{member.surname + " " + member.name}</span>
         </Flex>
       </Flex>
       {member.role && member.role === "owner" && (
@@ -45,7 +45,7 @@ const SearchUserItem = ({
           Xóa
         </Button>
       )}
-      {!member.role && !isPending && (
+      {!member.role && !isPending && isOwner && (
         <Button
           type="default"
           icon={<MailOutlined />}

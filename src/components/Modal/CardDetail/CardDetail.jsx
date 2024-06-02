@@ -78,7 +78,6 @@ const CardDetail = () => {
   const [newCard, setNewCard] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
   const cmtRef = useRef(null);
-
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -188,7 +187,7 @@ const CardDetail = () => {
     dispatch(updateDates(dataAddDate))
       .unwrap()
       .then((rs) => msg.success(rs.message))
-      .catch((er) => msg.error(er.message));
+      .catch((er) => msg.error(er.errMessage));
   };
 
   const handleCardCompleteChange = (data) => {
@@ -209,7 +208,7 @@ const CardDetail = () => {
       dispatch(updateDates(dataAddDate))
         .unwrap()
         .then((rs) => msg.success(rs.message))
-        .catch((er) => msg.error(er.message));
+        .catch((er) => msg.error(er.errMessage));
       const dueDate = dayjs(selectedCard?.date?.dueDate);
       renderDueDateStatus(dueDate);
     }
@@ -449,16 +448,16 @@ const CardDetail = () => {
             <Option
               key={mem.user}
               value={mem.user}
-              label={mem.name + " " + mem.surname}
+              label={mem.surname + " " + mem.name}
             >
               <Flex className="" gap={8}>
                 <Avatar
                   size={24}
                   style={{ background: mem?.color, fontSize: 12 }}
                 >
-                  {mem?.name[0] + mem?.surname[0]}
+                  {mem?.surname[0] + mem?.name[0]}
                 </Avatar>
-                <div>{mem.name + " " + mem.surname}</div>
+                <div>{mem.surname + " " + mem.name}</div>
               </Flex>
             </Option>
           ))}
@@ -598,7 +597,7 @@ const CardDetail = () => {
                   </Button>
                 </Dropdown>
               </Flex>
-              <Collapse defaultActiveKey={["1", "2", "3"]} ghost items={col1} />
+              <Collapse defaultActiveKey={["1", "2"]} ghost items={col1} />
             </Col>
 
             <Col xs={24} sm={24} md={24} lg={10}>

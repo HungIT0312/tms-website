@@ -10,13 +10,13 @@ const Activity = ({ activity }) => {
           size={36}
           style={{ background: activity?.user?.color, fontSize: 12 }}
         >
-          {activity?.user?.name[0] + activity?.user?.surname[0]}
+          {activity?.user?.surname[0] + activity?.user?.name[0]}
         </Avatar>
       </div>
       <Flex vertical justify="space-between" gap={4}>
         <span>
           <strong>
-            {activity?.user?.name + " " + activity?.user?.surname}
+            {activity?.user?.surname + " " + activity?.user?.name}
           </strong>{" "}
           {activity?.action}
         </span>

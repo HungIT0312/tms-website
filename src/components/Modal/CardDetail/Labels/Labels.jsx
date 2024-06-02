@@ -154,7 +154,7 @@ const Labels = ({ card }) => {
         icon={<PlusOutlined />}
         onClick={() => setIsAdd(!isAdd)}
       >
-        Create new
+        Tạo mới
       </Button>
     </Flex>
   ) : (
@@ -172,14 +172,14 @@ const Labels = ({ card }) => {
         {text}
       </Tag>
       <Form layout="vertical">
-        <Form.Item name="title" label="Title">
+        <Form.Item name="title" label="Tiêu đề">
           <Input
             value={text}
             defaultValue={text}
             onChange={(e) => setText(e.target.value)}
           ></Input>
         </Form.Item>
-        <Form.Item name="type" label="Color/type">
+        <Form.Item name="type" label="Màu">
           <Row gutter={8}>
             {labelTypes &&
               labelTypes.map((t, index) => (
@@ -211,7 +211,7 @@ const Labels = ({ card }) => {
         >
           {isEdit && (
             <Button type="" color="" danger onClick={() => handleDeleteLabel()}>
-              Delete
+              Xóa
             </Button>
           )}
           <Flex gap={8} justify="space-between">
@@ -223,7 +223,7 @@ const Labels = ({ card }) => {
                 setColorSelected("magenta");
               }}
             >
-              Back
+              Hủy
             </Button>
             <Button type="primary" onClick={handleClick}>
               OK

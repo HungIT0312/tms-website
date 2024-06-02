@@ -4,6 +4,7 @@ import {
   ApartmentOutlined,
   CheckSquareOutlined,
   ClockCircleOutlined,
+  CommentOutlined,
   EditOutlined,
   EllipsisOutlined,
   ExportOutlined,
@@ -54,7 +55,6 @@ const CardItem = ({
     transition,
     isDragging,
   } = useSortable({ id: card?._id, data: { ...card, typeDrag: "card" } });
-
   const dndKitListStyle = {
     transform: CSS.Translate.toString(transform),
     transition,
@@ -65,7 +65,6 @@ const CardItem = ({
     // display: card?.isPlaceHolder ? "none" : "block",
     // overflow: "unset",
   };
-
   const handleSelectCard = () => {
     const slug = _.kebabCase(card.title.toLowerCase());
     dispatch(setSelectedCard(card));
@@ -112,7 +111,11 @@ const CardItem = ({
       <Tag
         key={l?._id + Math.random(1000)}
         color={l?.type}
-        style={{ minHeight: l?.text?.length < 1 ? 12 : "none", minWidth: 24 }}
+        style={{
+          minHeight: l?.text?.length < 1 ? 12 : "none",
+          minWidth: 24,
+          zIndex: 0,
+        }}
       >
         {l?.text}
       </Tag>
@@ -151,6 +154,7 @@ const CardItem = ({
       {renderListTitle}
     </Flex>
   );
+  const comments = card?.activities?.filter((a) => a?.isComment);
   return !isAdd ? (
     <Flex
       className="card-item"
@@ -181,9 +185,6 @@ const CardItem = ({
 
         <Flex className="card-item__content" wrap="wrap" align="center" gap={8}>
           <Flex gap={8} align="center" wrap="wrap" style={{ height: 28 }}>
-            {/* <Flex align="center" className="card-item__content-item">
-              <EyeOutlined />
-            </Flex> */}
             {card?.date?.dueDate && (
               <Tooltip placement="bottom" title={tooltipDate} arrow={false}>
                 <Flex
@@ -201,22 +202,23 @@ const CardItem = ({
                 </Flex>
               </Tooltip>
             )}
-            {/* <Flex align="center" gap={3} className="card-item__content-item">
-                <PaperClipOutlined />
-                <span>2</span>
-              </Flex>
+            {card?.attachments?.length > 0 && (
               <Flex align="center" gap={3} className="card-item__content-item">
-                <MessageOutlined />
-                <span>2</span>
+                <PaperClipOutlined />
+                <span>{card?.attachments?.length}</span>
               </Flex>
-              <Flex gap={3} align="center" className="card-item__content-item">
-                <CheckSquareOutlined />
-                <span>2/4</span>
-              </Flex> */}
+            )}
+
             {card?.subTasks?.length > 0 && (
               <Flex gap={3} align="center" className="card-item__content-item">
                 <ApartmentOutlined />
                 <span>{card?.subTasks?.length}</span>
+              </Flex>
+            )}
+            {comments?.length > 0 && (
+              <Flex gap={3} align="center" className="card-item__content-item">
+                <CommentOutlined />
+                <span>{comments?.length}</span>
               </Flex>
             )}
           </Flex>

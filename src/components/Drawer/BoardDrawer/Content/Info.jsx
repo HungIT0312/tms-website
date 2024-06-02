@@ -15,7 +15,11 @@ const Info = ({ owner, selectedBoard }) => {
   const { userInformation } = useSelector((state) => state.user);
   const isMe = owner.user === userInformation._id.toString();
   const dispatch = useDispatch();
-
+  const isOwner = selectedBoard?.members?.some(
+    (mem) =>
+      mem.user.toString() === userInformation._id.toString() &&
+      mem.role === "owner"
+  );
   const triggerCallUpdate = (value) => {
     const newDes = {
       boardId: selectedBoard?._id,
@@ -37,7 +41,7 @@ const Info = ({ owner, selectedBoard }) => {
               style={{ background: `${owner?.color}`, fontSize: 20 }}
               size={48}
             >
-              {owner?.name[0] + owner?.surname[0]}
+              {owner?.surname[0] + owner?.name[0]}
             </Avatar>
           </div>
           <Flex
@@ -50,7 +54,7 @@ const Info = ({ owner, selectedBoard }) => {
             justify="start"
           >
             <span className="info__name">
-              {owner?.name + " " + owner?.surname}
+              {owner?.surname + " " + owner?.name}
             </span>
             <span className="info__mail">{owner?.email}</span>
             {isMe && <Link>Thay đổi thông tin</Link>}
@@ -62,11 +66,22 @@ const Info = ({ owner, selectedBoard }) => {
           <FiAlignLeft className="info__icon" />
           <span className="info__title">Mô tả</span>
         </Flex>
-        <QuillTextBox
-          content={selectedBoard?.description || ""}
-          placeholder={""}
-          getCleanHTML={triggerCallUpdate}
-        />
+        {isOwner ? (
+          <QuillTextBox
+            content={selectedBoard?.description || ""}
+            placeholder={""}
+            getCleanHTML={triggerCallUpdate}
+          />
+        ) : (
+          <div
+            style={{
+              border: "1px solid #eee",
+              borderRadius: 4,
+              padding: 12,
+            }}
+            dangerouslySetInnerHTML={{ __html: selectedBoard?.description }}
+          />
+        )}
       </Flex>
     </Flex>
   );

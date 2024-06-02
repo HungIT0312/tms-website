@@ -37,17 +37,12 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
       mem.user.toString() === userInformation._id.toString() &&
       mem.role === "owner"
   );
-
   const renderMember = members.map((member) => {
     if (member.role === "owner") {
       return (
-        <div
-          key={member._id}
-          className="owner"
-          title={`${member.name + " " + member.surname}.`}
-        >
+        <div key={member._id} className="owner" title={`Chủ sở hữu`}>
           <Avatar style={{ background: `${member.color}`, fontSize: 10 }}>
-            {member.name[0] + member.surname[0]}
+            {member.surname[0] + member.name[0]}
           </Avatar>
           <span title="Chủ sỡ hữu." className="owner__badge">
             <Image
@@ -64,7 +59,7 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
       return (
         <Tooltip
           key={member._id}
-          title={member.name + " " + member.surname}
+          title={`${member.surname + " " + member.name}`}
           placement="bottom"
           style={{ cursor: "pointer" }}
         >
@@ -74,7 +69,7 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
             }}
             icon={<UserOutlined />}
           >
-            {member.name[0] + member.surname[0]}
+            {member.surname[0] + member.name[0]}
           </Avatar>
         </Tooltip>
       );
@@ -102,13 +97,17 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
           onClick={() => navigate(rootLink)}
           className="board-header__back"
         />
-        <EditText
-          name="title"
-          defaultValue={selectedBoard.title}
-          inline
-          style={{ width: `${selectedBoard?.title?.length}ch` }}
-          onSave={(value) => handleBoardTitleChange(value)}
-        />
+        {isOwner ? (
+          <EditText
+            name="title"
+            defaultValue={selectedBoard.title}
+            inline
+            style={{ width: `${selectedBoard?.title?.length}ch` }}
+            onSave={(value) => handleBoardTitleChange(value)}
+          />
+        ) : (
+          <Flex>{selectedBoard.title}</Flex>
+        )}
       </Flex>
       <Flex justify="center" align="center" gap={8}>
         <Popover

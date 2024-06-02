@@ -25,7 +25,11 @@ const QuillTextBox = ({ content, placeholder, getCleanHTML = () => {} }) => {
     }
     setIsChangeDes(false);
   };
-
+  const handleCancel = () => {
+    // Reset the editor content to the initial value
+    quillRef.current.editor.root.innerHTML = initialValue;
+    setIsChangeDes(false);
+  };
   return (
     <Flex className="" align="end" gap={12} vertical>
       <div
@@ -47,15 +51,17 @@ const QuillTextBox = ({ content, placeholder, getCleanHTML = () => {} }) => {
         }}
         ref={quillRef}
         theme="snow"
-        // value={value}
-        // onChange={(text) => setValue(text)}
-        onBlur={handleBlur}
         placeholder={placeholder}
       />
       {isChangeDes && (
-        <Button type="primary" onClick={handleBlur}>
-          Save
-        </Button>
+        <Flex gap={8}>
+          <Button type="primary" onClick={handleBlur}>
+            Lưu
+          </Button>
+          <Button type="default" onClick={handleCancel}>
+            Hủy
+          </Button>
+        </Flex>
       )}
     </Flex>
   );

@@ -13,6 +13,7 @@ import SearchUserItem from "./SearchUserItem/SearchUserItem";
 import { removeMemberInBoard } from "../../../stores/board/boardThunk";
 import { useDispatch, useSelector } from "react-redux";
 import { removeBoardMemberUI } from "../../../stores/list/ListSlice";
+
 const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
   const [inputText, setInputText] = useState();
   const [keyword, setKeyword] = useState();
@@ -20,31 +21,38 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
   const [pendingUsers, setPendingUsers] = useState([]);
   const dispatch = useDispatch();
   const [api, contextHolder] = notification.useNotification();
+
   useEffect(() => {
     const time = setTimeout(() => {
       setKeyword(inputText);
-    }, 300);
+    }, 500);
     return () => {
       clearTimeout(time);
     };
   }, [inputText]);
+
   useEffect(() => {
     const getUserSearch = async () => {
       if (!keyword) return;
       try {
         const res = await searchUser({ key: keyword });
         if (res) {
-          const filteredResults = res.filter(
-            (user) => !board.members.find((member) => member.user === user._id)
-          );
-          setUserSearch(filteredResults);
+          if (isOwner) {
+            setUserSearch(res);
+          } else {
+            const filteredResults = res.filter((user) =>
+              board.members.find((member) => member.user === user._id)
+            );
+            setUserSearch(filteredResults);
+          }
         }
       } catch (error) {
         console.log(error);
       }
     };
     getUserSearch();
-  }, [board.members, keyword]);
+  }, [board.members, keyword, isOwner]);
+
   useEffect(() => {
     try {
       const getPending = async () => {
@@ -84,7 +92,6 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
     }
   };
 
-  // eslint-disable-next-line react/prop-types
   const handleRemoveMember = (id) => {
     Modal.confirm({
       title: "Xóa thành viên",
@@ -107,6 +114,7 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
       cancelText: "Hủy",
     });
   };
+
   const renderAll = (members = []) => {
     return (
       members &&

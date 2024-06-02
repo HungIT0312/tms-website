@@ -129,6 +129,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
         className="pop__item"
         onClick={() => {
           // editTitleRef.current.focus();
+          // console.log(titleRef);
         }}
       >
         Thay đổi tiêu đề
@@ -181,7 +182,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
           <Flex className="List-column__header" gap={8} align="center" vertical>
             <Input
               className="List-column__title"
-              placeholder="Type new title"
+              placeholder="Nhập tiêu đề mới"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />

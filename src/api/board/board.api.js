@@ -37,3 +37,12 @@ export const deleteLabel = (data) => {
 export const getBoardStats = (boardId) => {
   return http.get(`/board/${boardId}/stats`);
 };
+export const lockBoard = (data) => {
+  const { boardId, isLocked } = data;
+  return http.post(`/board/${boardId}/lock`, { isLocked });
+};
+export const deleteBoard = (boardId) => {
+  return http.delete(`/board/${boardId}`);
+};
+// route.post("/:boardId/lock", boardController.lockBoard);
+// route.delete("/:boardId", boardController.deleteBoard);

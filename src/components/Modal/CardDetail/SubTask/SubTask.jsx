@@ -17,16 +17,16 @@ const SubTask = ({ task, handleClick = () => {} }) => {
       <Flex gap={16} align="center" justify="center">
         {task?.date?.completed ? (
           <Tag bordered={false} color="green">
-            Resolved
+            Hoàn thành
           </Tag>
         ) : (
           <Tag bordered={false} color="red">
-            Unresolved
+            Chưa giải quyết
           </Tag>
         )}
 
         {task?.members?.length > 0 ? (
-          <Tooltip title="Board User" placement="bottom">
+          <Tooltip title={task?.members[0]?.user?.fullName} placement="bottom">
             <Avatar
               size={20}
               style={{
@@ -34,7 +34,7 @@ const SubTask = ({ task, handleClick = () => {} }) => {
                 background: task?.members[0]?.color,
               }}
             >
-              {task?.members[0]?.name[0] + task?.members[0]?.surname[0]}
+              {task?.members[0]?.surname[0] + task?.members[0]?.name[0]}
             </Avatar>
           </Tooltip>
         ) : (

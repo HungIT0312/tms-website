@@ -54,6 +54,7 @@ const cardSlice = createSlice({
       );
       state.selectedCard.attachments.splice(index, 1);
     },
+   
   },
   extraReducers: (builder) =>
     builder
