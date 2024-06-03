@@ -2,9 +2,23 @@ const boardModel = require("../Models/boardModel");
 const cardModel = require("../Models/cardModel");
 const labelModel = require("../Models/labelModel");
 const listModel = require("../Models/listModel");
+const notificationModal = require("../Models/notificationModal");
 const userModel = require("../Models/userModel");
 const helperMethods = require("./helperMethods");
+const dotenv = require("dotenv");
 const dayjs = require("dayjs");
+const nodemailer = require("nodemailer");
+const mailDelete = require("../utils/mailDelete");
+dotenv.config();
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.SERVER_EMAIL,
+    pass: process.env.SERVER_EMAIL_PASS,
+  },
+});
 const create = async (req, callback) => {
   try {
     const { title, backgroundImageLink, description } = req.body;
@@ -403,16 +417,16 @@ const getBoardStats = async (boardId, callback) => {
 const updateLockBoard = async (boardId, isLocked, user, callback) => {
   try {
     const board = await boardModel.findById(boardId);
-
     if (!board) {
       return callback({ message: "Không tìm thấy bảng" });
     }
 
+    // Lock or unlock the board
     board._destroy = isLocked;
     await board.save();
 
+    // Update lists and cards based on the board's lock status
     await listModel.updateMany({ owner: boardId }, { _destroy: isLocked });
-
     const lists = await listModel.find({ owner: boardId });
     const listIds = lists.map((list) => list._id);
     await cardModel.updateMany(
@@ -427,6 +441,18 @@ const updateLockBoard = async (boardId, isLocked, user, callback) => {
     });
     await board.save();
 
+    for (const member of board.members) {
+      if (member.user.toString() !== user._id.toString()) {
+        await notificationModal.create({
+          user: member.user,
+          message: `<p>${user.surname + " " + user.name} ${action} <b>${
+            board.title
+          }</b></p>`,
+          link: `/board/${boardId}`,
+        });
+      }
+    }
+
     return callback(false, {
       message: isLocked ? "Khóa bảng thành công!" : "Mở khóa bảng thành công!",
     });
@@ -438,32 +464,48 @@ const updateLockBoard = async (boardId, isLocked, user, callback) => {
   }
 };
 
-const deleteBoard = async (boardId, callback) => {
+const deleteBoard = async (boardId, user, callback) => {
   try {
     const board = await boardModel.findById(boardId);
-
+    const mailOptions = {
+      from: process.env.SERVER_EMAIL,
+      to: user.email,
+      subject: "Thông báo về dự án",
+      text: `Dự án bạn đang tham gia đã đóng`,
+      html: mailDelete(
+        `Dự án <b>${board.title}</b> mà bạn đang tham gia đã được đóng lại bởi ${user.surname} ${user.name}, mọi thông tin liên hệ với chủ sở hữu để biết thêm thông tin.`
+      ),
+    };
     if (!board) {
       return callback({ message: "Không tìm thấy bảng" });
     }
 
-    // Xóa bảng khỏi danh sách boards của tất cả người dùng liên quan
     await userModel.updateMany(
       { boards: boardId },
       { $pull: { boards: boardId } }
     );
 
-    // Tìm tất cả các list thuộc bảng và lấy danh sách list IDs
     const lists = await listModel.find({ owner: boardId });
     const listIds = lists.map((list) => list._id);
 
-    // Xóa tất cả các card thuộc các list này
     await cardModel.deleteMany({ owner: { $in: listIds } });
 
-    // Xóa tất cả các list thuộc bảng
     await listModel.deleteMany({ owner: boardId });
 
-    // Xóa bảng
-    await boardModel.findByIdAndDelete(boardId);
+    await boardModel.findByIdAndDelete(boardId).then(() => {
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          return callback({
+            errMessage: "Không gửi được email thông báo",
+            details: error,
+          });
+        } else {
+          return callback(false, {
+            message: "Người dùng đã nhận được thông báo.",
+          });
+        }
+      });
+    });
 
     return callback(false, { message: "Xóa bảng thành công!" });
   } catch (error) {
