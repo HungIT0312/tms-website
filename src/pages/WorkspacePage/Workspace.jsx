@@ -172,7 +172,7 @@ const Workspace = () => {
   return (
     <div className="workspace">
       <Flex justify="space-between" style={{ paddingBottom: 32 }}>
-        <div className="workspace-title">Không gian làm việc của bạn</div>
+        <div className="workspace-title">Dự án quản lý</div>
         <Flex gap={8}>
           <Input
             size="middle"
@@ -235,9 +235,29 @@ const Workspace = () => {
         <Row gutter={[16, 16]}>
           <Divider orientation="left" orientationMargin={12}>
             <div className="workspace-title" style={{ border: "none" }}>
-              Không gian làm việc đang tham gia
+              Dự án tham gia
             </div>
           </Divider>
+          {!isLoading && searchedBoard("member")?.length < 1 && (
+            <Flex
+              style={{ width: "100vw" }}
+              justify="center"
+              align="center"
+              vertical
+            >
+              <Image
+                preview={false}
+                src={images.emptyBoard}
+                width={160}
+              ></Image>
+              <span
+                className="content__msg"
+                style={{ marginTop: 24, fontWeight: 600 }}
+              >
+                Bạn không có bảng nào ở đây
+              </span>
+            </Flex>
+          )}
           {isLoading && renderSkeletons(6)}
           {!isLoading &&
             boards?.length > 0 &&
@@ -253,6 +273,26 @@ const Workspace = () => {
               Dự án đang tạm dừng
             </div>
           </Divider>
+          {!isLoading && searchedBoard("owner", true)?.length < 1 && (
+            <Flex
+              style={{ width: "100vw" }}
+              justify="center"
+              align="center"
+              vertical
+            >
+              <Image
+                preview={false}
+                src={images.emptyBoard}
+                width={160}
+              ></Image>
+              <span
+                className="content__msg"
+                style={{ marginTop: 24, fontWeight: 600 }}
+              >
+                Bạn không có bảng nào ở đây
+              </span>
+            </Flex>
+          )}
           {isLoading && renderSkeletons(6)}
           {!isLoading &&
             boards?.length > 0 &&

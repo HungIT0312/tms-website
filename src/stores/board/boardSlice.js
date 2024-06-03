@@ -30,6 +30,9 @@ const boardSlice = createSlice({
     changeBg(state, action) {
       state.selectedBoard.backgroundImageLink = action.payload;
     },
+    removeBoard(state, action) {
+      state.boards = state.boards.filter((b) => b._id !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -204,6 +207,6 @@ const boardSlice = createSlice({
   },
 });
 
-export const { addBoardLabelUI, changeBg } = boardSlice.actions;
+export const { addBoardLabelUI, changeBg, removeBoard } = boardSlice.actions;
 
 export default boardSlice.reducer;
