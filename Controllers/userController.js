@@ -117,6 +117,34 @@ const getAllActivities = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+const updateUser = async (req, res) => {
+  const userId = req.user.id;
+  const { password, ...basicInfo } = req.body;
+
+  if (password) {
+    // Update password
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    await userService.updateUserPassword(
+      userId,
+      hashedPassword,
+      (err, result) => {
+        if (err) return res.status(400).send(err);
+        return res
+          .status(200)
+          .send({ message: "Mật khẩu đã được cập nhật thành công!" });
+      }
+    );
+  } else {
+    // Update basic information
+    await userService.updateUserBasicInfo(userId, basicInfo, (err, result) => {
+      if (err) return res.status(400).send(err);
+      return res
+        .status(200)
+        .send({ message: "Thông tin cơ bản đã được cập nhật thành công!" });
+    });
+  }
+};
 module.exports = {
   login,
   getUser,
@@ -126,4 +154,5 @@ module.exports = {
   verifyEmail,
   registerByEmail,
   getAllActivities,
+  updateUser,
 };

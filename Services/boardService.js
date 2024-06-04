@@ -9,6 +9,7 @@ const dotenv = require("dotenv");
 const dayjs = require("dayjs");
 const nodemailer = require("nodemailer");
 const mailDelete = require("../utils/mailDelete");
+const invitationModel = require("../Models/invitationModel");
 dotenv.config();
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -99,7 +100,10 @@ const getAll = async (userId, callback) => {
 const getById = async (id, callback) => {
   try {
     // Get board by id
-    const board = await boardModel.findById(id).populate("labels");
+    const board = await boardModel.findById(id).populate("labels").populate({
+      path: "members.user",
+      select: "name surname email color",
+    });
     return callback(false, board);
   } catch (error) {
     return callback({
@@ -467,6 +471,7 @@ const updateLockBoard = async (boardId, isLocked, user, callback) => {
 const deleteBoard = async (boardId, user, callback) => {
   try {
     const board = await boardModel.findById(boardId);
+
     const mailOptions = {
       from: process.env.SERVER_EMAIL,
       to: user.email,
@@ -491,7 +496,7 @@ const deleteBoard = async (boardId, user, callback) => {
     await cardModel.deleteMany({ owner: { $in: listIds } });
 
     await listModel.deleteMany({ owner: boardId });
-
+    await invitationModel.deleteMany({ board: boardId });
     await boardModel.findByIdAndDelete(boardId).then(() => {
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {

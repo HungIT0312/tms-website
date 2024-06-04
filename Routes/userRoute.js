@@ -9,4 +9,5 @@ router.post("/search", userController.searchUsers);
 router.post("/refresh-token", userController.refreshToken);
 router.post("/register-by-mail", userController.registerByEmail);
 router.post("/verify-mail", userController.verifyEmail);
+router.patch("/update-user", userController.updateUser);
 module.exports = router;

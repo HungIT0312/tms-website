@@ -258,6 +258,42 @@ const getUserActivities = async (userId, callback) => {
   }
 };
 
+const updateUserPassword = async (userId, newPassword, callback) => {
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) return callback({ errMessage: "Không tìm thấy người dùng!" });
+
+    user.password = newPassword;
+    await user.save();
+
+    return callback(false, {
+      message: "Mật khẩu đã được cập nhật thành công!",
+    });
+  } catch (err) {
+    return callback({
+      errMessage: "Không thể cập nhật mật khẩu",
+      details: err.message,
+    });
+  }
+};
+const updateUserBasicInfo = async (userId, basicInfo, callback) => {
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) return callback({ errMessage: "Không tìm thấy người dùng!" });
+
+    Object.assign(user, basicInfo);
+    await user.save();
+
+    return callback(false, {
+      message: "Thông tin cơ bản đã được cập nhật thành công!",
+    });
+  } catch (err) {
+    return callback({
+      errMessage: "Không thể cập nhật thông tin cơ bản",
+      details: err.message,
+    });
+  }
+};
 module.exports = {
   login,
   getUser,
@@ -267,4 +303,6 @@ module.exports = {
   registerByEmail,
   verifyEmail,
   getUserActivities,
+  updateUserPassword,
+  updateUserBasicInfo,
 };

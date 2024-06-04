@@ -185,7 +185,6 @@ const changeCardToAnotherList = async (req, res) => {
     boardId,
     user,
     newListId,
-    completed,
     cardId,
     (err, result) => {
       if (err) return res.status(400).send(err);
