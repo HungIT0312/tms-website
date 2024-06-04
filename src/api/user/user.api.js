@@ -21,6 +21,9 @@ export const registerUserByEmail = (userData) => {
 export const verifyMail = (token) => {
   return http.post("/user/verify-mail", token);
 };
+export const updateUser = (data) => {
+  return http.patch("/user/update-user", { ...data });
+};
 // router.post("/register", userController.register);
 // router.post("/login", userController.login);
 // router.get("/get-user", userController.getUser);

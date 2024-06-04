@@ -102,7 +102,7 @@ const BoardDrawer = ({
             <span className="drawer-item__name">Danh sách lưu trữ</span>
           </Flex>
         </Flex>
-        {owner?.user == userInformation?._id && (
+        {owner?.user._id == userInformation?._id && (
           <>
             <Flex
               gap={12}

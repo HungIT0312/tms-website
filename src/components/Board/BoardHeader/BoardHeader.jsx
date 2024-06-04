@@ -34,7 +34,7 @@ const BoardHeader = ({ showDrawer, handleSearch, searchKey }) => {
   const inputRef = useRef(null);
   const isOwner = selectedBoard?.members?.some(
     (mem) =>
-      mem.user.toString() === userInformation._id.toString() &&
+      mem.user._id.toString() === userInformation._id.toString() &&
       mem.role === "owner"
   );
   const renderMember = members.map((member) => {

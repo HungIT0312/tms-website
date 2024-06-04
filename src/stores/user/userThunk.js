@@ -3,6 +3,7 @@ import {
   logInUser,
   registerUserByEmail,
   searchUser,
+  updateUser,
   verifyMail,
 } from "../../api/user/user.api";
 
@@ -44,6 +45,17 @@ export const searchUserByKey = createAsyncThunk(
   async (userData, thunkApi) => {
     try {
       const response = await searchUser(userData);
+      return response;
+    } catch (error) {
+      throw thunkApi.rejectWithValue(error);
+    }
+  }
+);
+export const updateUserInfo = createAsyncThunk(
+  "user/updateUserInfo",
+  async (userData, thunkApi) => {
+    try {
+      const response = await updateUser(userData);
       return response;
     } catch (error) {
       throw thunkApi.rejectWithValue(error);

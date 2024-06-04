@@ -54,7 +54,6 @@ const cardSlice = createSlice({
       );
       state.selectedCard.attachments.splice(index, 1);
     },
-   
   },
   extraReducers: (builder) =>
     builder
@@ -63,7 +62,6 @@ const cardSlice = createSlice({
         state.message = null;
       })
       .addCase(updateCardInfo.fulfilled, (state, action) => {
-        state.selectedCard = action.payload.card;
         state.message = action.payload.message;
         state.isLoading = false;
       })

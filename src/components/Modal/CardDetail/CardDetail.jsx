@@ -141,9 +141,9 @@ const CardDetail = () => {
   };
   const renderLabels =
     selectedCard?.labels &&
-    selectedCard?.labels.map((l) => {
+    selectedCard?.labels.map((l, index) => {
       return (
-        <Tag style={{ height: 22, minWidth: 30 }} key={l?._id} color={l?.type}>
+        <Tag style={{ height: 22, minWidth: 30 }} key={index} color={l?.type}>
           {l?.text}
         </Tag>
       );
@@ -446,9 +446,9 @@ const CardDetail = () => {
         >
           {selectedBoard?.members?.map((mem) => (
             <Option
-              key={mem.user}
-              value={mem.user}
-              label={mem.surname + " " + mem.name}
+              key={mem.user._id}
+              value={mem.user._id}
+              label={mem?.user?.fullName}
             >
               <Flex className="" gap={8}>
                 <Avatar
@@ -457,7 +457,7 @@ const CardDetail = () => {
                 >
                   {mem?.surname[0] + mem?.name[0]}
                 </Avatar>
-                <div>{mem.surname + " " + mem.name}</div>
+                <div>{mem?.user?.fullName}</div>
               </Flex>
             </Option>
           ))}

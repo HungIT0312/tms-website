@@ -37,10 +37,10 @@ const InvitationItem = ({ invitation }) => {
         <Flex gap={8} vertical>
           <span className="invitation__text">
             <span>
-              {invitation.inviter.name + " " + invitation.inviter.surname}
+              {invitation?.inviter?.name + " " + invitation?.inviter?.surname}
             </span>
             <span> đã mời bạn vào bảng "</span>
-            <strong>{invitation.board.title}</strong>".
+            <strong>{invitation?.board?.title}</strong>".
           </span>
           <Flex justify="space-between" align="center">
             <div className="invitation__date">

@@ -1,25 +1,52 @@
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  LeftOutlined,
-  RightCircleFilled,
   SettingOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Col, Flex, Form, Input, Row, Tag } from "antd";
+import {
+  Avatar,
+  Button,
+  Col,
+  Flex,
+  Form,
+  Input,
+  Row,
+  Tag,
+  message,
+} from "antd";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "./UserPage.scss";
+import { updateUserInfoUI } from "../../stores/user/userSlice";
+import { updateUserInfo } from "../../stores/user/userThunk";
 
 const UserPage = () => {
   const { userInformation } = useSelector((state) => state.user);
   const [form] = Form.useForm();
   const [isEdit, setIsEdit] = useState(false);
   const [isEditPass, setIsEditPass] = useState(false);
+  const dispatch = useDispatch();
   const onFinish = (values) => {
     if (isEditPass) {
-      console.log("Updated Values: ", values);
+      try {
+        dispatch(updateUserInfo(values));
+        message.success("Cập nhật thành công");
+      } catch (error) {
+        message.error("Cập nhật không thành công");
+      }
     } else {
-      console.log("Updated Values: ", values);
+      const dataUpdate = {
+        ...userInformation,
+        name: values?.name,
+        surname: values?.surname,
+      };
+      try {
+        dispatch(updateUserInfoUI(dataUpdate));
+        dispatch(updateUserInfo(values));
+        message.success("Cập nhật thành công");
+      } catch (error) {
+        message.error("Cập nhật không thành công");
+      }
     }
     // Logic to update user information goes here
     setIsEdit(false);

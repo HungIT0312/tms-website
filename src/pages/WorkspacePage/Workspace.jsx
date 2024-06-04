@@ -181,6 +181,7 @@ const Workspace = () => {
             className="workspace__search"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            allowClear
           />
           <Button
             type="primary"
@@ -295,8 +296,8 @@ const Workspace = () => {
           )}
           {isLoading && renderSkeletons(6)}
           {!isLoading &&
-            boards?.length > 0 &&
-            searchedBoard("owner", true).map((board) => (
+            storageBoards?.length > 0 &&
+            searchedBoard("", true).map((board) => (
               <Col key={board._id} xs={24} sm={12} md={6} lg={4}>
                 <BoardPreview
                   isMem={true}

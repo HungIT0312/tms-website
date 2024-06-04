@@ -16,7 +16,7 @@ const Background = () => {
 
   const isOwner = selectedBoard?.members?.some(
     (mem) =>
-      mem.user.toString() === userInformation._id.toString() &&
+      mem.user._id.toString() === userInformation._id.toString() &&
       mem.role === "owner"
   );
 

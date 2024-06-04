@@ -27,7 +27,6 @@ const BoardFilter = () => {
       dueDates: e?.filter((item) => item.now) || [],
       completed: completed,
     };
-    console.log(data);
     dispatch(getListsByFilter(data));
   };
   const handleChangeUserSearch = (e) => {

@@ -13,7 +13,7 @@ import "./Info.scss";
 
 const Info = ({ owner, selectedBoard }) => {
   const { userInformation } = useSelector((state) => state.user);
-  const isMe = owner.user === userInformation._id.toString();
+  const isMe = owner.user._id === userInformation._id.toString();
   const dispatch = useDispatch();
   const isOwner = selectedBoard?.members?.some(
     (mem) =>
@@ -28,6 +28,7 @@ const Info = ({ owner, selectedBoard }) => {
     };
     dispatch(updateBoardInfo(newDes));
   };
+  const mailName = owner?.email.split("@")[0];
   return (
     <Flex className="info" vertical gap={16}>
       <Flex vertical gap={12}>
@@ -53,11 +54,9 @@ const Info = ({ owner, selectedBoard }) => {
             gap={4}
             justify="start"
           >
-            <span className="info__name">
-              {owner?.surname + " " + owner?.name}
-            </span>
+            <span className="info__name">{owner?.user?.fullName}</span>
             <span className="info__mail">{owner?.email}</span>
-            {isMe && <Link>Thay đổi thông tin</Link>}
+            {isMe && <Link to={`/user/${mailName}`}>Thay đổi thông tin</Link>}
           </Flex>
         </Flex>
       </Flex>

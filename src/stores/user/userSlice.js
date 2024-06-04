@@ -25,6 +25,9 @@ const userSlice = createSlice({
       deleteCookie();
       window.localStorage.clear();
     },
+    updateUserInfoUI: (state, action) => {
+      state.userInformation = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -67,5 +70,5 @@ const userSlice = createSlice({
       });
   },
 });
-export const { logOut } = userSlice.actions;
+export const { logOut, updateUserInfoUI } = userSlice.actions;
 export default userSlice.reducer;
