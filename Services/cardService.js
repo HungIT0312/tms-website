@@ -557,10 +557,11 @@ const updateStartDueDates = async (
         }`,
       });
     }
+    const now = dayjs();
     if (card.date.completed !== completed) {
       card.date.completed = completed;
       if (completed) {
-        card.date.resolvedAt = Date.now();
+        card.date.resolvedAt = now;
         card.activities.unshift({
           user: user._id,
           action: `đã cập nhật trạng thái của thẻ là hoàn thành`,
