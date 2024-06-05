@@ -15,11 +15,7 @@ const Info = ({ owner, selectedBoard }) => {
   const { userInformation } = useSelector((state) => state.user);
   const isMe = owner.user._id === userInformation._id.toString();
   const dispatch = useDispatch();
-  const isOwner = selectedBoard?.members?.some(
-    (mem) =>
-      mem.user.toString() === userInformation._id.toString() &&
-      mem.role === "owner"
-  );
+  const isOwner = owner.user._id === userInformation._id.toString();
   const triggerCallUpdate = (value) => {
     const newDes = {
       boardId: selectedBoard?._id,

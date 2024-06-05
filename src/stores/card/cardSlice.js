@@ -40,7 +40,11 @@ const cardSlice = createSlice({
       state.selectedCard.labels.push(action.payload);
     },
     updateCardDate(state, action) {
-      state.selectedCard.labels.push(action.payload);
+      state.selectedCard.date = {
+        ...state.selectedCard.date,
+        resolvedAt: action.payload.resolvedAt,
+        updatedAt: action.payload.updatedAt,
+      };
     },
     updateCardDateCompletedUI(state, action) {
       state.selectedCard.date.completed = action.payload;
@@ -181,6 +185,7 @@ export const {
   addLabelToCardUI,
   updateCardDateCompletedUI,
   updateCardSubTaskUI,
+  updateCardDate,
   removeAttachment,
   uploadFileUI,
 } = cardSlice.actions;

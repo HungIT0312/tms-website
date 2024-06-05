@@ -37,6 +37,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   setSelectedCard,
+  updateCardDate,
   updateCardDateCompletedUI,
   updateCardSubTaskUI,
 } from "../../../stores/card/cardSlice";
@@ -201,6 +202,12 @@ const CardDetail = () => {
           completed: data,
         },
       };
+      const now = dayjs();
+      if (data) {
+        dispatch(updateCardDate({ resolvedAt: now, updatedAt: now }));
+      } else {
+        dispatch(updateCardDate({ resolvedAt: null, updatedAt: now }));
+      }
       dispatch(
         updateDateCardListUI({ ...dataAddDate, date: { completed: data } })
       );
@@ -384,12 +391,13 @@ const CardDetail = () => {
       ),
       span: 4,
     },
+
     {
       key: "4",
       label: "Cập nhật lúc",
       children: (
         <DatePicker
-          defaultValue={dayjs(selectedCard?.date?.updatedAt)}
+          value={dayjs(selectedCard?.date?.updatedAt)}
           minDate={dayjs(selectedCard?.date?.updatedAt)}
           maxDate={dayjs(selectedCard?.date?.updatedAt)}
           allowClear={false}
@@ -404,6 +412,19 @@ const CardDetail = () => {
         <DatePicker
           disabled
           defaultValue={dayjs(selectedCard?.createdAt)}
+          allowClear={false}
+        />
+      ),
+      span: 4,
+    },
+    selectedCard?.date?.resolvedAt !== null && {
+      key: "6",
+      label: "Hoàn thành",
+      children: (
+        <DatePicker
+          value={dayjs(selectedCard?.date?.resolvedAt)}
+          minDate={dayjs(selectedCard?.date?.resolvedAt)}
+          maxDate={dayjs(selectedCard?.date?.resolvedAt)}
           allowClear={false}
         />
       ),

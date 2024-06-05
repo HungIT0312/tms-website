@@ -24,15 +24,23 @@ const CreateBoard = ({ isOpen, showModal }) => {
         backgroundImageLink: bgLink,
         isImage: true,
       };
-      dispatch(createNewBoard(value)).then(() => {
-        api.success({
-          message: `Tạo mới !`,
-          description: "Thêm thành công",
-          placement: "bottomRight",
+      dispatch(createNewBoard(value))
+        .then(() => {
+          api.success({
+            message: `Tạo mới !`,
+            description: "Thêm thành công",
+            placement: "bottomRight",
+          });
+        })
+        .catch(() => {
+          api.error({
+            message: `Tạo mới !`,
+            description: "Thêm thất bại",
+            placement: "bottomRight",
+          });
         });
-      });
+      showModal(false);
     }
-    showModal(false);
   };
   const handleCancel = () => {
     showModal(false);
