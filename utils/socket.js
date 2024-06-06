@@ -9,12 +9,9 @@ const initializeSocket = (server, corsOptions) => {
   io.on("connection", (socket) => {
     socket.on("join", ({ userId }) => {
       userConnections[userId] = socket.id;
-      //   console.log(`User ${userId} connected with socket ID ${socket.id}`);
-      console.log("A user connected");
     });
 
     socket.on("disconnect", () => {
-      console.log("User disconnected");
       for (const [userId, socketId] of Object.entries(userConnections)) {
         if (socketId === socket.id) {
           delete userConnections[userId];

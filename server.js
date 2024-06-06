@@ -13,7 +13,6 @@ const auth = require("./Middlewares/auth");
 const socketIo = require("socket.io");
 const { initializeSocket } = require("./utils/socket");
 
-
 dotenv.config();
 
 const app = express();
@@ -71,7 +70,7 @@ app.use("/invitation", invitationRoute);
 app.use("/notification", notificationRoute);
 
 const server = app.listen(process.env.PORT, () => {
-  console.log(`Server is online! Port: ${process.env.PORT}`);
+  // console.log(`Server is online! Port: ${process.env.PORT}`);
 });
 initializeSocket(server, {
   cors: {

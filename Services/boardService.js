@@ -10,6 +10,7 @@ const dayjs = require("dayjs");
 const nodemailer = require("nodemailer");
 const mailDelete = require("../utils/mailDelete");
 const invitationModel = require("../Models/invitationModel");
+const { emitToUser } = require("../utils/socket");
 dotenv.config();
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -162,6 +163,13 @@ const removeMember = async (boardId, memberId, user, callback) => {
       member.boards.splice(boardIndex, 1);
     }
     await member.save();
+    const newNotice = await notificationModal.create({
+      user: memberId,
+      message: `<p>${
+        user.surname + " " + user.name
+      } đã xóa bạn ra khỏi bảng <b>${board.title}</b></p>`,
+      link: `/`,
+    });
 
     const lists = await listModel.find({ owner: boardId });
 

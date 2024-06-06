@@ -1,7 +1,6 @@
 const boardModel = require("../Models/boardModel");
 const invitationModel = require("../Models/invitationModel");
 const userModel = require("../Models/userModel");
-const { emitToUser } = require("../utils/socket");
 
 const acceptInvitation = async (invitationId, userId, callback) => {
   try {

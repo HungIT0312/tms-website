@@ -40,15 +40,12 @@ const create = async (
       });
     }
 
-    // Create new card
     const card = new cardModel({ title: title });
     card.owner = listId;
-
-    // Set isSubTaskOf if parentCardId is provided
+    card.date.resolvedAt = null;
     if (parentCardId) {
       card.isSubTaskOf = parentCardId;
 
-      // Find parent card and add new card to its subTasks
       const parentCard = await cardModel.findById(parentCardId);
       if (parentCard) {
         parentCard.subTasks.push(card._id);
