@@ -40,7 +40,7 @@ const SearchUserItem = ({
           title={`${
             !isOwner ? "Chỉ chủ sở hữu mới có thể xóa thành viên" : ""
           }`}
-          onClick={() => handleRemoveMember(member.user.toString())}
+          onClick={() => handleRemoveMember(member.user)}
         >
           Xóa
         </Button>

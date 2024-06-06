@@ -522,29 +522,27 @@ const CardDetail = () => {
       label: "Ngày",
       children: <Descriptions title="" items={itemTime} layout="" />,
     },
+
     {
       key: "3",
       label: "Task phụ",
-      children:
-        selectedCard?.isSubTaskOf && !selectedCard?.isSubTaskOf?._destroy ? (
-          <Flex>Đây là một task phụ.</Flex>
-        ) : (
-          <Flex vertical gap={8}>
-            <Flex gap={8} vertical>
-              {renderSubTasks}
-            </Flex>
-            <Space.Compact style={{ width: "100%" }}>
-              <Input
-                value={newCard}
-                placeholder="Nhập tên thẻ mới."
-                onChange={(e) => setNewCard(e.target.value)}
-              />
-              <Button prefix={<PlusOutlined />} onClick={handleAddNewCard}>
-                Thêm
-              </Button>
-            </Space.Compact>
+      children: (
+        <Flex vertical gap={8}>
+          <Flex gap={8} vertical>
+            {renderSubTasks}
           </Flex>
-        ),
+          <Space.Compact style={{ width: "100%" }}>
+            <Input
+              value={newCard}
+              placeholder="Nhập tên thẻ mới."
+              onChange={(e) => setNewCard(e.target.value)}
+            />
+            <Button prefix={<PlusOutlined />} onClick={handleAddNewCard}>
+              Thêm
+            </Button>
+          </Space.Compact>
+        </Flex>
+      ),
     },
   ];
 

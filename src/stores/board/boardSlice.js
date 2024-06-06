@@ -33,6 +33,16 @@ const boardSlice = createSlice({
     removeBoard(state, action) {
       state.boards = state.boards.filter((b) => b._id !== action.payload);
     },
+    removeStorageBoard(state, action) {
+      state.storageBoards = state.storageBoards.filter(
+        (b) => b._id !== action.payload
+      );
+    },
+    removeBoardMember(state, action) {
+      state.selectedBoard.members = state.selectedBoard.members.filter(
+        (m) => m.user._id !== action.payload
+      );
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -207,6 +217,12 @@ const boardSlice = createSlice({
   },
 });
 
-export const { addBoardLabelUI, changeBg, removeBoard } = boardSlice.actions;
+export const {
+  addBoardLabelUI,
+  changeBg,
+  removeBoard,
+  removeBoardMember,
+  removeStorageBoard,
+} = boardSlice.actions;
 
 export default boardSlice.reducer;

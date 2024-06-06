@@ -169,48 +169,46 @@ const ListSlice = createSlice({
 
     deleteCardInListById(state, action) {
       const { cardId, parentCardId } = action.payload;
-      if (parentCardId) {
-        state.lists = state.lists.map((list) => {
-          list.cards = list.cards.map((card) => {
-            if (card._id === parentCardId) {
-              return {
-                ...card,
-                subTasks: card.subTasks.filter(
-                  (subTaskId) => subTaskId !== cardId
-                ),
-              };
-            }
-            return card;
-          });
-          return list;
-        });
-      }
-      const cardIdsToRemove = new Set();
-      const getCardAndSubtasks = (cards, cardId) => {
+
+      const gatherSubtaskIds = (cards, cardId, ids = new Set()) => {
         for (let card of cards) {
           if (card._id === cardId) {
-            cardIdsToRemove.add(card._id);
+            ids.add(card._id);
             if (card.subTasks && card.subTasks.length > 0) {
               card.subTasks.forEach((subTaskId) =>
-                cardIdsToRemove.add(subTaskId)
+                gatherSubtaskIds(cards, subTaskId, ids)
               );
             }
             break;
           }
         }
+        return ids;
       };
 
-      // Iterate through all lists to find the card and its subtasks
-      state.lists.forEach((list) => {
-        getCardAndSubtasks(list.cards, cardId);
-      });
+      const cardIdsToRemove = gatherSubtaskIds(
+        state.lists.flatMap((list) => list.cards),
+        cardId
+      );
 
-      // Filter out the card and its subtasks from each list
+      // Remove the card and its subtasks from each list
       state.lists = state.lists.map((list) => {
-        const updatedCards = list.cards.filter(
+        list.cards = list.cards.filter(
           (card) => !cardIdsToRemove.has(card._id)
         );
-        return { ...list, cards: updatedCards };
+        if (parentCardId) {
+          list.cards = list.cards.map((card) => {
+            if (card._id === parentCardId) {
+              return {
+                ...card,
+                subTasks: card.subTasks.filter(
+                  (subTaskId) => !cardIdsToRemove.has(subTaskId)
+                ),
+              };
+            }
+            return card;
+          });
+        }
+        return list;
       });
     },
     updateCardInListById(state, action) {

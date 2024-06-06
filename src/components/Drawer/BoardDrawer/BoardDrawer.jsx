@@ -6,24 +6,15 @@ import {
   LockOutlined,
   ProjectOutlined,
 } from "@ant-design/icons";
-import {
-  Button,
-  Divider,
-  Drawer,
-  Flex,
-  Form,
-  Image,
-  Input,
-  Modal,
-  Tag,
-  message,
-} from "antd";
+import { Button, Divider, Drawer, Flex, Image, message } from "antd";
 import { useState } from "react";
 import { FiArchive } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { deleteBoard, lockBoard } from "../../../api/board/board.api";
 import { removeBoard } from "../../../stores/board/boardSlice";
+import DeleteBoard from "../../Modal/DeleteBoard/DeleteBoard";
+import LockBoard from "../../Modal/LockBoard/LockBoard";
 import "./BoardDrawer.scss";
 import Activities from "./Content/Activities";
 import Archive from "./Content/Archive";
@@ -44,7 +35,6 @@ const BoardDrawer = ({
   // const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
-  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const renderDrawerContent = (child) => {
@@ -160,6 +150,7 @@ const BoardDrawer = ({
       navigate(`/`);
     } catch (error) {
       console.log(error);
+      message.error("Khóa dự án không thành công");
     }
   };
   const deleteBoardById = async () => {
@@ -167,97 +158,20 @@ const BoardDrawer = ({
       dispatch(removeBoard(selectedBoard?._id));
       await deleteBoard(selectedBoard?._id);
       setIsOpen2(false);
-      const input = document.getElementById("lock-board-input");
-      input.value = "";
       message.success("Dự án đã được đóng.");
       navigate("/");
     } catch (error) {
       console.log(error);
+      message.error("Đóng dự án không thành công");
     }
   };
   const handleLockBoard = async () => {
-    const input = document.getElementById("lock-board-input").value;
-    if (input !== selectedBoard.title) {
-      message.error("Tên dự án không đúng");
-      return;
-    }
     lockBoardById();
   };
   const handleDeleteBoard = async () => {
-    const input = document.getElementById("lock-board-input").value;
-    if (input !== selectedBoard.title) {
-      message.error("Tên dự án không đúng");
-      return;
-    }
     deleteBoardById();
   };
-  const handleInputChange = async (e) => {
-    const value = e.target.value;
-    await setIsConfirmDisabled(value.trim() !== selectedBoard.title.trim());
-  };
-  const handleInputChange2 = async (e) => {
-    const value = e.target.value;
-    await setIsConfirmDisabled(value.trim() !== selectedBoard.title.trim());
-  };
-  const content = (
-    <Flex vertical>
-      <p>
-        Việc khóa hay tạm dừng dự án sẽ làm các công việc bị hủy bỏ tạm thời,
-        các thành viên có trong bảng sẽ không thể tương tác với bảng này nữa.
-      </p>
-      <Form layout="vertical">
-        <Form.Item
-          label={
-            <Flex gap={4}>
-              Hãy nhập lại tên dự án
-              <Tag color="default" style={{ margin: "0px 4px" }}>
-                {selectedBoard.title}
-              </Tag>
-              để khóa
-            </Flex>
-          }
-          rules={[{ required: true, message: "Vui lòng nhập tiêu đề bảng!" }]}
-        >
-          <Input
-            id="lock-board-input"
-            type="text"
-            onChange={handleInputChange}
-          ></Input>
-        </Form.Item>
-      </Form>
-    </Flex>
-  );
-  const contentDelete = (
-    <Flex vertical>
-      <p>
-        Cần cân nhắc kĩ trước khi thực hiện hành động, việc đóng dự án sẽ xóa
-        các thông tin, tiến độ và thành viên có trong dự án. Hệ thống sẽ gửi
-        thông báo đến thành viên. Bạn có thể lựa chọn
-        <b style={{ margin: "0 4px" }}>khóa dự án</b>để lưu trữ dự án thay vì
-        đóng hoàn toàn.
-      </p>
-      <Form layout="vertical">
-        <Form.Item
-          label={
-            <p>
-              Nếu đã xác nhận, hãy nhập lại tên dự án
-              <Tag color="error" style={{ margin: "0px 4px" }}>
-                {selectedBoard.title}
-              </Tag>
-              để đóng dự án này
-            </p>
-          }
-          rules={[{ required: true, message: "Vui lòng nhập tiêu đề bảng!" }]}
-        >
-          <Input
-            id="lock-board-input"
-            type="text"
-            onChange={handleInputChange2}
-          ></Input>
-        </Form.Item>
-      </Form>
-    </Flex>
-  );
+
   return (
     <Drawer
       title="Menu"
@@ -283,43 +197,17 @@ const BoardDrawer = ({
       {renderKey === "activity" && <Activities selectedBoard={selectedBoard} />}
       {renderKey === "archive" && <Archive />}
       {renderKey === "bg" && <Background />}
-      <Modal
-        title="Bạn có muốn khóa, tạm dừng dự án này không?"
-        okText="Xác nhận"
-        cancelText="Hủy"
-        centered={true}
-        onOk={handleLockBoard}
-        onCancel={() => {
-          setIsOpen(false);
-          const input = document.getElementById("lock-board-input");
-          input.value = "";
-        }}
-        open={isOpen}
-        okButtonProps={{
-          disabled: isConfirmDisabled,
-        }}
-      >
-        {content}
-      </Modal>
-      <Modal
-        title="Bạn có muốn đóng dự án này không"
-        okText="Đóng"
-        okType="danger"
-        cancelText="Hủy"
-        centered={true}
-        onOk={handleDeleteBoard}
-        onCancel={() => {
-          setIsOpen2(false);
-          const input = document.getElementById("lock-board-input");
-          input.value = "";
-        }}
-        open={isOpen2}
-        okButtonProps={{
-          disabled: isConfirmDisabled,
-        }}
-      >
-        {contentDelete}
-      </Modal>
+      <LockBoard
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        handleLockBoard={handleLockBoard}
+      />
+
+      <DeleteBoard
+        isOpen2={isOpen2}
+        setIsOpen2={setIsOpen2}
+        handleDeleteBoard={handleDeleteBoard}
+      />
     </Drawer>
   );
 };

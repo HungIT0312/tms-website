@@ -9,7 +9,28 @@ const QuillTextBox = ({ content, placeholder, getCleanHTML = () => {} }) => {
   const [initialValue, setInitialValue] = useState(content || "");
   const quillRef = useRef(null);
   const showRef = useRef(null);
+  const fullToolbarOptions = [
+    [{ font: [] }],
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ color: [] }, { background: [] }],
+    [{ script: "sub" }, { script: "super" }],
+    [
+      { list: "ordered" },
+      { list: "bullet" },
+      { indent: "-1" },
+      { indent: "+1" },
+    ],
+    [{ direction: "rtl" }],
+    [{ align: [] }],
+    ["link"],
+    ["blockquote", "code-block"],
+    ["clean"],
+  ];
 
+  const modules = {
+    toolbar: fullToolbarOptions,
+  };
   useEffect(() => {
     showRef.current.innerHTML = content;
     quillRef.current.editor.root.innerHTML = content;
@@ -52,6 +73,7 @@ const QuillTextBox = ({ content, placeholder, getCleanHTML = () => {} }) => {
         ref={quillRef}
         theme="snow"
         placeholder={placeholder}
+        modules={modules}
       />
       {isChangeDes && (
         <Flex gap={8}>

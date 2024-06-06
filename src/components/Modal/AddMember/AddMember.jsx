@@ -13,6 +13,7 @@ import SearchUserItem from "./SearchUserItem/SearchUserItem";
 import { removeMemberInBoard } from "../../../stores/board/boardThunk";
 import { useDispatch, useSelector } from "react-redux";
 import { removeBoardMemberUI } from "../../../stores/list/ListSlice";
+import { removeBoardMember } from "../../../stores/board/boardSlice";
 
 const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
   const [inputText, setInputText] = useState();
@@ -92,15 +93,19 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
     }
   };
 
-  const handleRemoveMember = (id) => {
+  const handleRemoveMember = (value) => {
     Modal.confirm({
       title: "Xóa thành viên",
       content:
         "Bạn có chắc chắn muốn xóa thành viên này không? Chúng tôi sẽ hủy bỏ nhiệm vụ được giao cho họ.",
       onOk: () => {
-        dispatch(removeBoardMemberUI({ memberId: id }));
+        dispatch(removeBoardMemberUI({ memberId: value._id }));
+        dispatch(removeBoardMember(value._id));
         dispatch(
-          removeMemberInBoard({ boardId: board._id.toString(), memberId: id })
+          removeMemberInBoard({
+            boardId: board._id.toString(),
+            memberId: value._id,
+          })
         );
         api.success({
           message: `Xóa thành viên !`,
