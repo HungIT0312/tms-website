@@ -23,8 +23,8 @@ const SearchUserItem = ({
           {member.surname[0] + member.name[0]}
         </Avatar>
         <Flex vertical>
-          <span className="">{member.email}</span>
-          <span className="">{member.surname + " " + member.name}</span>
+          <span className="">{member?.email}</span>
+          <span className="">{member?.user?.fullName || member?.fullName}</span>
         </Flex>
       </Flex>
       {member.role && member.role === "owner" && (

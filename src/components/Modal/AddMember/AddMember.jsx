@@ -42,9 +42,9 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
             setUserSearch(res);
           } else {
             const filteredResults = res.filter((user) =>
-              board.members.find((member) => member.user === user._id)
+              board.members.find((member) => member.user._id == user._id)
             );
-            setUserSearch(filteredResults);
+            setUserSearch([...filteredResults]);
           }
         }
       } catch (error) {
@@ -138,7 +138,7 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
 
   return (
     <Modal
-      title="Thêm thành viên"
+      title={isOwner ? "Thêm thành viên" : "Thành viên"}
       centered
       open={isOpen}
       onOk={() => setIsOpen(false)}

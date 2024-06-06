@@ -125,7 +125,7 @@ export const Header = () => {
         </span>
         <div className="header__avatar" onClick={() => setIsPopup(!isPopup)}>
           <Avatar style={{ background: `${userInformation.color}` }}>
-            {userInformation.name[0] + userInformation.surname[0]}
+            {userInformation.surname[0] + userInformation.name[0]}
           </Avatar>
         </div>
         {isPopup && (

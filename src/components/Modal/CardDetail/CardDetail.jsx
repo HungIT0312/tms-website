@@ -278,7 +278,7 @@ const CardDetail = () => {
     setNewCard("");
   };
   const handleAddPeople = (e) => {
-    const crrMember = selectedBoard?.members.filter((mem) => mem.user == e);
+    const crrMember = selectedBoard?.members.filter((mem) => mem.user._id == e);
     const dataAddDate = {
       boardId: boardId,
       listId: selectedCard?.owner,

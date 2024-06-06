@@ -37,9 +37,7 @@ const BoardFilter = () => {
   };
   const filteredUsers = selectedBoard?.members?.filter(
     (member) =>
-      (member?.name + " " + member?.surname)
-        .toLowerCase()
-        .includes(userSearch.toLowerCase()) ||
+      member?.user?.fullName.toLowerCase().includes(userSearch.toLowerCase()) ||
       member?.email?.toLowerCase().includes(userSearch.toLowerCase())
   );
   const filteredLabels = selectedBoard?.labels?.filter(
@@ -105,7 +103,7 @@ const BoardFilter = () => {
                 >
                   {item?.name[0] + item?.surname[0]}
                 </Avatar>
-                <span>{item?.name + " " + item?.surname}</span>
+                <span>{item?.user?.fullName}</span>
               </Flex>
             </Checkbox>
           ))}

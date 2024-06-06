@@ -232,7 +232,7 @@ const CardItem = ({
                   background: card?.members[0]?.color,
                 }}
               >
-                {card?.members[0]?.name[0] + card?.members[0]?.surname[0]}
+                {card?.members[0]?.surname[0] + card?.members[0]?.name[0]}
               </Avatar>
             ) : (
               // {/* </Tooltip> */}
