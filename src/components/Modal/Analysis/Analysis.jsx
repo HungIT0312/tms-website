@@ -2,34 +2,51 @@
 import {
   BorderOutlined,
   CheckSquareOutlined,
+  CloseCircleOutlined,
   ExclamationCircleOutlined,
+  InfoCircleOutlined,
+  LeftOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import {
+  Button,
   Card,
   Col,
+  Descriptions,
   Flex,
+  Input,
   Modal,
   Progress,
   Row,
+  Skeleton,
+  Space,
   Statistic,
   Table,
-  Input,
-  Button,
-  Space,
-  Skeleton,
+  Tag,
 } from "antd";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getBoardStats } from "../../../api/board/board.api";
 import "./Analysis.scss";
+import { analysisUser } from "../../../api/user/user.api";
+import dayjs from "dayjs";
+import _ from "lodash";
+import { useDispatch, useSelector } from "react-redux";
+import { getCardById } from "../../../stores/card/cardThunk";
 
 const Analysis = ({ isOpen, setIsOpen }) => {
   const { boardId } = useParams();
   const [boardStats, setBoardStats] = useState();
-  const [isLoading, setIsLoading] = useState(false);
-  const searchInput = useRef(null);
+  const { selectedBoard } = useSelector((state) => state.board);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSelfStats, setIsSelfStats] = useState(false);
+  const [selectedMem, setSelectedMem] = useState(null);
+  const [userStats, setUserStats] = useState(null);
+  const searchInput = useRef(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
   useEffect(() => {
     const fetchGetBoardStats = async () => {
       try {
@@ -56,7 +73,16 @@ const Analysis = ({ isOpen, setIsOpen }) => {
   const handleReset = (clearFilters) => {
     clearFilters();
   };
-
+  const handleSelectCard = async (card) => {
+    const slug = _.kebabCase(card.title.toLowerCase());
+    await dispatch(getCardById(card?.key));
+    navigate(`${rootLink}/c/${slug}`);
+  };
+  const checkOwner = (user) => {
+    return selectedBoard.members.some(
+      (mem) => mem?.user?._id == user?.key && mem?.role == "owner"
+    );
+  };
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -147,14 +173,26 @@ const Analysis = ({ isOpen, setIsOpen }) => {
   const data = boardStats?.statsArray?.map((item) => {
     return {
       key: item.user._id,
-      name: item?.user?.name + " " + item?.user?.surname,
+      name: item?.user?.fullName,
       Tasks: item?.tasks?.totalTask,
       Unresolve: item?.tasks?.unresolve,
       Resolve: item?.tasks?.complete,
       Overdue: item?.tasks?.overdue,
     };
   });
-
+  const data2 = userStats?.cards?.map((item) => {
+    return {
+      key: item?._id,
+      title: item?.title,
+      createdAt: dayjs(item?.createdAt).format("DD-MM-YYYY"),
+      dueDate: dayjs(item?.dueDate).format("DD-MM-YYYY"),
+      resolvedAt: item?.resolvedAt
+        ? dayjs(item?.resolvedAt).format("DD-MM-YYYY")
+        : "",
+      overdue: item?.overdue,
+      completed: item?.completed,
+    };
+  });
   const total = boardStats?.totalTask;
   const resolvePercent = Math.floor((boardStats?.completeTask / total) * 100);
 
@@ -164,6 +202,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
       ...getColumnSearchProps("name"),
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Thẻ",
@@ -186,11 +225,127 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       sorter: (a, b) => a.Overdue - b.Overdue,
       render: (text) => <div style={{ color: "red" }}>{text}</div>,
     },
+    {
+      title: "Chi tiết",
+      key: "action",
+      render: (_, user) => (
+        <Button
+          onClick={() => {
+            setSelectedMem(user);
+            setIsSelfStats(true);
+            try {
+              const fetchStats = async () => {
+                const rs = await analysisUser({
+                  userId: user.key,
+                  boardId: boardId,
+                });
+                if (rs) {
+                  setUserStats(rs);
+                }
+              };
+              fetchStats();
+            } catch (error) {
+              console.log(error);
+            }
+          }}
+        >
+          <InfoCircleOutlined />
+        </Button>
+      ),
+    },
   ];
+  const columns2 = [
+    {
+      title: "Thẻ",
+      dataIndex: "title",
+      sorter: (a, b) => a.title - b.title,
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      sorter: (a, b) => a.createdAt - b.createdAt,
+    },
+    {
+      title: "Ngày đến hạn",
+      dataIndex: "dueDate",
+      sorter: (a, b) => a.dueDate - b.dueDate,
+    },
+    {
+      title: "Ngày hoàn thành",
+      dataIndex: "resolvedAt",
+      sorter: (a, b) => a.resolvedAt - b.resolvedAt,
+    },
+    {
+      title: "Tiến độ",
+      dataIndex: "overdue",
+      sorter: (a, b) => a.overdue - b.overdue,
+      render: (text) => (
+        <div style={{ color: "red" }}>
+          {text && (
+            <Tag icon={<CloseCircleOutlined />} color="error">
+              Quá hạn
+            </Tag>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "completed",
+      sorter: (a, b) => a.completed - b.completed,
+      render: (text) => (
+        <div style={{ color: "red" }}>
+          {text && <Tag color="success">Đã hoàn thành</Tag>}
+          {!text && <Tag color="error">Chưa hoàn thành</Tag>}
+        </div>
+      ),
+    },
 
+    {
+      title: "Chi tiết",
+      key: "action",
+      render: (_, card) => (
+        <Button
+          onClick={() => {
+            // console.log(card);
+            handleSelectCard(card);
+          }}
+        >
+          <InfoCircleOutlined />
+        </Button>
+      ),
+    },
+  ];
+  const ItemPeople = [
+    {
+      key: "1",
+      label: "Họ và tên",
+      children: <Flex>{selectedMem?.name}</Flex>,
+      span: 3,
+    },
+    {
+      key: "1",
+      label: "Vai trò",
+      children: (
+        <Flex>{checkOwner(selectedMem) ? "Chủ sở hữu" : "Thành viên"}</Flex>
+      ),
+      span: 3,
+    },
+  ];
   return (
     <Modal
-      title="Phân tích"
+      title={
+        <Flex gap={16}>
+          {" "}
+          {isSelfStats && (
+            <LeftOutlined
+              style={{ cursor: "pointer" }}
+              onClick={() => setIsSelfStats(false)}
+            />
+          )}
+          Phân tích
+        </Flex>
+      }
       centered
       open={isOpen}
       onOk={() => setIsOpen(false)}
@@ -200,7 +355,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
     >
       {isLoading ? (
         <Skeleton active paragraph={{ rows: 8 }} />
-      ) : (
+      ) : !isSelfStats ? (
         <Flex gap={16} vertical style={{ marginTop: 12 }}>
           <Row gutter={[16, 16]}>
             <Col
@@ -270,6 +425,11 @@ const Analysis = ({ isOpen, setIsOpen }) => {
             </Col>
           </Row>
           <Table columns={columns} dataSource={data} pagination={false} />
+        </Flex>
+      ) : (
+        <Flex vertical style={{ marginTop: 24 }}>
+          <Descriptions title="" items={ItemPeople} layout="" />
+          <Table columns={columns2} dataSource={data2} pagination={false} />
         </Flex>
       )}
     </Modal>

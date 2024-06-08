@@ -102,7 +102,7 @@ const BoardDrawer = ({
             >
               <LockOutlined className="drawer-item__icon" />
               <Flex vertical>
-                <span className="drawer-item__name">Khóa dự án</span>
+                <span className="drawer-item__name">Khóa bảng</span>
               </Flex>
             </Flex>
             <Flex
@@ -119,7 +119,7 @@ const BoardDrawer = ({
               />
               <Flex vertical>
                 <span className="drawer-item__name" style={{ color: "red" }}>
-                  Đóng dự án
+                  Đóng bảng
                 </span>
               </Flex>
             </Flex>
@@ -145,12 +145,12 @@ const BoardDrawer = ({
       };
       dispatch(removeBoard(selectedBoard?._id));
       await lockBoard(data);
-      message.success("Dự án đã được khóa");
+      message.success("Bảng đã được khóa");
       setIsOpen(false);
       navigate(`/`);
     } catch (error) {
       console.log(error);
-      message.error("Khóa dự án không thành công");
+      message.error("Khóa Bảng không thành công");
     }
   };
   const deleteBoardById = async () => {
@@ -158,11 +158,11 @@ const BoardDrawer = ({
       dispatch(removeBoard(selectedBoard?._id));
       await deleteBoard(selectedBoard?._id);
       setIsOpen2(false);
-      message.success("Dự án đã được đóng.");
+      message.success("Bảng đã được đóng.");
       navigate("/");
     } catch (error) {
       console.log(error);
-      message.error("Đóng dự án không thành công");
+      message.error("Đóng Bảng không thành công");
     }
   };
   const handleLockBoard = async () => {
@@ -207,6 +207,7 @@ const BoardDrawer = ({
         isOpen2={isOpen2}
         setIsOpen2={setIsOpen2}
         handleDeleteBoard={handleDeleteBoard}
+        board={selectedBoard}
       />
     </Drawer>
   );

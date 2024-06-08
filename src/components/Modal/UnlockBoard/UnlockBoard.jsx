@@ -11,14 +11,14 @@ const UnlockBoard = ({ isOpen, onClose, handleLockBoard, board }) => {
   const content = (
     <Flex vertical>
       <p>
-        Mở lại dự án, các thành viên có thể làm việc trở lại trên dự án này như
-        bình thường.
+        Mở lại bảng, dự án các thành viên có thể làm việc trở lại trên bảng, dự
+        án này như bình thường.
       </p>
       <Form layout="vertical">
         <Form.Item
           label={
             <p>
-              Hãy nhập lại tên dự án
+              Hãy nhập lại tên bảng
               <span
                 style={{
                   background: "#eee",
@@ -46,7 +46,7 @@ const UnlockBoard = ({ isOpen, onClose, handleLockBoard, board }) => {
   return (
     <Modal
       open={isOpen}
-      title="Bạn có muốn xác nhận mở lại dự án không?"
+      title="Bạn có muốn xác nhận mở lại bảng không?"
       okText="Xác nhận"
       cancelText="Hủy"
       centered={true}

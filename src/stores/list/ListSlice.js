@@ -168,7 +168,7 @@ const ListSlice = createSlice({
     },
 
     deleteCardInListById(state, action) {
-      const { cardId, parentCardId } = action.payload;
+      const { cardId, parentCardId, deleteSubtasks } = action.payload;
 
       const gatherSubtaskIds = (cards, cardId, ids = new Set()) => {
         for (let card of cards) {
@@ -190,20 +190,45 @@ const ListSlice = createSlice({
         cardId
       );
 
-      // Remove the card and its subtasks from each list
       state.lists = state.lists.map((list) => {
-        list.cards = list.cards.filter(
-          (card) => !cardIdsToRemove.has(card._id)
-        );
-        if (parentCardId) {
+        if (deleteSubtasks) {
+          // Remove the card and its subtasks from each list
+          list.cards = list.cards.filter(
+            (card) => !cardIdsToRemove.has(card._id)
+          );
+          if (parentCardId) {
+            list.cards = list.cards.map((card) => {
+              if (card._id === parentCardId) {
+                return {
+                  ...card,
+                  subTasks: card.subTasks.filter(
+                    (subTaskId) => !cardIdsToRemove.has(subTaskId)
+                  ),
+                };
+              }
+              return card;
+            });
+          }
+        } else {
+          // Remove only the card itself, but update subtasks
+          list.cards = list.cards.filter((card) => card._id !== cardId);
+          if (parentCardId) {
+            list.cards = list.cards.map((card) => {
+              if (card._id === parentCardId) {
+                return {
+                  ...card,
+                  subTasks: card.subTasks.filter(
+                    (subTaskId) => subTaskId !== cardId
+                  ),
+                };
+              }
+              return card;
+            });
+          }
+          // Update subtasks to remove isSubTaskOf
           list.cards = list.cards.map((card) => {
-            if (card._id === parentCardId) {
-              return {
-                ...card,
-                subTasks: card.subTasks.filter(
-                  (subTaskId) => !cardIdsToRemove.has(subTaskId)
-                ),
-              };
+            if (cardIdsToRemove.has(card._id)) {
+              return { ...card, isSubTaskOf: null };
             }
             return card;
           });

@@ -1,25 +1,25 @@
 /* eslint-disable react/prop-types */
 import { Flex, Form, Input, Modal, Tag } from "antd";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 
 const DeleteBoard = ({
   isOpen2,
   setIsOpen2,
   handleDeleteBoard,
   isLock = false,
+  board,
 }) => {
   const [textDel, setTextDel] = useState("");
-  const { selectedBoard } = useSelector((state) => state.board);
+  // const { selectedBoard } = useSelector((state) => state.board);
   const handleInputChange2 = async (e) => {
     const value = e.target.value;
     setTextDel(value);
   };
   const noidung = (
     <p>
-      Cần cân nhắc kĩ trước khi thực hiện hành động, việc đóng dự án sẽ xóa các
-      thông tin, tiến độ và thành viên có trong dự án. Hệ thống sẽ gửi thông báo
-      đến thành viên. Hiện tại bảng đã được khóa.
+      Cần cân nhắc kĩ trước khi thực hiện hành động, việc đóng bảng, dự án sẽ
+      xóa các thông tin, tiến độ và thành viên có trong bảng, dự án. Hệ thống sẽ
+      gửi thông báo đến thành viên. Hiện tại bảng đã được khóa.
     </p>
   );
   const contentDelete = (
@@ -28,10 +28,10 @@ const DeleteBoard = ({
         noidung
       ) : (
         <p>
-          Cần cân nhắc kĩ trước khi thực hiện hành động, việc đóng dự án sẽ xóa
-          các thông tin, tiến độ và thành viên có trong dự án. Hệ thống sẽ gửi
-          thông báo đến thành viên. Bạn có thể lựa chọn
-          <b style={{ margin: "0 4px" }}>khóa dự án</b>để lưu trữ dự án thay vì
+          Cần cân nhắc kĩ trước khi thực hiện hành động, việc đóng đóng bảng, dự
+          án sẽ xóa các thông tin, tiến độ và thành viên có trong đóng bảng, dự
+          án. Hệ thống sẽ gửi thông báo đến thành viên. Bạn có thể lựa chọn
+          <b style={{ margin: "0 4px" }}>khóa bảng</b>để lưu trữ bảng thay vì
           đóng hoàn toàn.
         </p>
       )}
@@ -40,11 +40,11 @@ const DeleteBoard = ({
         <Form.Item
           label={
             <p>
-              Nếu đã xác nhận, hãy nhập lại tên dự án
+              Nếu đã xác nhận, hãy nhập lại tên bảng
               <Tag color="error" style={{ margin: "0px 4px" }}>
-                {selectedBoard.title}
+                {board.title}
               </Tag>
-              để đóng dự án này
+              để đóng bảng này
             </p>
           }
           rules={[{ required: true, message: "Vui lòng nhập tiêu đề bảng!" }]}
@@ -62,7 +62,7 @@ const DeleteBoard = ({
   );
   return (
     <Modal
-      title="Bạn có muốn đóng dự án này không"
+      title="Bạn có muốn đóng bảng này không"
       okText="Đóng"
       okType="danger"
       cancelText="Hủy"
@@ -74,7 +74,7 @@ const DeleteBoard = ({
       }}
       open={isOpen2}
       okButtonProps={{
-        disabled: textDel !== selectedBoard.title,
+        disabled: textDel !== board.title,
       }}
     >
       {contentDelete}

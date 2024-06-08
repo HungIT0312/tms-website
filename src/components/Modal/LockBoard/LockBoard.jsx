@@ -14,14 +14,14 @@ const LockBoard = ({ isOpen, setIsOpen, handleLockBoard }) => {
   const content = (
     <Flex vertical>
       <p>
-        Việc khóa hay tạm dừng dự án sẽ làm các công việc bị hủy bỏ tạm thời,
+        Việc khóa hay tạm dừng bảng, dự án sẽ làm các công việc bị hủy bỏ tạm thời,
         các thành viên có trong bảng sẽ không thể tương tác với bảng này nữa.
       </p>
       <Form layout="vertical">
         <Form.Item
           label={
             <Flex gap={4}>
-              Hãy nhập lại tên dự án
+              Hãy nhập lại tên bảng
               <Tag color="default" style={{ margin: "0px 4px" }}>
                 {selectedBoard.title}
               </Tag>
@@ -42,7 +42,7 @@ const LockBoard = ({ isOpen, setIsOpen, handleLockBoard }) => {
   );
   return (
     <Modal
-      title="Bạn có muốn khóa, tạm dừng dự án này không?"
+      title="Bạn có muốn khóa, tạm dừng bảng này không?"
       okText="Xác nhận"
       cancelText="Hủy"
       centered={true}

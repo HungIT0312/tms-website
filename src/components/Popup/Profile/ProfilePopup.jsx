@@ -31,13 +31,11 @@ const ProfilePopup = () => {
       >
         <div className="profilePopup__avatar">
           <Avatar style={{ background: `${userInformation.color}` }}>
-            {userInformation.name[0] + userInformation.surname[0]}
+            {userInformation.surname[0] + userInformation.name[0]}
           </Avatar>
         </div>
         <Flex vertical className="profilePopup__info">
-          <span className="profilePopup__name">
-            {userInformation.name + " " + userInformation.surname}
-          </span>
+          <span className="profilePopup__name">{userInformation.fullName}</span>
           <span className="profilePopup__mail">{userInformation.email}</span>
         </Flex>
       </Flex>

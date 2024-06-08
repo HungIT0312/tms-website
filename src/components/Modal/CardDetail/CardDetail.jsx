@@ -57,6 +57,7 @@ import {
   updateParentCardUI,
 } from "../../../stores/list/ListSlice";
 import QuillTextBox from "../../QuillTextBox/QuillTextBox";
+import DeleteCard from "../DeleteCard/DeleteCard";
 import ActivityAndComment from "./Activity/ActivityAndComment";
 import "./CardDetail.scss";
 import Labels from "./Labels/Labels";
@@ -75,10 +76,12 @@ const CardDetail = () => {
   const { selectedBoard } = useSelector((state) => state.board);
   const { boardId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [newCard, setNewCard] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
   const cmtRef = useRef(null);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -247,18 +250,23 @@ const CardDetail = () => {
     dispatch(updateCardInListById(newDes));
     dispatch(updateCardInfo(newDes));
   };
-  const handleDeleteThisTask = () => {
+  const handleDeleteThisTask = (checked) => {
     const dataDelete = {
       boardId: boardId,
       listId: selectedCard?.owner,
       cardId: selectedCard?._id,
       parentCardId: selectedCard?.isSubTaskOf?._id,
+      deleteSubtasks: checked,
     };
-    dispatch(setSelectedCard(null));
-    dispatch(deleteCardInListById(dataDelete));
-    msg.success("Xóa thành công!");
-    navigate(rootLink);
-    dispatch(deleteCardById(dataDelete));
+    try {
+      dispatch(deleteCardInListById(dataDelete));
+      dispatch(setSelectedCard(null));
+      navigate(rootLink);
+      msg.success("Xóa thành công!");
+      dispatch(deleteCardById(dataDelete));
+    } catch (error) {
+      msg.success("Xóa không thành công!");
+    }
   };
   const handleAddNewCard = () => {
     if (!newCard) return;
@@ -285,8 +293,13 @@ const CardDetail = () => {
       cardId: selectedCard?._id,
       member: crrMember,
     };
-    dispatch(updateCardMemberUI(dataAddDate));
-    dispatch(changeMemberAssign({ ...dataAddDate, memberId: e }));
+    try {
+      dispatch(updateCardMemberUI(dataAddDate));
+      dispatch(changeMemberAssign({ ...dataAddDate, memberId: e }));
+      msg.success("Đã thay đổi!");
+    } catch (error) {
+      msg.success("Thay đổi không thành công!");
+    }
   };
 
   //==============================================================  //==============================================================
@@ -330,7 +343,7 @@ const CardDetail = () => {
     },
     {
       key: "2",
-      label: "Task phụ của",
+      label: "Thẻ cha",
       children:
         selectedCard?.isSubTaskOf && !selectedCard?.isSubTaskOf?._destroy ? (
           <Flex
@@ -525,7 +538,7 @@ const CardDetail = () => {
 
     {
       key: "3",
-      label: "Task phụ",
+      label: "Thẻ phụ",
       children: (
         <Flex vertical gap={8}>
           <Flex gap={8} vertical>
@@ -552,16 +565,7 @@ const CardDetail = () => {
         showModal();
         break;
       case "delete":
-        Modal.confirm({
-          title: "Bạn có muốn xóa task này không?",
-          onOk: () => {
-            handleDeleteThisTask();
-          },
-          okText: "Xóa",
-          okType: "danger",
-          centered: true,
-          cancelText: "Hủy",
-        });
+        setIsDeleteOpen(true);
         break;
       default:
         break;
@@ -646,6 +650,11 @@ const CardDetail = () => {
           <Spin />
         </Flex>
       )}
+      <DeleteCard
+        close={() => setIsDeleteOpen(false)}
+        isOpen={isDeleteOpen}
+        handleDeleteThisTask={handleDeleteThisTask}
+      />
     </Modal>
   );
 };

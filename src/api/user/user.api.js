@@ -24,6 +24,9 @@ export const verifyMail = (token) => {
 export const updateUser = (data) => {
   return http.patch("/user/update-user", { ...data });
 };
+export const analysisUser = (data) => {
+  return http.post("/user/stats", { ...data });
+};
 // router.post("/register", userController.register);
 // router.post("/login", userController.login);
 // router.get("/get-user", userController.getUser);

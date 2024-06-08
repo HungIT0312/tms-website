@@ -37,8 +37,9 @@ const UserPage = () => {
     } else {
       const dataUpdate = {
         ...userInformation,
-        name: values?.name,
-        surname: values?.surname,
+        name: values?.name.trim(),
+        surname: values?.surname.trim(),
+        fullName: values?.surname + " " + values?.name,
       };
       try {
         dispatch(updateUserInfoUI(dataUpdate));
@@ -97,7 +98,7 @@ const UserPage = () => {
           gap={8}
         >
           <Avatar size={84} style={{ background: `${userInformation?.color}` }}>
-            {userInformation?.name[0] + userInformation?.surname[0]}
+            {userInformation?.surname[0] + userInformation?.name[0]}
           </Avatar>
         </Flex>
         <Form.Item name="name" label="Tình trạng">

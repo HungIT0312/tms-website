@@ -35,7 +35,7 @@ const StorageBoard = ({ isOpen, setIsOpen }) => {
       Modal.info({
         title: "Thông báo",
         content:
-          "Bạn không có quyền tham gia dự án này. Hãy liên hệ với chủ sở hữu hoặc admin để truy cập",
+          "Bạn không có quyền tham gia bảng này. Hãy liên hệ với chủ sở hữu hoặc admin để truy cập",
         centered: true,
       });
     }
@@ -54,14 +54,14 @@ const StorageBoard = ({ isOpen, setIsOpen }) => {
 
   const handleLockBoard = async () => {
     lockBoardById();
-    message.success("Dự án đã được mở ");
+    message.success("Bảng đã được mở ");
     onClose();
     const slug = _.kebabCase(board.title.toLowerCase());
     navigate(`/board/${board?._id}/${slug}`);
   };
   const columns = [
     {
-      title: "Tên dự án",
+      title: "Tên bảng",
       dataIndex: "title",
       key: "title",
       render: (text) => <a>{text}</a>,
@@ -75,7 +75,7 @@ const StorageBoard = ({ isOpen, setIsOpen }) => {
           <Avatar size={20} style={{ background: owner.color, fontSize: 8 }}>
             {owner.surname[0] + owner.name[0]}
           </Avatar>
-          <span> {owner.surname + " " + owner.name}</span>
+          <span> {owner.user.fullName}</span>
         </Flex>
       ),
     },
@@ -155,11 +155,11 @@ const StorageBoard = ({ isOpen, setIsOpen }) => {
       await deleteBoard(board?._id);
       dispatch(removeStorageBoard(board?._id));
       setIsOpen2(false);
-      message.success("Dự án đã được đóng.");
+      message.success("Bảng đã được đóng.");
       navigate("/");
     } catch (error) {
       console.log(error);
-      message.error("Đóng dự án không thành công");
+      message.error("Đóng bảng không thành công");
     }
   };
   const handleDeleteBoard = async () => {
@@ -186,6 +186,7 @@ const StorageBoard = ({ isOpen, setIsOpen }) => {
         setIsOpen2={setIsOpen2}
         isLock={true}
         handleDeleteBoard={handleDeleteBoard}
+        board={board}
       />
     </Modal>
   );

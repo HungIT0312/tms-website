@@ -44,7 +44,7 @@ const Workspace = () => {
       boards.filter((board) => {
         return board?.members.some(
           (member) =>
-            member.user.toString() === userInformation._id.toString() &&
+            member.user._id.toString() === userInformation._id.toString() &&
             member.role === role
         );
       })
