@@ -6,6 +6,9 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const emailHTML = require("../utils/mailHTML");
 const boardModel = require("../Models/boardModel");
+const cardModel = require("../Models/cardModel");
+const dayjs = require("dayjs");
+const listModel = require("../Models/listModel");
 dotenv.config();
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -27,8 +30,8 @@ const registerByEmail = async (user, currentURL, callback) => {
     const mailOptions = {
       from: process.env.SERVER_EMAIL,
       to: user.email,
-      subject: "Email Verification",
-      text: `Please click this button to verify your email.`,
+      subject: "Email xác thực",
+      text: `Vui lòng nhấp vào nút này để xác minh email của bạn.`,
       html: emailHTML(currentURL, verificationToken),
     };
     const newUser = new userModel({
@@ -294,6 +297,46 @@ const updateUserBasicInfo = async (userId, basicInfo, callback) => {
     });
   }
 };
+const userStats = async (userId, boardId, callback) => {
+  try {
+    // Tìm tất cả các lists thuộc về bảng
+    const lists = await listModel.find({ owner: boardId });
+
+    // Lấy tất cả các thẻ thuộc về các lists này và user là thành viên
+    const listIds = lists.map((list) => list._id);
+    const cards = await cardModel.find({
+      owner: { $in: listIds },
+      "members.user": userId,
+    });
+
+    const cardDetails = cards.map((card) => {
+      const now = dayjs();
+      const dueDate = dayjs(card.date.dueDate);
+      const overdue = dueDate.isBefore(now);
+
+      return {
+        title: card.title,
+        _id: card._id,
+        createdAt: card.createdAt,
+        dueDate: card.date.dueDate,
+        completed: card.date.completed,
+        resolvedAt: card.date.resolvedAt,
+        overdue: overdue,
+        _destroy: card._destroy,
+      };
+    });
+
+    return callback(false, {
+      totalCards: cards.length,
+      cards: cardDetails,
+    });
+  } catch (error) {
+    return callback({
+      errMessage: "Đã có lỗi xảy ra",
+      details: error.message,
+    });
+  }
+};
 module.exports = {
   login,
   getUser,
@@ -305,4 +348,5 @@ module.exports = {
   getUserActivities,
   updateUserPassword,
   updateUserBasicInfo,
+  userStats,
 };

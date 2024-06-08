@@ -145,6 +145,13 @@ const updateUser = async (req, res) => {
     });
   }
 };
+const userStats = async (req, res) => {
+  const { userId, boardId } = req.body;
+  await userService.userStats(userId, boardId, (err, result) => {
+    if (err) return res.status(500).send(err);
+    return res.status(200).send(result);
+  });
+};
 module.exports = {
   login,
   getUser,
@@ -155,4 +162,5 @@ module.exports = {
   registerByEmail,
   getAllActivities,
   updateUser,
+  userStats,
 };

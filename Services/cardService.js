@@ -105,7 +105,14 @@ const create = async (
   }
 };
 
-const deleteById = async (cardId, listId, boardId, user, callback) => {
+const deleteById = async (
+  cardId,
+  listId,
+  boardId,
+  user,
+  deleteSubtasks,
+  callback
+) => {
   try {
     // Get models
     const card = await cardModel.findById(cardId);
@@ -126,15 +133,24 @@ const deleteById = async (cardId, listId, boardId, user, callback) => {
       });
     }
 
-    const deleteCardAndSubtasks = async (card) => {
+    if (deleteSubtasks) {
+      const deleteCardAndSubtasks = async (card) => {
+        const subtasks = await cardModel.find({ isSubTaskOf: card._id });
+        for (const subtask of subtasks) {
+          await deleteCardAndSubtasks(subtask);
+        }
+        await cardModel.findByIdAndDelete(card._id);
+      };
+
+      await deleteCardAndSubtasks(card);
+    } else {
       const subtasks = await cardModel.find({ isSubTaskOf: card._id });
       for (const subtask of subtasks) {
-        await deleteCardAndSubtasks(subtask);
+        subtask.isSubTaskOf = null;
+        await subtask.save();
       }
       await cardModel.findByIdAndDelete(card._id);
-    };
-
-    await deleteCardAndSubtasks(card);
+    }
 
     if (card.isSubTaskOf) {
       const parentCard = await cardModel.findById(card.isSubTaskOf);
@@ -475,23 +491,26 @@ const changeCardMember = async (
     const slugB = _.kebabCase(board.title.toLowerCase());
     const slugC = _.kebabCase(card.title.toLowerCase());
     await board.save();
-    const newNotice = await notificationModal.create({
-      user: member._id,
-      message:
-        "<p> Bạn đã được thêm vào thẻ <b>" +
-        card.title +
-        "</b> trong danh sách <b>" +
-        list.title +
-        "</b>",
-      link: `/board/${boardId}/${slugB}/c/${slugC}`,
-    });
-    const returnNotice = await notificationModal
-      .findById(newNotice._id)
-      .populate("user");
-    emitToUser(member._id.toString(), "changeCardMember", {
-      dataAdd: { member: card.members, listId, cardId, boardId },
-      newNotice: returnNotice,
-    });
+    if (user._id != memberId) {
+      const newNotice = await notificationModal.create({
+        user: member._id,
+        message:
+          "<p> Bạn đã được thêm vào thẻ <b>" +
+          card.title +
+          "</b> trong danh sách <b>" +
+          list.title +
+          "</b>",
+        link: `/board/${boardId}/${slugB}/c/${slugC}`,
+      });
+      const returnNotice = await notificationModal
+        .findById(newNotice._id)
+        .populate("user");
+      emitToUser(member._id.toString(), "changeCardMember", {
+        dataAdd: { member: card.members, listId, cardId, boardId },
+        newNotice: returnNotice,
+      });
+    }
+
     return callback(false, { message: "Thành công", member: card.members });
   } catch (error) {
     return callback({

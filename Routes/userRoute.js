@@ -10,4 +10,5 @@ router.post("/refresh-token", userController.refreshToken);
 router.post("/register-by-mail", userController.registerByEmail);
 router.post("/verify-mail", userController.verifyEmail);
 router.patch("/update-user", userController.updateUser);
+router.post("/stats", userController.userStats);
 module.exports = router;

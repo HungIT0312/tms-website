@@ -28,13 +28,20 @@ const create = async (req, res) => {
 const deleteById = async (req, res) => {
   // deconstruct the params
   const user = req.user;
-  const { boardId, listId, cardId } = req.params;
+  const { boardId, listId, cardId, deleteSubtasks } = req.params;
 
   // Call the card service
-  await cardService.deleteById(cardId, listId, boardId, user, (err, result) => {
-    if (err) return res.status(500).send(err);
-    return res.status(200).send(result);
-  });
+  await cardService.deleteById(
+    cardId,
+    listId,
+    boardId,
+    user,
+    deleteSubtasks,
+    (err, result) => {
+      if (err) return res.status(500).send(err);
+      return res.status(200).send(result);
+    }
+  );
 };
 
 const getCard = async (req, res) => {

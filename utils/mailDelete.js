@@ -18,6 +18,8 @@ const mailDelete = (content) => {
           background-color: #fff;
         }
         .card {
+        display: flex;
+        flex-direction:column;
           background-color: #ffffff;
           padding: 20px;
           border-radius: 8px;
@@ -32,11 +34,18 @@ const mailDelete = (content) => {
           border-radius: 8px;
 
         }
+          img{
+          width:160px;
+          align-self: center
+          }
       </style>
     </head>
     <body>
       <div class="container">
+
         <div class="card">
+          <img src="https://res.cloudinary.com/dzdfqqdxs/image/upload/v1714743799/logoBanner.png"/>
+
           <h2>Thông báo</h2>
           <p>${content}</p>
         </div>

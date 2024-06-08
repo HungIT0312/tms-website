@@ -84,7 +84,10 @@ const getAll = async (userId, callback) => {
     const boardIds = user.boards;
 
     // Get boards of user
-    const boards = await boardModel.find({ _id: { $in: boardIds } });
+    const boards = await boardModel.find({ _id: { $in: boardIds } }).populate({
+      path: "members.user",
+      select: "name surname email color",
+    });
 
     // Delete unneccesary objects
     boards.forEach((board) => {
