@@ -138,7 +138,7 @@ const StorageBoard = ({ isOpen, setIsOpen }) => {
 
   const dataBoard = storageBoards.map((b) => {
     const owner = b?.members?.find((member) => member.role === "owner");
-    const isOwner = userInformation._id === owner.user;
+    const isOwner = userInformation._id === owner.user._id;
     const newObj = {
       key: b._id,
       board: b,
