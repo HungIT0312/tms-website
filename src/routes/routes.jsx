@@ -9,6 +9,7 @@ import Board from "../pages/BoardPage/Board";
 import VerifiedMail from "../pages/VerifiedPage/VerifiedMail";
 import CardDetail from "../components/Modal/CardDetail/CardDetail";
 import UserPage from "../pages/UserPage/UserPage";
+import NotFoundPage from "../pages/ErrorPage/404Page";
 
 const routes = createBrowserRouter([
   {
@@ -61,17 +62,13 @@ const routes = createBrowserRouter([
             path: "",
             element: <UserPage />,
           },
-          {
-            path: "activity",
-            element: <></>,
-          },
-          {
-            path: "cards",
-            element: <></>,
-          },
         ],
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);
 export default routes;
