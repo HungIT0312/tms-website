@@ -2,7 +2,6 @@
 import {
   BorderOutlined,
   CheckSquareOutlined,
-  CloseCircleOutlined,
   ExclamationCircleOutlined,
   InfoCircleOutlined,
   LeftOutlined,
@@ -24,15 +23,15 @@ import {
   Table,
   Tag,
 } from "antd";
-import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { getBoardStats } from "../../../api/board/board.api";
-import "./Analysis.scss";
-import { analysisUser } from "../../../api/user/user.api";
 import dayjs from "dayjs";
 import _ from "lodash";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { getBoardStats } from "../../../api/board/board.api";
+import { analysisUser } from "../../../api/user/user.api";
 import { getCardById } from "../../../stores/card/cardThunk";
+import "./Analysis.scss";
 
 const Analysis = ({ isOpen, setIsOpen }) => {
   const { boardId } = useParams();
@@ -188,7 +187,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       dueDate: dayjs(item?.dueDate).format("DD-MM-YYYY"),
       resolvedAt: item?.resolvedAt
         ? dayjs(item?.resolvedAt).format("DD-MM-YYYY")
-        : "",
+        : null,
       overdue: item?.overdue,
       completed: item?.completed,
     };
@@ -223,7 +222,6 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       title: "Quá hạn",
       dataIndex: "Overdue",
       sorter: (a, b) => a.Overdue - b.Overdue,
-      render: (text) => <div style={{ color: "red" }}>{text}</div>,
     },
     {
       title: "Chi tiết",
@@ -274,16 +272,22 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       title: "Ngày hoàn thành",
       dataIndex: "resolvedAt",
       sorter: (a, b) => a.resolvedAt - b.resolvedAt,
+      render: (text) => <div>{text}</div>,
     },
     {
-      title: "Tiến độ",
+      title: "Đến hạn",
       dataIndex: "overdue",
       sorter: (a, b) => a.overdue - b.overdue,
       render: (text) => (
-        <div style={{ color: "red" }}>
+        <div>
           {text && (
-            <Tag icon={<CloseCircleOutlined />} color="error">
-              Quá hạn
+            <Tag bordered={false} color="volcano">
+              Đã quá hạn
+            </Tag>
+          )}
+          {!text && (
+            <Tag bordered={false} color="green">
+              Còn hạn
             </Tag>
           )}
         </div>
