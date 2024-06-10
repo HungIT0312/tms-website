@@ -40,6 +40,7 @@ import {
   updateCardDate,
   updateCardDateCompletedUI,
   updateCardSubTaskUI,
+  updateDueDate,
 } from "../../../stores/card/cardSlice";
 import {
   addCard,
@@ -80,6 +81,9 @@ const CardDetail = () => {
   const [status, setStatus] = useState("");
   const [newCard, setNewCard] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
+  const [isPermissUser, setIsPermissUser] = useState(
+    !selectedCard?.date?.dueDate
+  );
   const cmtRef = useRef(null);
 
   const showModal = () => {
@@ -187,7 +191,9 @@ const CardDetail = () => {
         completed: selectedCard?.date?.completed,
       },
     };
+    setIsPermissUser((prev) => !prev);
     dispatch(updateDateCardListUI(dataAddDate));
+    dispatch(updateDueDate({ ...dataAddDate.date }));
     dispatch(updateDates(dataAddDate))
       .unwrap()
       .then((rs) => msg.success(rs.message))
@@ -383,6 +389,7 @@ const CardDetail = () => {
       label: "Trạng thái",
       children: (
         <Select
+          title={isPermissUser ? `Bạn cần thiết lập ngày đến hạn` : ""}
           placeholder="Trạng thái"
           variant="borderless"
           defaultValue={selectedCard?.date?.completed}
@@ -400,6 +407,7 @@ const CardDetail = () => {
               label: "Đã hoàn thành",
             },
           ]}
+          disabled={isPermissUser}
         />
       ),
       span: 4,
@@ -414,6 +422,7 @@ const CardDetail = () => {
           minDate={dayjs(selectedCard?.date?.updatedAt)}
           maxDate={dayjs(selectedCard?.date?.updatedAt)}
           allowClear={false}
+          disabled
         />
       ),
       span: 4,
@@ -439,6 +448,7 @@ const CardDetail = () => {
           minDate={dayjs(selectedCard?.date?.resolvedAt)}
           maxDate={dayjs(selectedCard?.date?.resolvedAt)}
           allowClear={false}
+          disabled
         />
       ),
       span: 4,

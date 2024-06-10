@@ -2,7 +2,9 @@
   &_popup {
     padding: 24px;
     min-width: 300px;
+    max-width: 500px;
     background-color: #fff;
+    border-radius: 4px;
   }
   &__content {
     width: 100%;

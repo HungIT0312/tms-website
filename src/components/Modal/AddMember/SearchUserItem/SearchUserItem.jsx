@@ -23,16 +23,18 @@ const SearchUserItem = ({
           {member.surname[0] + member.name[0]}
         </Avatar>
         <Flex vertical>
-          <span className="">{member?.email}</span>
-          <span className="">{member?.user?.fullName || member?.fullName}</span>
+          <span className="search-users__item--name">
+            {member?.user?.fullName || member?.fullName}
+          </span>
+          <span className="search-users__item--mail">{member?.email}</span>
         </Flex>
       </Flex>
-      {member.role && member.role === "owner" && (
+      {/* {isOwner && member.role && member.role === "owner" && (
         <Button className="owner-btn" type="default">
           Chủ sở hữu
         </Button>
-      )}
-      {member.role && member.role === "member" && (
+      )} */}
+      {isOwner && member.role && member.role === "member" && (
         <Button
           icon={<UserDeleteOutlined />}
           disabled={!isOwner}

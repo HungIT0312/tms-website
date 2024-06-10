@@ -27,11 +27,9 @@ export const updateUser = (data) => {
 export const analysisUser = (data) => {
   return http.post("/user/stats", { ...data });
 };
-// router.post("/register", userController.register);
-// router.post("/login", userController.login);
-// router.get("/get-user", userController.getUser);
-// router.get("/get-users", userController.getAllUsersByIds);
-// router.post("/search", userController.searchUsers);
-// router.post("/refresh-token", userController.refreshToken);
-// router.post("/register-by-mail", userController.registerByEmail);
-// router.post("/verify-mail", userController.verifyEmail);
+export const forgotPass = (data) => {
+  return http.post("/user/forgot-password", { ...data });
+};
+export const resetPass = (data) => {
+  return http.post("/user/reset-password", { ...data });
+};

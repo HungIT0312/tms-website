@@ -10,6 +10,9 @@ import VerifiedMail from "../pages/VerifiedPage/VerifiedMail";
 import CardDetail from "../components/Modal/CardDetail/CardDetail";
 import UserPage from "../pages/UserPage/UserPage";
 import NotFoundPage from "../pages/ErrorPage/404Page";
+// import ResetPass from "../pages/VerifiedPage/ResetPass";
+import ForgotPasswordPage from "../pages/VerifiedPage/ForgotPass";
+import ResetPass from "../pages/VerifiedPage/ResetPass";
 
 const routes = createBrowserRouter([
   {
@@ -32,6 +35,14 @@ const routes = createBrowserRouter([
       {
         path: "verify-mail",
         element: <VerifiedMail />,
+      },
+      {
+        path: "forgot-pass",
+        element: <ForgotPasswordPage />,
+      },
+      {
+        path: "reset",
+        element: <ResetPass />,
       },
     ],
   },

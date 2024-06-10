@@ -16,7 +16,7 @@ const InvitationItem = ({ invitation }) => {
     const rs = await dispatch(acceptBoardInvite(invitation._id));
     if (rs) {
       api.success({
-        message: `Accept invitation!`,
+        message: `Đã chấp nhận lời mời!`,
         description: message,
         placement: "bottomRight",
       });

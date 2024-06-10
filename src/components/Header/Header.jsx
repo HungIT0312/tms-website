@@ -12,6 +12,7 @@ import InvitationPopup from "../Popup/Ivitation/InvitationPopup";
 import NotificationPopup from "../Popup/Notification/NotificationPopup";
 import ProfilePopup from "../Popup/Profile/ProfilePopup";
 import "./Header.scss";
+import { setNotifications } from "../../stores/notice/noticeSlice";
 
 export const Header = () => {
   const [isPopup, setIsPopup] = useState(false);
@@ -43,9 +44,11 @@ export const Header = () => {
 
   useEffect(() => {
     socket.on("sendInvitation", (value) => {
-      dispatch(setAddInvitation(value.data));
+      dispatch(setAddInvitation(value));
     });
-
+    socket.on("changeCardMember", (value) => {
+      dispatch(setNotifications([...notifications, value.newNotice]));
+    });
     return () => {
       socket.off("changeCardMember");
       socket.off("sendInvitation");

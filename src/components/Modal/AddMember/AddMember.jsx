@@ -39,10 +39,14 @@ const AddMember = ({ isOpen, setIsOpen, board, isOwner }) => {
         const res = await searchUser({ key: keyword });
         if (res) {
           if (isOwner) {
-            setUserSearch(res);
+            const filteredResults = res.filter(
+              (user) =>
+                !board.members.some((member) => member.user._id === user._id)
+            );
+            setUserSearch(filteredResults);
           } else {
             const filteredResults = res.filter((user) =>
-              board.members.find((member) => member.user._id == user._id)
+              board.members.some((member) => member.user._id === user._id)
             );
             setUserSearch([...filteredResults]);
           }

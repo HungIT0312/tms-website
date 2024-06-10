@@ -9,10 +9,14 @@ const AuthLayout = () => {
     const lastPart = pathParts[pathParts.length - 1];
     if (lastPart == "register") {
       return "Đăng ký";
-    } else return "Đăng nhập";
+    } else if (lastPart == "login") {
+      return "Đăng nhập";
+    }
     // return capitalizeFirstLetter(lastPart);
   };
   const { pathname } = useLocation();
+  const pathParts = pathname.split("/");
+  const lastPart = pathParts[pathParts.length - 1];
   changeTitle(pathname);
   return (
     <div className="login-container">
@@ -33,7 +37,9 @@ const AuthLayout = () => {
           />
           {/* <div className="login__sitename">TMS</div> */}
         </div>
-        <div className="">{getCurrentPathName(pathname)} để tiếp tục</div>
+        {(lastPart == "register" || lastPart == "login") && (
+          <div className="">{getCurrentPathName(pathname)} để tiếp tục</div>
+        )}
         <Outlet />
       </div>
       <div>

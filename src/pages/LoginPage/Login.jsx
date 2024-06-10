@@ -1,5 +1,5 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Form, Input, notification } from "antd";
+import { Button, Flex, Form, Input, notification } from "antd";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -86,13 +86,18 @@ const Login = () => {
           placeholder="Password"
         />
       </Form.Item>
-
       <Form.Item>
         <Button type="primary" htmlType="submit" className="login-form-button">
           Đăng nhập
         </Button>
-        Bạn chưa có tài khoản? <Link to={"/auth/register"}>Đăng ký ngay !</Link>
       </Form.Item>
+      <Flex justify="space-between">
+        <span>
+          Bạn chưa có tài khoản?{" "}
+          <Link to={"/auth/register"}>Đăng ký ngay !</Link>
+        </span>
+        <Link to={"/auth/forgot-pass"}>Quên mật khẩu</Link>
+      </Flex>
     </Form>
   );
 };

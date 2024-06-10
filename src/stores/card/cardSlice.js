@@ -58,6 +58,13 @@ const cardSlice = createSlice({
       );
       state.selectedCard.attachments.splice(index, 1);
     },
+    updateDueDate(state, action) {
+      state.selectedCard.date = {
+        ...state.selectedCard.date,
+        dueDate: action.payload.dueDate,
+        startDate: action.payload.startDate,
+      };
+    },
   },
   extraReducers: (builder) =>
     builder
@@ -188,6 +195,7 @@ export const {
   updateCardDate,
   removeAttachment,
   uploadFileUI,
+  updateDueDate,
 } = cardSlice.actions;
 
 export default cardSlice.reducer;

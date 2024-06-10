@@ -35,9 +35,11 @@ const VerifiedMail = () => {
   return (
     <div>
       {!verified && !verificationToken ? (
-        <p>Please verify your email to complete registration...</p>
+        <p>Vui lòng xác minh email của bạn để hoàn tất đăng ký...</p>
       ) : (
-        <p>Email verified successfully! Redirecting in {countdown} seconds</p>
+        <p>
+          Email đã được xác minh thành công! Chuyển hướng trong {countdown} giây
+        </p>
       )}
     </div>
   );
