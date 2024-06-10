@@ -506,7 +506,6 @@ const changeCardMember = async (
         .findById(newNotice._id)
         .populate("user");
       emitToUser(member._id.toString(), "changeCardMember", {
-        dataAdd: { member: card.members, listId, cardId, boardId },
         newNotice: returnNotice,
       });
     }

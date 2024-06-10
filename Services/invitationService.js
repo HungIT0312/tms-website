@@ -1,6 +1,7 @@
 const boardModel = require("../Models/boardModel");
 const invitationModel = require("../Models/invitationModel");
 const userModel = require("../Models/userModel");
+const { emitToUser } = require("../utils/socket");
 
 const acceptInvitation = async (invitationId, userId, callback) => {
   try {
@@ -49,10 +50,12 @@ const acceptInvitation = async (invitationId, userId, callback) => {
     await newMember.boards.push(board._id); // Add boardId to user's boards
     await newMember.save();
     await board.save();
-
+    const newBoard = await boardModel
+      .findById(invitation.board)
+      .populate("members.user");
     return callback(false, {
       message: "Chấp nhận lời mời!",
-      board: board,
+      board: newBoard,
       invitation: invitation,
     });
   } catch (error) {
@@ -108,7 +111,11 @@ const sentMemberInvitation = async (boardId, member, user, callback) => {
       board: boardId,
     });
     await newInvitation.save();
-
+    const invitation = await invitationModel
+      .findOne({ _id: newInvitation._id })
+      .populate("board", "title description")
+      .populate("inviter", "name surname color");
+    emitToUser(member._id.toString(), "sendInvitation", invitation);
     return callback(false, {
       message: "Đã gửi lời mời!",
       data: newInvitation,

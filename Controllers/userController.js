@@ -152,6 +152,37 @@ const userStats = async (req, res) => {
     return res.status(200).send(result);
   });
 };
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).send({ errMessage: "Email là bắt buộc!" });
+  }
+
+  const currentURL = req.get("origin");
+  await userService.forgotPassword(email, currentURL, (err, result) => {
+    if (err) {
+      return res.status(400).send(err);
+    }
+    return res.status(200).send(result);
+  });
+};
+const resetPassword = async (req, res) => {
+  const { resetToken, newPassword } = req.body;
+  if (!(resetToken && newPassword)) {
+    return res
+      .status(400)
+      .send({ errMessage: "Token và mật khẩu mới là bắt buộc!" });
+  }
+
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(newPassword, salt);
+  await userService.resetPassword(resetToken, hashedPassword, (err, result) => {
+    if (err) {
+      return res.status(400).send(err);
+    }
+    return res.status(200).send(result);
+  });
+};
 module.exports = {
   login,
   getUser,
@@ -163,4 +194,6 @@ module.exports = {
   getAllActivities,
   updateUser,
   userStats,
+  forgotPassword,
+  resetPassword,
 };

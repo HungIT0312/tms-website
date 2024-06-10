@@ -41,6 +41,8 @@ app.use(
       { url: "/user/refresh-token", method: ["POST"] },
       { url: "/user/register-by-mail", method: ["POST"] },
       { url: "/user/verify-mail", method: ["POST"] },
+      { url: "/user/reset-password", method: ["POST"] },
+      { url: "/user/forgot-password", method: ["POST"] },
     ],
   })
 );

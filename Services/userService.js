@@ -9,6 +9,7 @@ const boardModel = require("../Models/boardModel");
 const cardModel = require("../Models/cardModel");
 const dayjs = require("dayjs");
 const listModel = require("../Models/listModel");
+const emailReset = require("../utils/mailReset");
 dotenv.config();
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -183,7 +184,7 @@ const searchUsers = async (query, callback) => {
     const users = await userModel.aggregate([
       {
         $project: {
-          fullName: { $concat: ["$name", " ", "$surname"] },
+          fullName: { $concat: ["$surname", " ", "$name"] },
           name: 1,
           surname: 1,
           email: 1,
@@ -337,6 +338,72 @@ const userStats = async (userId, boardId, callback) => {
     });
   }
 };
+const resetPassword = async (resetToken, newPassword, callback) => {
+  try {
+    const decoded = jwt.verify(resetToken, process.env.JWT_SECRET_ACCESS);
+    const user = await userModel.findById(decoded.id);
+    if (!user || user.resetToken !== resetToken) {
+      return callback({
+        errMessage: "Mã đặt lại mật khẩu không hợp lệ hoặc đã hết hạn",
+      });
+    }
+
+    user.password = newPassword;
+    user.resetToken = null;
+    await user.save();
+
+    return callback(false, {
+      message: "Mật khẩu đã được cập nhật thành công!",
+    });
+  } catch (err) {
+    return callback({
+      errMessage: "Không thể cập nhật mật khẩu, vui lòng thử lại sau",
+      details: err.message,
+    });
+  }
+};
+const forgotPassword = async (email, currentURL, callback) => {
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) return callback({ errMessage: "Email không tồn tại!" });
+
+    const resetToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET_ACCESS,
+      { expiresIn: "1h" }
+    );
+
+    const resetURL = currentURL;
+    const mailOptions = {
+      from: process.env.SERVER_EMAIL,
+      to: user.email,
+      subject: "Đặt lại mật khẩu",
+      text: `Ấn vào nút để đặt lại mật khẩu`,
+      html: emailReset(resetURL, resetToken),
+    };
+    user.resetToken = resetToken;
+    await user.save();
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        return callback({
+          errMessage: "Không gửi được email đặt lại mật khẩu",
+          details: error,
+        });
+      } else {
+        return callback(false, {
+          message:
+            "Email đặt lại mật khẩu đã được gửi thành công! Vui lòng kiểm tra email của bạn.",
+        });
+      }
+    });
+  } catch (err) {
+    return callback({
+      errMessage: "Không thể xử lý yêu cầu đặt lại mật khẩu",
+      details: err.message,
+    });
+  }
+};
 module.exports = {
   login,
   getUser,
@@ -349,4 +416,6 @@ module.exports = {
   updateUserPassword,
   updateUserBasicInfo,
   userStats,
+  forgotPassword,
+  resetPassword,
 };

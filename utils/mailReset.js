@@ -1,4 +1,4 @@
-const emailHTML = (currentURL, verificationToken) => {
+const emailReset = (currentURL, verificationToken) => {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -41,10 +41,10 @@ const emailHTML = (currentURL, verificationToken) => {
     <body>
       <div class="container">
         <div class="card">
-         <img src="https://res.cloudinary.com/dzdfqqdxs/image/upload/v1714743799/logoBanner.png"/>
-          <h2>Email xác thực</h2>
-          <p>Cảm ơn bạn đã đăng ký với website TMS của chúng tôi! Vui lòng xác minh địa chỉ email của bạn bằng cách nhấp vào nút bên dưới:</p>
-          <a href="${currentURL}/auth/verify-mail?verificationToken=${verificationToken}" target="_blank" class="button">Xác nhận Email</a>
+          <img src="https://res.cloudinary.com/dzdfqqdxs/image/upload/v1714743799/logoBanner.png"/>
+          <h2>Đặt lại mật khẩu</h2>
+          <p>Nếu bạn đã xác minh email và cần lấy lại mật khẩu, vui lòng ấn nút phía dưới để xác nhận</p>
+          <a href="${currentURL}/auth/reset?repass=${verificationToken}" target="_blank" class="button">Đặt lại mật khẩu</a>
         </div>
       </div>
     </body>
@@ -52,4 +52,4 @@ const emailHTML = (currentURL, verificationToken) => {
   `;
 };
 
-module.exports = emailHTML;
+module.exports = emailReset;

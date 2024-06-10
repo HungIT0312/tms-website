@@ -47,6 +47,9 @@ const userSchema = mongoose.Schema({
   verificationToken: {
     type: String,
   },
+  resetToken: {
+    type: String,
+  },
 });
 userSchema.virtual("fullName").get(function () {
   return `${this.surname} ${this.name}`;
