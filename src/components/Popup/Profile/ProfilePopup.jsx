@@ -13,7 +13,7 @@ const ProfilePopup = () => {
   const navigate = useNavigate();
   const handleLogOut = () => {
     dispatch(logOut());
-    message.success("Logout successful!");
+    message.success("Đã đăng xuất!");
     navigate("/home");
   };
   const handleChangeAccount = () => {

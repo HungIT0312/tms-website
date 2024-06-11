@@ -146,7 +146,7 @@ const Workspace = () => {
           {!isLoading &&
             boards?.length > 0 &&
             searchedBoard("owner").map((board) => (
-              <Col key={board._id} xs={26} sm={12} md={6} lg={4}>
+              <Col key={board._id} xs={26} sm={12} md={4} lg={4}>
                 <BoardPreview board={board} />
               </Col>
             ))}
@@ -181,7 +181,7 @@ const Workspace = () => {
           {!isLoading &&
             boards?.length > 0 &&
             searchedBoard("member").map((board) => (
-              <Col key={board._id} xs={24} sm={12} md={6} lg={4}>
+              <Col key={board._id} xs={24} sm={12} md={4} lg={4}>
                 <BoardPreview isMem={true} board={board} />
               </Col>
             ))}
