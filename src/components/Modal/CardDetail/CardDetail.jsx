@@ -345,7 +345,7 @@ const CardDetail = () => {
           </Button>
         </Flex>
       ),
-      span: 4,
+      span: 3,
     },
     {
       key: "2",
@@ -363,7 +363,7 @@ const CardDetail = () => {
         ) : (
           "Không có"
         ),
-      span: 4,
+      span: 3,
     },
   ];
 
@@ -382,7 +382,7 @@ const CardDetail = () => {
           />
         </Tooltip>
       ),
-      span: 4,
+      span: 3,
     },
     {
       key: "2",
@@ -410,7 +410,7 @@ const CardDetail = () => {
           disabled={isPermissUser}
         />
       ),
-      span: 4,
+      span: 3,
     },
 
     {
@@ -425,7 +425,7 @@ const CardDetail = () => {
           disabled
         />
       ),
-      span: 4,
+      span: 3,
     },
     {
       key: "3",
@@ -437,7 +437,7 @@ const CardDetail = () => {
           allowClear={false}
         />
       ),
-      span: 4,
+      span: 3,
     },
     selectedCard?.date?.resolvedAt !== null && {
       key: "6",
@@ -451,7 +451,7 @@ const CardDetail = () => {
           disabled
         />
       ),
-      span: 4,
+      span: 3,
     },
   ];
 
@@ -507,7 +507,7 @@ const CardDetail = () => {
           ))}
         </Select>
       ),
-      span: 4,
+      span: 3,
     },
   ];
 
