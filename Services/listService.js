@@ -80,10 +80,10 @@ const deleteById = async (listId, boardId, user, callback) => {
     const validate = board.lists.filter(
       (list) => list.toString() === listId.toString()
     );
-    if (!validate)
+    if (!validate.length)
       return callback({ errMessage: "Thông tin của danh sách hoặc bảng sai" });
 
-    if (!user.boards.filter((board) => board === boardId))
+    if (!user.boards.includes(boardId))
       return callback({
         errMessage:
           "Bạn không thể xóa danh sách không được lưu trữ trên bảng của bạn",
@@ -91,13 +91,26 @@ const deleteById = async (listId, boardId, user, callback) => {
 
     const result = await listModel.findByIdAndDelete(listId);
 
+    if (!result) {
+      return callback({ errMessage: "Không tìm thấy danh sách cần xóa" });
+    }
+
     board.lists = board.lists.filter((list) => list.toString() !== listId);
 
+    const cards = await cardModel.find({ owner: listId });
+    if (cards.length > 0) {
+      for (const card of cards) {
+        board.activity.unshift({
+          user: user._id,
+          action: `đã xóa thẻ "${card.title}" khỏi danh sách "${result.title}"`,
+        });
+      }
+    }
     board.activity.unshift({
       user: user._id,
-      action: `đã xóa danh sách "${result.title}"  khỏi bảng`,
+      action: `đã xóa danh sách "${result.title}" khỏi bảng`,
     });
-    board.save();
+    await board.save();
 
     await cardModel.deleteMany({ owner: listId });
 
@@ -192,9 +205,15 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
           "Bạn không thể xóa danh sách không được lưu trữ trên bảng của bạn",
       });
     }
-
+    if (property != "_destroy") {
+      board.activity.unshift({
+        user: user._id,
+        action: `đã đổi tiêu đề danh sách "${list.title}" thành "${value}"`,
+      });
+    }
     list[property] = value;
-    if (property === "_destroy") {
+
+    if (property == "_destroy") {
       await Promise.all(
         list.cards.map(async (card) => {
           await cardModel.findByIdAndUpdate(card._id, {
@@ -202,7 +221,19 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
           });
         })
       );
+      if (value) {
+        board.activity.unshift({
+          user: user._id,
+          action: `đã lưu trữ danh sách "${list.title}"`,
+        });
+      } else {
+        board.activity.unshift({
+          user: user._id,
+          action: `đã khôi phục danh sách "${list.title}"`,
+        });
+      }
     }
+    await board.save();
 
     await list.save();
     const newlist = await listModel
@@ -225,6 +256,7 @@ const updateList = async (listId, boardId, user, value, property, callback) => {
         ],
       })
       .exec();
+
     return callback(false, { message: "Thành công", list: newlist });
   } catch (error) {
     return callback({

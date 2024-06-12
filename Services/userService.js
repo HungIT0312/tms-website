@@ -313,7 +313,22 @@ const userStats = async (userId, boardId, callback) => {
     const cardDetails = cards.map((card) => {
       const now = dayjs();
       const dueDate = dayjs(card.date.dueDate);
-      const overdue = dueDate.isBefore(now);
+      const resolvedAt = card.date.resolvedAt
+        ? dayjs(card.date.resolvedAt)
+        : null;
+
+      let dueStatus;
+      if (resolvedAt) {
+        if (resolvedAt.isAfter(dueDate)) {
+          dueStatus = "Quá hạn";
+        } else if (resolvedAt.isSame(dueDate, "day")) {
+          dueStatus = "Đúng hạn";
+        } else {
+          dueStatus = `Trước hạn ${dueDate.diff(resolvedAt, "day")} ngày`;
+        }
+      } else {
+        dueStatus = dueDate.isBefore(now) ? "Quá hạn" : "Còn hạn";
+      }
 
       return {
         title: card.title,
@@ -322,7 +337,7 @@ const userStats = async (userId, boardId, callback) => {
         dueDate: card.date.dueDate,
         completed: card.date.completed,
         resolvedAt: card.date.resolvedAt,
-        overdue: overdue,
+        dueStatus: dueStatus,
         _destroy: card._destroy,
       };
     });
@@ -338,6 +353,7 @@ const userStats = async (userId, boardId, callback) => {
     });
   }
 };
+
 const resetPassword = async (resetToken, newPassword, callback) => {
   try {
     const decoded = jwt.verify(resetToken, process.env.JWT_SECRET_ACCESS);

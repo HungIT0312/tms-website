@@ -247,16 +247,12 @@ const update = async (cardId, listId, boardId, user, updatedObj, callback) => {
     }
     card.activities.unshift({
       user: user._id,
-      action: `đã cập nhật thẻ này trong danh sách "${list.title}"`,
+      action: `đã cập nhật thông tin thẻ này`,
     });
-    board.activity.unshift({
-      user: user._id,
-      action: `đã cập nhật thẻ trong danh sách "${list.title}"`,
-    });
+    await card.save();
+
     //Update card
     await card.updateOne(updatedObj);
-    await board.save();
-    await card.save();
     const updatedCard = await cardModel
       .findById(cardId)
       .populate({
@@ -271,6 +267,12 @@ const update = async (cardId, listId, boardId, user, updatedObj, callback) => {
       .populate({
         path: "labels",
       });
+    board.activity.unshift({
+      user: user._id,
+      action: `đã cập nhật thông tin thẻ "${updatedCard.title}" trong danh sách "${list.title}"`,
+    });
+    await board.save();
+
     return callback(false, { message: "Thành công!", card: updatedCard });
   } catch (error) {
     return callback({
@@ -422,7 +424,7 @@ const deleteComment = async (
     //Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: `đã xóa nhận xét của ra khỏi "${card.title}"`,
+      action: `đã xóa 1 bình luận ra khỏi "${card.title}"`,
     });
     board.save();
 
@@ -478,7 +480,7 @@ const changeCardMember = async (
     ];
     card.activities.unshift({
       user: user._id,
-      action: `thay đổi người được chỉ định thành "${member.surname} ${member.name}" trong thẻ "${card.title}"`,
+      action: `thay đổi người được chỉ định thành "${member.surname} ${member.name}"`,
     });
 
     await card.save();
@@ -489,7 +491,7 @@ const changeCardMember = async (
       action: `thay đổi người được chỉ định thành "${member.surname} ${member.name}" trong thẻ "${card.title}"`,
     });
     const slugB = _.kebabCase(board.title.toLowerCase());
-    const slugC = _.kebabCase(card.title.toLowerCase());
+    // const slugC = _.kebabCase(card.title.toLowerCase());
     await board.save();
     if (user._id != memberId) {
       const newNotice = await notificationModal.create({
@@ -497,10 +499,10 @@ const changeCardMember = async (
         message:
           "<p> Bạn đã được thêm vào thẻ <b>" +
           card.title +
-          "</b> trong danh sách <b>" +
-          list.title +
+          "</b> trong bảng <b>" +
+          board.title +
           "</b>",
-        link: `/board/${boardId}/${slugB}/c/${slugC}`,
+        link: `/board/${boardId}/${slugB}`,
       });
       const returnNotice = await notificationModal
         .findById(newNotice._id)
@@ -561,15 +563,9 @@ const updateStartDueDates = async (
     if (startDate || dueDate) {
       card.activities.unshift({
         user: user._id,
-        action: `đã cập nhật ngày đến hạn từ ${
-          startDate
-            ? dayjs(startDate).toDate().toDateString()
-            : "không có ngày bắt đầu"
-        } đến ${
-          dueDate
-            ? dayjs(dueDate).toDate().toDateString()
-            : "không có ngày kết thúc"
-        }`,
+        action: `đã cập nhật ngày đến hạn bắt đầu ${
+          startDate ? dayjs(startDate).format("DD/MM/YYYY") : "từ chưa có ngày"
+        } đến ${dueDate ? dayjs(dueDate).format("DD/MM/YYYY") : "hạn cuối"}`,
       });
     }
     const now = dayjs();
