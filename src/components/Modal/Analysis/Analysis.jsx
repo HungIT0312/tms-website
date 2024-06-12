@@ -32,6 +32,7 @@ import { getBoardStats } from "../../../api/board/board.api";
 import { analysisUser } from "../../../api/user/user.api";
 import { getCardById } from "../../../stores/card/cardThunk";
 import "./Analysis.scss";
+import { setSelectedCard } from "../../../stores/card/cardSlice";
 
 const Analysis = ({ isOpen, setIsOpen }) => {
   const { boardId } = useParams();
@@ -73,9 +74,10 @@ const Analysis = ({ isOpen, setIsOpen }) => {
     clearFilters();
   };
   const handleSelectCard = async (card) => {
+    await dispatch(getCardById(card?.key)).unwrap();
     const slug = _.kebabCase(card.title.toLowerCase());
-    await dispatch(getCardById(card?.key));
     navigate(`${rootLink}/c/${slug}`);
+    // .then((rs) => dispatch(setSelectedCard(rs)));
   };
   const checkOwner = (user) => {
     return selectedBoard.members.some(
@@ -188,7 +190,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       resolvedAt: item?.resolvedAt
         ? dayjs(item?.resolvedAt).format("DD-MM-YYYY")
         : null,
-      overdue: item?.overdue,
+      dueStatus: item?.dueStatus,
       completed: item?.completed,
     };
   });
@@ -276,25 +278,25 @@ const Analysis = ({ isOpen, setIsOpen }) => {
     },
     {
       title: "Đến hạn",
-      dataIndex: "overdue",
+      dataIndex: "dueStatus",
       sorter: (a, b) => a.overdue - b.overdue,
       render: (text) => (
         <div>
-          {text && (
+          {text == "Quá hạn" && (
             <Tag bordered={false} color="volcano">
-              Đã quá hạn
+              {text}
             </Tag>
           )}
-          {!text && (
+          {text !== "Quá hạn" && (
             <Tag bordered={false} color="green">
-              Còn hạn
+              {text}
             </Tag>
           )}
         </div>
       ),
     },
     {
-      title: "Trạng thái",
+      title: "Tình trạng",
       dataIndex: "completed",
       sorter: (a, b) => a.completed - b.completed,
       render: (text) => (
@@ -311,7 +313,6 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       render: (_, card) => (
         <Button
           onClick={() => {
-            // console.log(card);
             handleSelectCard(card);
           }}
         >
@@ -353,7 +354,10 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       centered
       open={isOpen}
       onOk={() => setIsOpen(false)}
-      onCancel={() => setIsOpen(false)}
+      onCancel={() => {
+        setIsOpen(false);
+        dispatch(setSelectedCard(null));
+      }}
       footer={false}
       className="analysis-model"
     >

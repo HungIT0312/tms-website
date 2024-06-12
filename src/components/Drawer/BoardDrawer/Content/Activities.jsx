@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Button, Flex } from "antd";
+import { Button, Flex, Spin, message } from "antd";
 import { useEffect, useState } from "react";
 import { getActivityById } from "../../../../api/board/board.api";
 import Activity from "../../../Activity/Activity";
@@ -9,9 +9,11 @@ const Activities = ({ selectedBoard }) => {
   const [activityLength, setActivityLength] = useState(0);
   const [limit, setLimit] = useState(10);
   const [isMore, setIsMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     try {
       const getActivity = async () => {
+        setIsLoading(true);
         const rs = await getActivityById({
           boardId: selectedBoard?._id,
           page: 1,
@@ -22,10 +24,12 @@ const Activities = ({ selectedBoard }) => {
           setIsMore(!(rs.length === rs.activities.length));
           setActivities(rs.activities);
           setLimit(rs.limit);
+          setIsLoading(false);
         }
       };
       getActivity();
     } catch (error) {
+      message.error("Lỗi dữ liệu");
       console.log(error);
     }
   }, [limit, selectedBoard]);
@@ -37,16 +41,22 @@ const Activities = ({ selectedBoard }) => {
     }
   };
   return (
-    <Flex vertical gap={16} style={{ overflowY: "auto" }}>
-      {activities &&
+    <Flex
+      vertical
+      gap={16}
+      style={{ overflowY: isLoading ? "hidden" : "auto" }}
+    >
+      {!isLoading &&
+        activities &&
         activities.map((activity) => (
           <Activity key={activity._id} activity={activity} />
         ))}
-      {activityLength > 10 && (
+      {!isLoading && activityLength > 10 && (
         <Button type="text" onClick={handleSeeMore}>
           {isMore ? "Xem thêm" : "Ít hơn"}
         </Button>
       )}
+      {isLoading && <Spin />}
     </Flex>
   );
 };

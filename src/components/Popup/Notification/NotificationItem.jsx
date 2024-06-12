@@ -2,8 +2,12 @@
 import { Flex } from "antd";
 import "./notice.scss";
 import formatDateTime from "../../../helpers/formatDatetime";
+import { useNavigate } from "react-router-dom";
 const NotificationItem = ({ notice = {} }) => {
-  const handleLink = () => {};
+  const navigate = useNavigate();
+  const handleLink = () => {
+    navigate(notice.link);
+  };
   return (
     <Flex vertical className="notice-item" onClick={handleLink}>
       <div

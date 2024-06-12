@@ -81,9 +81,7 @@ const CardDetail = () => {
   const [status, setStatus] = useState("");
   const [newCard, setNewCard] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
-  const [isPermissUser, setIsPermissUser] = useState(
-    !selectedCard?.date?.dueDate
-  );
+
   const cmtRef = useRef(null);
 
   const showModal = () => {
@@ -191,7 +189,6 @@ const CardDetail = () => {
         completed: selectedCard?.date?.completed,
       },
     };
-    setIsPermissUser((prev) => !prev);
     dispatch(updateDateCardListUI(dataAddDate));
     dispatch(updateDueDate({ ...dataAddDate.date }));
     dispatch(updateDates(dataAddDate))
@@ -237,9 +234,13 @@ const CardDetail = () => {
         cardId: selectedCard?._id,
         updateObj: { ...selectedCard, title: data?.value },
       };
-
-      dispatch(updateCardInListById(updateData));
-      dispatch(updateCardInfo(updateData));
+      try {
+        dispatch(updateCardInListById(updateData));
+        dispatch(updateCardInfo(updateData));
+        msg.success("Cập nhật thành công");
+      } catch (error) {
+        msg.error("Đã xảy ra lỗi, cập nhật không thành công");
+      }
     }
   };
   const triggerCallUpdate = (value) => {
@@ -252,9 +253,13 @@ const CardDetail = () => {
         description: value,
       },
     };
-
-    dispatch(updateCardInListById(newDes));
-    dispatch(updateCardInfo(newDes));
+    try {
+      dispatch(updateCardInListById(newDes));
+      dispatch(updateCardInfo(newDes));
+      msg.success("Đã cập nhật mô tả");
+    } catch (error) {
+      msg.success("Cập nhật không thành công!");
+    }
   };
   const handleDeleteThisTask = (checked) => {
     const dataDelete = {
@@ -282,13 +287,15 @@ const CardDetail = () => {
       boardId: boardId,
       parentCardId: selectedCard?._id,
     };
+
     dispatch(addCard(data))
       .unwrap()
       .then((rs) => {
-        msg.success("Thành công!");
+        msg.success("Thêm thành công!");
         dispatch(updateParentCardUI({ ...data, newCard: rs.card }));
         dispatch(updateCardSubTaskUI(rs.card));
-      });
+      })
+      .catch(() => msg.error("Thêm thất bại!"));
     setNewCard("");
   };
   const handleAddPeople = (e) => {
@@ -389,7 +396,10 @@ const CardDetail = () => {
       label: "Trạng thái",
       children: (
         <Select
-          title={isPermissUser ? `Bạn cần thiết lập ngày đến hạn` : ""}
+          title={
+            !selectedCard?.date?.dueDate ? `Bạn cần thiết lập ngày đến hạn` : ""
+          }
+          disabled={!selectedCard?.date?.dueDate}
           placeholder="Trạng thái"
           variant="borderless"
           defaultValue={selectedCard?.date?.completed}
@@ -407,7 +417,6 @@ const CardDetail = () => {
               label: "Đã hoàn thành",
             },
           ]}
-          disabled={isPermissUser}
         />
       ),
       span: 3,
