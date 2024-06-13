@@ -15,14 +15,15 @@
     color: #888888;
   }
   &__description {
-    border: 1px solid #eee;
     border-radius: 4px;
-    padding: 12px;
+    padding: 0 12px;
     width: calc(100% - 24px);
     cursor: pointer;
     min-height: 120px;
+    border: 1px solid transparent;
+    border: 1px solid #eee;
     &:hover {
-      background-color: #eee;
+      background-color: #eeeeee5d;
     }
   }
 }

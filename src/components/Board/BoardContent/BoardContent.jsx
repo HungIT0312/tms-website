@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { Flex } from "antd";
+import { Flex, message } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -33,7 +33,7 @@ import listProperty from "../../../constants/listProperty";
 const BoardContent = ({ searchKey }) => {
   const dispatch = useDispatch();
   const { boardId } = useParams();
-  const { loading, lists } = useSelector((state) => state.list);
+  const { loading, lists,isLoadingNew } = useSelector((state) => state.list);
   const [activeDragItemId, setActiveDragItemId] = useState(null);
   const [activeDragItemType, setActiveDragItemType] = useState(null);
   const [activeDragItemData, setActiveDragItemData] = useState(null);
@@ -228,7 +228,12 @@ const BoardContent = ({ searchKey }) => {
   };
 
   const handleCreateList = (data) => {
-    dispatch(createNewList({ ...data, boardId: boardId }));
+    try {
+      dispatch(createNewList({ ...data, boardId: boardId }));
+      message.success("Thêm thành công");
+    } catch (error) {
+      message.success("Thêm thất bại");
+    }
   };
   const renderListsAfterSearch = lists?.map((list) => {
     const matchingCards = list?.cards.filter((card) =>
@@ -250,6 +255,7 @@ const BoardContent = ({ searchKey }) => {
           handleCreateList={handleCreateList}
           lists={renderListsAfterSearch}
           loading={loading}
+          isLoadingNew={isLoadingNew}
         />
         <DragOverlay dropAnimation={dropAnimation}>
           {!activeDragItemType && null}

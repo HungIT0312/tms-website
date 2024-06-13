@@ -7,7 +7,9 @@ import { Flex, Skeleton } from "antd";
 import Column from "./Column/Column";
 import "./ListColumns.scss";
 
-const ListColumns = ({ handleCreateList, lists, loading }) => {
+
+const ListColumns = ({ handleCreateList, lists, loading, isLoadingNew }) => {
+
   const renderLists = lists?.map((list) => (
     <Column key={list._id} list={list} />
   ));
@@ -31,7 +33,12 @@ const ListColumns = ({ handleCreateList, lists, loading }) => {
       <Flex gap={12} className="list-columns">
         {loading ? renderLoadingSkeletons() : renderLists}
         {!loading && (
-          <Column isAddList={true} handleCreateList={handleCreateList} />
+          <Column
+            isAddList={true}
+            handleCreateList={handleCreateList}
+            isLoadingNew={isLoadingNew}
+
+          />
         )}
 
         {/* {true && <Spin size="large" style={{ margin: "0 auto" }} />} */}

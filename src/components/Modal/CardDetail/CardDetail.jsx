@@ -73,15 +73,20 @@ const CardDetail = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
-  const { selectedCard, isLoading } = useSelector((state) => state.card);
+  const { selectedCard, isLoading, isLoadingNewCard } = useSelector(
+    (state) => state.card
+  );
   const { selectedBoard } = useSelector((state) => state.board);
+  const { userInformation } = useSelector((state) => state.user);
   const { boardId } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [status, setStatus] = useState("");
   const [newCard, setNewCard] = useState("");
   const [tooltipDate, setTooltipDate] = useState("");
-
+  const isYourCard =
+    selectedCard?.members[0]?.user?._id === userInformation._id;
+  const isPermision = selectedCard?.date?.dueDate && isYourCard;
   const cmtRef = useRef(null);
 
   const showModal = () => {
@@ -397,9 +402,12 @@ const CardDetail = () => {
       children: (
         <Select
           title={
-            !selectedCard?.date?.dueDate ? `Bạn cần thiết lập ngày đến hạn` : ""
+            (!selectedCard?.date?.dueDate &&
+              `Bạn cần thiết lập ngày đến hạn`) ||
+            (!isYourCard && `Đây không phải thẻ của bạn`) ||
+            ""
           }
-          disabled={!selectedCard?.date?.dueDate}
+          disabled={!isPermision}
           placeholder="Trạng thái"
           variant="borderless"
           defaultValue={selectedCard?.date?.completed}
@@ -562,6 +570,11 @@ const CardDetail = () => {
         <Flex vertical gap={8}>
           <Flex gap={8} vertical>
             {renderSubTasks}
+            {isLoadingNewCard && (
+              <Flex justify="center" align="center" className="subtask">
+                <Spin />
+              </Flex>
+            )}
           </Flex>
           <Space.Compact style={{ width: "100%" }}>
             <Input

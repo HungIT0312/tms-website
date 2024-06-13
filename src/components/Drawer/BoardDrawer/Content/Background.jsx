@@ -85,17 +85,18 @@ const Background = () => {
           <Row gutter={[8, 8]}>{renderBg(bgColors)}</Row>
         </div>
       </Flex>
-      <Flex gap={8}>
-        <Button
-          type="primary"
-          disabled={!isOwner}
-          title="Chỉ chủ sỡ hữu mới có thể chỉnh sửa"
-          onClick={handleOk}
-        >
-          Thay đổi
-        </Button>
-        {/* <Button>Hủy</Button> */}
-      </Flex>
+      {isOwner && (
+        <Flex gap={8}>
+          <Button
+            type="primary"
+            title="Chỉ chủ sỡ hữu mới có thể chỉnh sửa"
+            onClick={handleOk}
+          >
+            Thay đổi
+          </Button>
+          {/* <Button>Hủy</Button> */}
+        </Flex>
+      )}
     </Flex>
   );
 };

@@ -5,20 +5,25 @@ import {
   ExclamationCircleOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Input, Modal, Popover, notification } from "antd";
-import { useEffect, useRef, useState } from "react";
-import ListCards from "../../Cards/ListCards";
-import "./Column.scss";
-import { useParams } from "react-router-dom";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useDispatch } from "react-redux";
-import { addCard } from "../../../stores/card/cardThunk";
+import { Button, Flex, Input, Modal, Popover, Spin, message } from "antd";
+import { useEffect, useRef, useState } from "react";
 import { EditText } from "react-edit-text";
-import { updateListInfo } from "../../../stores/list/ListThunk";
+import { useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 import listProperty from "../../../constants/listProperty";
+import { addCard } from "../../../stores/card/cardThunk";
+import { updateListInfo } from "../../../stores/list/ListThunk";
+import ListCards from "../../Cards/ListCards";
+import "./Column.scss";
 
-const Column = ({ isAddList = false, handleCreateList, list }) => {
+const Column = ({
+  isAddList = false,
+  handleCreateList,
+  list,
+  isLoadingNew,
+}) => {
   const [isAddNew, setIsAddNew] = useState(false);
   const [isAddNewTask, setIsAddNewTask] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -27,9 +32,8 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
   const [open, setOpen] = useState(false);
   const [listCard, setListCard] = useState([]);
   const { boardId } = useParams();
-  const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch();
-
+  const [loadingColumnId, setLoadingColumnId] = useState(null);
   //====================================================DND kit===============================================
   const {
     attributes,
@@ -46,6 +50,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
     opacity: isDragging ? 0.8 : undefined,
     height: "100%",
   };
+
   useEffect(() => {
     setListCard(list?.cards);
     const handleClickOutside = (event) => {
@@ -56,6 +61,7 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
         !event.target.classList.contains("List-column__footer--add")
       ) {
         setIsAddNewTask(false);
+        setIsAddNew(false); // Ensure both add new list and add new task are handled
       }
     };
 
@@ -78,27 +84,24 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
     if (!newTitle) return;
     handleCreateList({ title: newTitle });
     setNewTitle("");
-    setIsAddNew(false);
+    // setIsAddNew(false);
   };
 
   const handleAddNewTask = async () => {
     if (!newTaskTitle) return;
     const data = { title: newTaskTitle, listId: list._id, boardId: boardId };
     try {
+      setLoadingColumnId(list._id);
       dispatch(addCard(data))
         .unwrap()
         .then((rs) => {
+          setLoadingColumnId(null);
+
           setListCard([...listCard, rs.card]);
-          api.success({
-            message: rs.message,
-            placement: "bottomRight",
-          });
+          message.success(rs.message);
         });
     } catch (error) {
-      api.error({
-        message: error.errMessage,
-        placement: "bottomRight",
-      });
+      message.error("Thêm thất bại");
     }
     setNewTaskTitle("");
     setIsAddNewTask(false);
@@ -179,37 +182,60 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
       )}
       {isAddNew && (
         <>
-          <Flex className="List-column__header" gap={8} align="center" vertical>
-            <Input
-              className="List-column__title"
-              placeholder="Nhập tiêu đề mới"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-            />
-          </Flex>
-          <Flex
-            className="List-column__footer List-column__footer--add"
-            gap={8}
-            align="center"
-          >
-            <Button type="primary" className="btn-add" onClick={handleCreate}>
-              Thêm
-            </Button>
-            <Button
-              type="text"
-              className="btn-add"
-              onClick={() => setIsAddNew(false)}
+          {!isLoadingNew && (
+            <>
+              <Flex
+                className="List-column__header"
+                gap={8}
+                align="center"
+                vertical
+              >
+                <Input
+                  className="List-column__title"
+                  placeholder="Nhập tiêu đề mới"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                />
+              </Flex>
+              <Flex
+                className="List-column__footer List-column__footer--add"
+                gap={8}
+                align="center"
+              >
+                <Button
+                  type="primary"
+                  className="btn-add"
+                  onClick={handleCreate}
+                >
+                  Thêm
+                </Button>
+                <Button
+                  type="text"
+                  className="btn-add"
+                  onClick={() => setIsAddNew(false)}
+                >
+                  Hủy
+                </Button>
+              </Flex>
+            </>
+          )}
+          {isLoadingNew && (
+            <Flex
+              className="List-column__header"
+              gap={8}
+              align="center"
+              vertical
+              justify="center"
             >
-              Hủy
-            </Button>
-          </Flex>
+              <Spin className="loading-spinner" />
+            </Flex>
+          )}
         </>
       )}
     </Flex>
   ) : (
     <div ref={setNodeRef} style={dndKitListStyle} {...attributes}>
       <Flex className="List-column" vertical {...listeners}>
-        {contextHolder}
         <Flex
           className="List-column__header"
           justify="space-between"
@@ -251,40 +277,54 @@ const Column = ({ isAddList = false, handleCreateList, list }) => {
           setIsAddNewTask={setIsAddNewTask}
         />
         {/* add new task ======================================================================================*/}
-
-        {!isAddNewTask && (
+        {loadingColumnId === list._id && (
           <Flex
-            className="List-column__footer"
+            className="card-item"
+            style={{ marginTop: 8 }}
             gap={8}
             align="center"
-            onClick={() => setIsAddNewTask(true)}
+            justify="center"
           >
-            <PlusOutlined />
-            <span>Thêm mới</span>
+            <Spin className="loading-spinner" />
           </Flex>
         )}
+        {!isAddNewTask && (
+          <>
+            <Flex
+              className="List-column__footer"
+              gap={8}
+              align="center"
+              onClick={() => setIsAddNewTask(true)}
+            >
+              <PlusOutlined />
+              <span>Thêm mới</span>
+            </Flex>
+          </>
+        )}
         {isAddNewTask && (
-          <Flex
-            className="List-column__footer List-column__footer--add"
-            gap={8}
-            align="center"
-            ref={addNewRef}
-          >
-            <Button
-              type="primary"
-              className="btn-add"
-              onClick={() => handleAddNewTask()}
+          <>
+            <Flex
+              className="List-column__footer List-column__footer--add"
+              gap={8}
+              align="center"
+              ref={addNewRef}
             >
-              Thêm
-            </Button>
-            <Button
-              type="text"
-              className="btn-cancel"
-              onClick={() => setIsAddNewTask(false)}
-            >
-              Hủy
-            </Button>
-          </Flex>
+              <Button
+                type="primary"
+                className="btn-add"
+                onClick={() => handleAddNewTask()}
+              >
+                Thêm
+              </Button>
+              <Button
+                type="text"
+                className="btn-cancel"
+                onClick={() => setIsAddNewTask(false)}
+              >
+                Hủy
+              </Button>
+            </Flex>
+          </>
         )}
       </Flex>
     </div>

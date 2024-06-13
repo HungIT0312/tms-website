@@ -43,6 +43,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
   const [isSelfStats, setIsSelfStats] = useState(false);
   const [selectedMem, setSelectedMem] = useState(null);
   const [userStats, setUserStats] = useState(null);
+  const [isUserStatsLoading, setIsUserStatsLoading] = useState(false);
   const searchInput = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -233,6 +234,7 @@ const Analysis = ({ isOpen, setIsOpen }) => {
           onClick={() => {
             setSelectedMem(user);
             setIsSelfStats(true);
+            setIsUserStatsLoading(true);
             try {
               const fetchStats = async () => {
                 const rs = await analysisUser({
@@ -241,11 +243,13 @@ const Analysis = ({ isOpen, setIsOpen }) => {
                 });
                 if (rs) {
                   setUserStats(rs);
+                  setIsUserStatsLoading(false);
                 }
               };
               fetchStats();
             } catch (error) {
               console.log(error);
+              setIsUserStatsLoading(false);
             }
           }}
         >
@@ -341,11 +345,13 @@ const Analysis = ({ isOpen, setIsOpen }) => {
     <Modal
       title={
         <Flex gap={16}>
-          {" "}
           {isSelfStats && (
             <LeftOutlined
               style={{ cursor: "pointer" }}
-              onClick={() => setIsSelfStats(false)}
+              onClick={() => {
+                setUserStats(null);
+                setIsSelfStats(false);
+              }}
             />
           )}
           Phân tích
@@ -437,7 +443,11 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       ) : (
         <Flex vertical style={{ marginTop: 24 }}>
           <Descriptions title="" items={ItemPeople} layout="" />
-          <Table columns={columns2} dataSource={data2} pagination={false} />
+          {isUserStatsLoading ? (
+            <Skeleton active paragraph={{ rows: 8 }} />
+          ) : (
+            <Table columns={columns2} dataSource={data2} pagination={false} />
+          )}
         </Flex>
       )}
     </Modal>

@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   addALabelToCard,
+  addCard,
   changeMemberAssign,
   deleteCardById,
   getCardById,
@@ -16,6 +17,7 @@ const initialState = {
   isError: false,
   message: null,
   selectedCard: null,
+  isLoadingNewCard: false,
 };
 
 const cardSlice = createSlice({
@@ -79,6 +81,18 @@ const cardSlice = createSlice({
       .addCase(updateCardInfo.rejected, (state, action) => {
         state.message = action.payload.errMessage;
         state.error = true;
+      })
+      .addCase(addCard.pending, (state) => {
+        state.error = false;
+        state.message = null;
+        state.isLoadingNewCard = true;
+      })
+      .addCase(addCard.fulfilled, (state) => {
+        state.isLoadingNewCard = false;
+      })
+      .addCase(addCard.rejected, (state) => {
+        state.error = true;
+        state.isLoadingNewCard = false;
       })
       //===============================================================
       .addCase(addALabelToCard.pending, (state) => {

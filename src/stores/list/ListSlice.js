@@ -16,6 +16,7 @@ const initialState = {
   lists: [],
   storageLists: [],
   loading: false,
+  isLoadingNew: false,
   error: false,
   message: null,
 };
@@ -290,12 +291,15 @@ const ListSlice = createSlice({
 
       .addCase(createNewList.pending, (state) => {
         state.error = false;
+        state.isLoadingNew = true;
       })
       .addCase(createNewList.fulfilled, (state, action) => {
         state.lists.push(action.payload);
         state.error = false;
+        state.isLoadingNew = false;
       })
       .addCase(createNewList.rejected, (state, action) => {
+        state.isLoadingNew = false;
         state.error = true;
         state.message = action.payload.errMessage;
       })
