@@ -11,7 +11,7 @@ import {
 } from "../../../../stores/card/cardThunk";
 import Activity from "../../../Activity/Activity";
 import Comment from "../../../Comment/Comment";
-
+import "./ActivityAndComment.scss";
 const ActivityAndComment = () => {
   const { selectedCard } = useSelector((state) => state.card);
   const [activities, setActivities] = useState([]);
@@ -120,6 +120,7 @@ const ActivityAndComment = () => {
               maxHeight: 300,
               overflowY: "auto",
             }}
+            className="cmt"
           >
             {isLoading && <Spin />}
             {!isLoading && activities.length > 0 && renderComments}
@@ -175,6 +176,7 @@ const ActivityAndComment = () => {
             maxHeight: 300,
             overflowY: "auto",
           }}
+          className="cmt"
         >
           {!isLoading && activities.length > 0 && renderActivities}
           {!isLoading && activities.length < 1 && renderEmpty}

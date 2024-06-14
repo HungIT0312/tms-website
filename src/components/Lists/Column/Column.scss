@@ -4,27 +4,7 @@
   border-radius: 12px;
   height: fit-content;
   max-height: calc(100% - 16px);
-  &::-webkit-scrollbar {
-    // height: 8px !important;
-    width: 4px !important;
-  }
 
-  /* Track */
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /* Handle */
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    height: 8px !important;
-  }
-
-  /* Handle on hover */
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5); /* Darker color on hover */
-  }
   &__title {
     font-size: 14px;
     font-weight: 600;
@@ -72,4 +52,7 @@
   &--delete {
     color: red !important;
   }
+}
+.column-footer {
+  padding: 0px 8px 8px 8px;
 }

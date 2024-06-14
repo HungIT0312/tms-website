@@ -1,8 +1,4 @@
-.list-cards {
-  overflow-y: auto;
-  height: 200px;
-  flex: 1;
-  padding-bottom: 8px;
+.cmt {
   &::-webkit-scrollbar {
     // height: 8px !important;
     width: 4px !important;

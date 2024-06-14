@@ -163,6 +163,11 @@ const Column = ({
       </Flex>
     </Flex>
   );
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleCreate();
+    }
+  };
   return isAddList ? (
     <Flex
       className={`List-column ${isAddNew ? "" : "List-column__add"}`}
@@ -195,6 +200,7 @@ const Column = ({
                   placeholder="Nhập tiêu đề mới"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
+                  onKeyDown={handleKeyPress}
                 />
               </Flex>
               <Flex
@@ -275,6 +281,7 @@ const Column = ({
           setNewTaskTitle={setNewTaskTitle}
           isAddNewTask={isAddNewTask}
           setIsAddNewTask={setIsAddNewTask}
+          handleAddNewTask={handleAddNewTask}
         />
         {/* add new task ======================================================================================*/}
         {loadingColumnId === list._id && (
@@ -304,7 +311,7 @@ const Column = ({
         {isAddNewTask && (
           <>
             <Flex
-              className="List-column__footer List-column__footer--add"
+              className="column-footer"
               gap={8}
               align="center"
               ref={addNewRef}

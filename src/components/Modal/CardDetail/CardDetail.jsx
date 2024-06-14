@@ -686,6 +686,7 @@ const CardDetail = () => {
         close={() => setIsDeleteOpen(false)}
         isOpen={isDeleteOpen}
         handleDeleteThisTask={handleDeleteThisTask}
+        subTasks={selectedCard?.subTasks}
       />
     </Modal>
   );

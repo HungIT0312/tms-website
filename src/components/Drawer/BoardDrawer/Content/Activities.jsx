@@ -3,7 +3,7 @@ import { Button, Flex, Spin, message } from "antd";
 import { useEffect, useState } from "react";
 import { getActivityById } from "../../../../api/board/board.api";
 import Activity from "../../../Activity/Activity";
-
+import './Activities.scss'
 const Activities = ({ selectedBoard }) => {
   const [activities, setActivities] = useState([]);
   const [activityLength, setActivityLength] = useState(0);
@@ -45,6 +45,7 @@ const Activities = ({ selectedBoard }) => {
       vertical
       gap={16}
       style={{ overflowY: isLoading ? "hidden" : "auto" }}
+      className="board-activity"
     >
       {!isLoading &&
         activities &&

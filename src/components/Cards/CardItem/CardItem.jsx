@@ -1,44 +1,40 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import {
   ApartmentOutlined,
-  CheckSquareOutlined,
   ClockCircleOutlined,
   CommentOutlined,
-  EditOutlined,
   EllipsisOutlined,
-  ExportOutlined,
-  LeftOutlined,
-  MessageOutlined,
   PaperClipOutlined,
-  RightOutlined,
 } from "@ant-design/icons";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Avatar, Flex, Input, Popover, Tag, Tooltip } from "antd";
 import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+import utc from "dayjs/plugin/utc";
+import weekday from "dayjs/plugin/weekday";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { setSelectedCard } from "../../../stores/card/cardSlice";
-import "./CardItem.scss";
+import { getCardById } from "../../../stores/card/cardThunk";
 import { changeCardToAnotherList } from "../../../stores/list/ListSlice";
 import { changeCardToDiffList } from "../../../stores/list/ListThunk";
-import { getCardById } from "../../../stores/card/cardThunk";
-import localeData from "dayjs/plugin/localeData";
-import weekday from "dayjs/plugin/weekday";
-import utc from "dayjs/plugin/utc";
+import "./CardItem.scss";
+
 dayjs.extend(weekday);
 dayjs.extend(localeData);
 dayjs.extend(utc);
+
 const CardItem = ({
   card = {},
   isAdd = false,
   newTaskTitle,
   setNewTaskTitle,
+  handleAddNewTask,
 }) => {
-  const [isEnter, setIsEnter] = useState(false);
+  // const [isEnter, setIsEnter] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
@@ -60,17 +56,15 @@ const CardItem = ({
     transition,
     opacity: isDragging ? 0.8 : undefined,
     border: isDragging ? "1px solid #2ecc71" : undefined,
-    // overflow: card?.isPlaceHolder ? "hidden" : "unset",
-    // height: card?.isPlaceHolder ? "0px" : "unset",
-    // display: card?.isPlaceHolder ? "none" : "block",
-    // overflow: "unset",
   };
+
   const handleSelectCard = () => {
     const slug = _.kebabCase(card.title.toLowerCase());
     dispatch(setSelectedCard(card));
     navigate(`${rootLink}/c/${slug}`);
     dispatch(getCardById(card?._id));
   };
+
   const renderDueDateStatus = (date) => {
     const now = dayjs();
     if (now.isAfter(date, "day")) {
@@ -84,6 +78,7 @@ const CardItem = ({
       setTooltipDate("");
     }
   };
+
   useEffect(() => {
     const dueDate = dayjs(card?.date?.dueDate);
     if (!card?.date?.dueDate || card?.date?.completed) {
@@ -91,6 +86,7 @@ const CardItem = ({
       setTooltipDate("");
     } else renderDueDateStatus(dueDate);
   }, [card?.date?.completed, card?.date?.dueDate]);
+
   const renderStatusColor = () => {
     if (status == "" && card?.date?.completed) {
       return "checkbox-due--complete";
@@ -105,6 +101,7 @@ const CardItem = ({
       return "checkbox-due";
     }
   };
+
   const renderLabels =
     card?.labels?.length > 0 &&
     card?.labels?.map((l) => (
@@ -120,6 +117,7 @@ const CardItem = ({
         {l?.text}
       </Tag>
     ));
+
   const handleEditClick = (e, list) => {
     e.stopPropagation();
     const data = {
@@ -137,6 +135,7 @@ const CardItem = ({
 
     dispatch(changeCardToAnotherList(data));
   };
+
   const renderListTitle = lists
     ?.filter((l) => l._id !== card?.owner)
     .map((l) => (
@@ -148,13 +147,22 @@ const CardItem = ({
         {l?.title}
       </Flex>
     ));
+
   const renderContent = (
     <Flex vertical gap={8}>
       <Flex className="change-title">Chuyển đến</Flex>
       {renderListTitle}
     </Flex>
   );
+
   const comments = card?.activities?.filter((a) => a?.isComment);
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleAddNewTask();
+    }
+  };
+
   return !isAdd ? (
     <Flex
       className="card-item"
@@ -191,8 +199,8 @@ const CardItem = ({
                   align="center"
                   className={renderStatusColor()}
                   gap={3}
-                  onMouseEnter={() => setIsEnter(true)}
-                  onMouseLeave={() => setIsEnter(false)}
+                  // onMouseEnter={() => setIsEnter(true)}
+                  // onMouseLeave={() => setIsEnter(false)}
                 >
                   <ClockCircleOutlined size={12} />
                   <span>
@@ -224,7 +232,6 @@ const CardItem = ({
           </Flex>
           <Flex align="end" justify="end" flex={1}>
             {card?.members?.length > 0 ? (
-              // <Tooltip title="Thành viên" placement="bottom">
               <Avatar
                 size={24}
                 style={{
@@ -235,7 +242,6 @@ const CardItem = ({
                 {card?.members[0]?.surname[0] + card?.members[0]?.name[0]}
               </Avatar>
             ) : (
-              // {/* </Tooltip> */}
               <></>
             )}
           </Flex>
@@ -249,6 +255,7 @@ const CardItem = ({
         placeholder="Tiêu đề mới"
         value={newTaskTitle}
         onChange={(e) => setNewTaskTitle(e.target.value)}
+        onKeyDown={handleKeyPress}
       />
     </Flex>
   );

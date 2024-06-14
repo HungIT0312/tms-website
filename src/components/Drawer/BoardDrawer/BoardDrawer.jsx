@@ -178,7 +178,7 @@ const BoardDrawer = ({
       placement="right"
       onClose={onClose}
       open={open}
-      getContainer={".board"}
+      getContainer={".board-content"}
       extra={
         renderKey !== "" &&
         renderKey !== "analysis" && (
