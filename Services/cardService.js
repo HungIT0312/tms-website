@@ -511,8 +511,11 @@ const changeCardMember = async (
         newNotice: returnNotice,
       });
     }
-
-    return callback(false, { message: "Thành công", member: card.members });
+    const newCard = await cardModel
+      .findById(card._id)
+      .populate("members.user")
+      .select("name surname _id email color");
+    return callback(false, { message: "Thành công", member: newCard.members });
   } catch (error) {
     return callback({
       errMessage: "Đã có lỗi xảy ra",
@@ -641,7 +644,7 @@ const addAttachment = async (
     //Add to board activity
     board.activity.unshift({
       user: user._id,
-      action: `đã thêm tệp đính kèm ${name} vào ${card.title}`,
+      action: `đã thêm tệp đính kèm ${name} vào thẻ ${card.title}`,
     });
     board.save();
 
@@ -690,6 +693,10 @@ const deleteAttachment = async (
     card.attachments = card.attachments.filter(
       (attachment) => attachment._id.toString() !== attachmentId.toString()
     );
+    card.activities.unshift({
+      user: user._id,
+      action: `đã xóa một tệp đính kèm khỏi thẻ`,
+    });
     await card.save();
 
     //Add to board activity

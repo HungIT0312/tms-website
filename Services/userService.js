@@ -323,6 +323,8 @@ const userStats = async (userId, boardId, callback) => {
           dueStatus = "Quá hạn";
         } else if (resolvedAt.isSame(dueDate, "day")) {
           dueStatus = "Đúng hạn";
+        } else if (dueDate.diff(resolvedAt, "day") === 0) {
+          dueStatus = "Đúng hạn";
         } else {
           dueStatus = `Trước hạn ${dueDate.diff(resolvedAt, "day")} ngày`;
         }
