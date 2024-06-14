@@ -311,10 +311,10 @@ const userStats = async (userId, boardId, callback) => {
     });
 
     const cardDetails = cards.map((card) => {
-      const now = dayjs();
-      const dueDate = dayjs(card.date.dueDate);
+      const now = dayjs().startOf("day");
+      const dueDate = dayjs(card.date.dueDate).startOf("day");
       const resolvedAt = card.date.resolvedAt
-        ? dayjs(card.date.resolvedAt)
+        ? dayjs(card.date.resolvedAt).startOf("day")
         : null;
 
       let dueStatus;
