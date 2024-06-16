@@ -67,6 +67,10 @@ const cardSlice = createSlice({
         startDate: action.payload.startDate,
       };
     },
+    updateCardAssignMemberUI(state, action) {
+      const { member } = action.payload;
+      state.selectedCard.members = [...member];
+    },
   },
   extraReducers: (builder) =>
     builder
@@ -142,7 +146,7 @@ const cardSlice = createSlice({
       //=====================================================================
       .addCase(changeMemberAssign.fulfilled, (state, action) => {
         state.message = action.payload.message;
-        state.selectedCard.members = action.payload.member;
+        // state.selectedCard.members = action.payload.member;
         state.isLoading = false;
       })
       //=====================================================================
@@ -210,6 +214,7 @@ export const {
   removeAttachment,
   uploadFileUI,
   updateDueDate,
+  updateCardAssignMemberUI,
 } = cardSlice.actions;
 
 export default cardSlice.reducer;

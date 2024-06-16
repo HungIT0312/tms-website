@@ -37,6 +37,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   setSelectedCard,
+  updateCardAssignMemberUI,
   updateCardDate,
   updateCardDateCompletedUI,
   updateCardSubTaskUI,
@@ -313,6 +314,7 @@ const CardDetail = () => {
     };
     try {
       dispatch(updateCardMemberUI(dataAddDate));
+      dispatch(updateCardAssignMemberUI(dataAddDate));
       dispatch(changeMemberAssign({ ...dataAddDate, memberId: e }));
       msg.success("Đã thay đổi!");
     } catch (error) {
