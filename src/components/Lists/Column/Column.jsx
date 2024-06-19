@@ -122,7 +122,10 @@ const Column = ({
       value: true,
       property: listProperty.DESTROY,
     };
-    dispatch(updateListInfo(updateData));
+    dispatch(updateListInfo(updateData))
+      .unwrap()
+      .then(() => message.success("Đã lưu trữ"))
+      .catch(() => message.success("Lưu trữ không thành công"));
   };
 
   //====================================================render content===============================================

@@ -443,16 +443,14 @@ const Analysis = ({ isOpen, setIsOpen }) => {
       ) : (
         <Flex vertical style={{ marginTop: 24 }}>
           <Descriptions title="" items={ItemPeople} layout="" />
-          {/* {isUserStatsLoading ? (
-            <Skeleton active paragraph={{ rows: 8 }} />
-          ) : ( */}
           <Table
             columns={columns2}
             dataSource={data2}
-            pagination={false}
+            pagination={{
+              pageSize: 5,
+            }}
             loading={isUserStatsLoading}
           />
-          {/* )} */}
         </Flex>
       )}
     </Modal>

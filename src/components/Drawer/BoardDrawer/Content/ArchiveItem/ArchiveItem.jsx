@@ -43,7 +43,10 @@ const ArchiveItem = ({ list }) => {
       value: false,
       property: listProperty.DESTROY,
     };
-    dispatch(updateListInfo(updateData));
+    dispatch(updateListInfo(updateData))
+      .unwrap()
+      .then(() => message.success("Đã khôi phục"))
+      .catch(() => message.success("Khôi phục không thành công"));
   };
   const content = (
     <Flex vertical gap={8}>
