@@ -48,3 +48,15 @@
   font-weight: 600;
   margin-bottom: 8px;
 }
+@media only screen and (max-width: 768px) {
+  .trello {
+    &_left {
+      display: none;
+      width: 25vw !important;
+    }
+    &_right {
+      display: none;
+      width: 25vw !important;
+    }
+  }
+}
