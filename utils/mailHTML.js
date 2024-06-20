@@ -18,6 +18,7 @@ const emailHTML = (currentURL, verificationToken) => {
           background-color: #fff;
         }
         .card {
+          
           background-color: #ffffff;
           padding: 20px;
           border-radius: 8px;
@@ -30,6 +31,7 @@ const emailHTML = (currentURL, verificationToken) => {
           text-decoration: none;
           padding: 10px 20px;
           border-radius: 8px;
+          align-self:end
 
         }
           img{

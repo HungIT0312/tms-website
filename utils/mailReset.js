@@ -18,6 +18,7 @@ const emailReset = (currentURL, verificationToken) => {
           background-color: #fff;
         }
         .card {
+
           background-color: #ffffff;
           padding: 20px;
           border-radius: 8px;
@@ -30,7 +31,7 @@ const emailReset = (currentURL, verificationToken) => {
           text-decoration: none;
           padding: 10px 20px;
           border-radius: 8px;
-
+          align-self:end
         }
           img{
           width:160px;

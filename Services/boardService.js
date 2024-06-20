@@ -65,8 +65,10 @@ const create = async (req, callback) => {
     // Lưu bảng mới
     newBoard.members = allMembers;
     await newBoard.save();
-
-    return callback(false, newBoard);
+    const returnBoard = await boardModel
+      .findById(newBoard._id)
+      .populate("members.user", "name surname email color _id");
+    return callback(false, returnBoard);
   } catch (error) {
     return callback({
       errMessage: "Có lỗi đã xảy ra!",
@@ -483,15 +485,6 @@ const deleteBoard = async (boardId, user, callback) => {
   try {
     const board = await boardModel.findById(boardId);
 
-    const mailOptions = {
-      from: process.env.SERVER_EMAIL,
-      to: user.email,
-      subject: "Thông báo về dự án",
-      text: `Dự án bạn đang tham gia đã đóng`,
-      html: mailDelete(
-        `Dự án <b>${board.title}</b> mà bạn đang tham gia đã được đóng lại bởi ${user.surname} ${user.name}, mọi thông tin liên hệ với chủ sở hữu để biết thêm thông tin.`
-      ),
-    };
     if (!board) {
       return callback({ message: "Không tìm thấy bảng" });
     }
@@ -508,21 +501,32 @@ const deleteBoard = async (boardId, user, callback) => {
 
     await listModel.deleteMany({ owner: boardId });
     await invitationModel.deleteMany({ board: boardId });
-    await boardModel.findByIdAndDelete(boardId).then(() => {
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          return callback({
-            errMessage: "Không gửi được email thông báo",
-            details: error,
-          });
-        } else {
-          return callback(false, {
-            message: "Người dùng đã nhận được thông báo.",
-          });
-        }
-      });
-    });
-
+    await boardModel.findByIdAndDelete(boardId);
+    for (const member of board.members) {
+      if (member.user.toString() !== user._id.toString()) {
+        const mailOptions = {
+          from: process.env.SERVER_EMAIL,
+          to: member.email,
+          subject: "Thông báo về dự án",
+          text: `Dự án bạn đang tham gia đã đóng`,
+          html: mailDelete(
+            `Dự án <b>${board.title}</b> mà bạn đang tham gia đã được đóng lại bởi ${user.surname} ${user.name}, mọi thông tin liên hệ với chủ sở hữu để biết thêm thông tin.`
+          ),
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            return callback({
+              errMessage: "Không gửi được email thông báo",
+              details: error,
+            });
+          } else {
+            return callback(false, {
+              message: "Người dùng đã nhận được thông báo.",
+            });
+          }
+        });
+      }
+    }
     return callback(false, { message: "Xóa bảng thành công!" });
   } catch (error) {
     return callback({
