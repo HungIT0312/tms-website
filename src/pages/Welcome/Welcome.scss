@@ -1,4 +1,5 @@
 @import "../../assets/scss/variable";
+
 .welcome {
   background: rgb(37, 56, 88);
   background: linear-gradient(
@@ -11,37 +12,13 @@
   );
   height: calc(100vh - 60px);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: #fff;
   position: relative;
   padding-top: 60px;
-  &__wrap {
-    display: flex;
-    flex-direction: column;
-    margin-right: 64px;
-    margin-left: 230px;
-  }
-  &__button {
-    align-self: flex-end;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 48px;
-  }
-  &__title {
-    font-size: 3rem;
-    font-weight: 500;
-    margin-bottom: 32px;
-  }
-  &__intro {
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 16px;
-  }
-  &__image {
-    margin-right: 136px;
-  }
+
   &__nav {
     position: fixed;
     top: 0;
@@ -51,6 +28,7 @@
     height: 60px;
     background-color: #fff;
     width: 100%;
+
     &--item {
       margin: 0 48px;
       display: flex;
@@ -60,7 +38,7 @@
     &--btn {
       cursor: pointer;
       padding: 8px 16px;
-      margin: 0px 8px;
+      margin: 0 8px;
     }
     &--login {
       color: $primary-color;
@@ -78,10 +56,104 @@
       }
     }
   }
-}
-.sitename {
-  color: #000;
-  font-weight: 800;
-  font-size: 24px;
-  margin-left: 8px;
+
+  &__wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 128px;
+  }
+
+  &__button {
+    display: flex;
+    align-self: flex-end;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+  }
+
+  &__title {
+    font-size: 3em;
+    font-weight: 500;
+    margin-bottom: 32px;
+  }
+
+  &__intro {
+    font-size: 1em;
+    font-weight: 400;
+    margin-bottom: 16px;
+  }
+
+  &__image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .sitename {
+    color: #000;
+    font-weight: 800;
+    font-size: 24px;
+    margin-left: 8px;
+  }
+
+  .welcome-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin: 128px;
+    // text-align: center;
+  }
+
+  @media only screen and (max-width: 1200px) {
+    .welcome {
+      font-size: 12px;
+      padding-top: 60px;
+    }
+
+    .welcome__wrap {
+      margin-right: 0;
+    }
+
+    .welcome-content {
+      flex-direction: column;
+      margin-top: 160px;
+      text-align: center;
+    }
+
+    .welcome__title {
+      font-size: 2em;
+      margin-bottom: 16px;
+    }
+
+    .welcome__intro {
+      font-size: 0.875em;
+      margin-bottom: 8px;
+    }
+
+    .welcome__image {
+      margin-top: 20px;
+    }
+  }
+
+  @media only screen and (max-width: 768px) {
+    .welcome {
+      font-size: 10px;
+    }
+
+    .welcome__title {
+      font-size: 1.5em;
+    }
+
+    .welcome__intro {
+      font-size: 0.75em;
+    }
+
+    .welcome-content {
+      margin: 30px;
+    }
+  }
 }

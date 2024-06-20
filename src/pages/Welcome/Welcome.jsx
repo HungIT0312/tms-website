@@ -1,4 +1,4 @@
-import { Button, Image } from "antd";
+import { Button, Flex, Image } from "antd";
 import "./Welcome.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import changeTitle from "../../helpers/changeTitle";
@@ -29,27 +29,30 @@ const Welcome = () => {
           </div>
         </div>
       </div>
-      <div className="welcome__wrap">
-        <div className="welcome__title">
-          TMS là công cụ để cộng tác, quản lý dự án và nâng cao năng suất.
+      <Flex className="welcome-content">
+        <div className="welcome__wrap">
+          <div className="welcome__title">
+            TMS là công cụ để cộng tác, quản lý dự án và nâng cao năng suất.
+          </div>
+          <div className="welcome__intro">
+            Với các tính năng linh hoạt và dễ sử dụng, TMS mang đến một trải
+            nghiệm làm việc liền mạch, giúp bạn theo dõi tiến độ, phân công
+            nhiệm vụ và đảm bảo mọi công việc đều hoàn thành đúng hạn. Hãy để
+            TMS trở thành trợ thủ đắc lực của bạn trên con đường chinh phục
+            thành công.
+          </div>
+          <Button
+            type="primary"
+            className="welcome__button"
+            onClick={() => navigate("/auth/register")}
+          >
+            Đăng ký ngay
+          </Button>
         </div>
-        <div className="welcome__intro">
-          Với các tính năng linh hoạt và dễ sử dụng, TMS mang đến một trải
-          nghiệm làm việc liền mạch, giúp bạn theo dõi tiến độ, phân công nhiệm
-          vụ và đảm bảo mọi công việc đều hoàn thành đúng hạn. Hãy để TMS trở
-          thành trợ thủ đắc lực của bạn trên con đường chinh phục thành công.
+        <div className="welcome__image">
+          <Image width={600} src={images.welcome} preview={false} />
         </div>
-        <Button
-          type="primary"
-          className="welcome__button"
-          onClick={() => navigate("/auth/register")}
-        >
-          Đăng ký ngay
-        </Button>
-      </div>
-      <div className="welcome__image">
-        <Image width={600} src={images.welcome} preview={false} />
-      </div>
+      </Flex>
     </div>
   );
 };
