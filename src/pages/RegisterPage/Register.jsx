@@ -37,12 +37,12 @@ const Register = () => {
       <Row gutter={12}>
         <Col xs={24} md={12} lg={12}>
           <Form.Item
-            name="name"
-            label="Tên"
+            name="surname"
+            label="Họ"
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập tên của bạn!",
+                message: "Vui lòng nhập họ của bạn!",
                 whitespace: true,
               },
               {
@@ -55,12 +55,12 @@ const Register = () => {
         </Col>
         <Col xs={24} md={12} lg={12}>
           <Form.Item
-            name="surname"
-            label="Họ"
+            name="name"
+            label="Tên"
             rules={[
               {
                 required: true,
-                message: "Vui lòng nhập họ của bạn!",
+                message: "Vui lòng nhập tên của bạn!",
                 whitespace: true,
               },
               {
