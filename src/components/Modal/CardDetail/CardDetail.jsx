@@ -30,6 +30,9 @@ import dayjs from "dayjs";
 import localeData from "dayjs/plugin/localeData";
 import utc from "dayjs/plugin/utc";
 import weekday from "dayjs/plugin/weekday";
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+dayjs.extend(utc);
 import _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { EditText } from "react-edit-text";
@@ -66,9 +69,7 @@ import Labels from "./Labels/Labels";
 import SubTask from "./SubTask/SubTask";
 import Attachment from "./UploadAttachment/Attachment";
 const { RangePicker } = DatePicker;
-dayjs.extend(weekday);
-dayjs.extend(localeData);
-dayjs.extend(utc);
+
 const { Option } = Select;
 const CardDetail = () => {
   const navigate = useNavigate();

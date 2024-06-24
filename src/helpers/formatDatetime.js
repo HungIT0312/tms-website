@@ -1,24 +1,24 @@
+import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+import utc from "dayjs/plugin/utc";
+import weekday from "dayjs/plugin/weekday";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+dayjs.extend(utc);
+dayjs.extend(relativeTime);
 const formatDateTime = (dateTimeStr) => {
-  const dateTime = new Date(dateTimeStr);
+  const dateTime = dayjs(dateTimeStr); // Parse the input date string as UTC
+  const now = dayjs(); // Get the current time in UTC
 
-  const day = String(dateTime.getDate()).padStart(2, "0");
-  const month = String(dateTime.getMonth() + 1).padStart(2, "0");
-  const year = dateTime.getFullYear();
+  const diffMinutes = now.diff(dateTime, "minute"); // Calculate the difference in minutes
 
-  const hours = String(dateTime.getHours()).padStart(2, "0");
-  const minutes = String(dateTime.getMinutes()).padStart(2, "0");
-
-  const now = new Date();
-
-  const diffMinutes = Math.floor((now - dateTime) / (1000 * 60));
-
-  // Xử lý logic
   if (diffMinutes < 1) {
     return "Bây giờ";
   } else if (diffMinutes >= 1 && diffMinutes < 10) {
     return `${diffMinutes} phút trước`;
   } else {
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
+    return dateTime.format("DD/MM/YYYY HH:mm");
   }
 };
 export default formatDateTime;
