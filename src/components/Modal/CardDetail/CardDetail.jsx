@@ -196,8 +196,15 @@ const CardDetail = () => {
         completed: selectedCard?.date?.completed,
       },
     };
+    const now = dayjs();
     dispatch(updateDateCardListUI(dataAddDate));
     dispatch(updateDueDate({ ...dataAddDate.date }));
+    dispatch(
+      updateCardDate({
+        resolvedAt: dataAddDate.date.resolvedAt,
+        updatedAt: now,
+      })
+    );
     dispatch(updateDates(dataAddDate))
       .unwrap()
       .then((rs) => msg.success(rs.message))
