@@ -5,11 +5,21 @@ import Dragger from "antd/es/upload/Dragger";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { removeAttachment } from "../../../../stores/card/cardSlice";
+import {
+  removeAttachment,
+  updateCardDate,
+} from "../../../../stores/card/cardSlice";
 import { deleteFile, uploadFile } from "../../../../stores/card/cardThunk";
 import getAudioUpload from "../../../../utils/UploadFile";
-
+import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+import utc from "dayjs/plugin/utc";
+import weekday from "dayjs/plugin/weekday";
+dayjs.extend(weekday);
+dayjs.extend(localeData);
+dayjs.extend(utc);
 const Attachment = () => {
+  const now = dayjs();
   const [initFiles, setInitFiles] = useState([]);
   const { selectedCard } = useSelector((state) => state.card);
   const { boardId } = useParams();
@@ -31,6 +41,12 @@ const Attachment = () => {
     console.log("Dropped files", e.dataTransfer.files);
   };
   const onChange = async (info) => {
+    dispatch(
+      updateCardDate({
+        resolvedAt: selectedCard.date.resolvedAt,
+        updatedAt: now,
+      })
+    );
     if (info.fileList?.length < initFiles?.length) {
       const data = {
         boardId: boardId,

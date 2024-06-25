@@ -68,10 +68,11 @@ import "./CardDetail.scss";
 import Labels from "./Labels/Labels";
 import SubTask from "./SubTask/SubTask";
 import Attachment from "./UploadAttachment/Attachment";
-const { RangePicker } = DatePicker;
 
+const { RangePicker } = DatePicker;
 const { Option } = Select;
 const CardDetail = () => {
+  const now = dayjs();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const rootLink = location.pathname?.split("/").slice(0, 4).join("/");
@@ -254,6 +255,13 @@ const CardDetail = () => {
         msg.success("Cập nhật thành công");
       } catch (error) {
         msg.error("Đã xảy ra lỗi, cập nhật không thành công");
+      } finally {
+        dispatch(
+          updateCardDate({
+            resolvedAt: selectedCard.date.resolvedAt,
+            updatedAt: now,
+          })
+        );
       }
     }
   };
@@ -273,6 +281,13 @@ const CardDetail = () => {
       msg.success("Đã cập nhật mô tả");
     } catch (error) {
       msg.success("Cập nhật không thành công!");
+    } finally {
+      dispatch(
+        updateCardDate({
+          resolvedAt: selectedCard.date.resolvedAt,
+          updatedAt: now,
+        })
+      );
     }
   };
   const handleDeleteThisTask = (checked) => {
@@ -327,6 +342,13 @@ const CardDetail = () => {
       msg.success("Đã thay đổi!");
     } catch (error) {
       msg.success("Thay đổi không thành công!");
+    } finally {
+      dispatch(
+        updateCardDate({
+          resolvedAt: selectedCard.date.resolvedAt,
+          updatedAt: now,
+        })
+      );
     }
   };
 
