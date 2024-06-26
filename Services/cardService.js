@@ -39,8 +39,8 @@ const create = async (
         errMessage: "Bạn không có quyền thêm thẻ vào danh sách hoặc bảng này",
       });
     }
-
-    const card = new cardModel({ title: title });
+    const now = dayjs();
+    const card = new cardModel({ title: title, createdAt: now });
     card.owner = listId;
     card.date.resolvedAt = null;
     if (parentCardId) {
